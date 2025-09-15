@@ -16,6 +16,9 @@ xcuserdata/
 timeline.xctimeline
 playground.xcworkspace
 
+## Xcode Derived Data (lokale Builds, groß & unnötig im Repo)
+DerivedData/
+
 # -----------------------------
 # Swift Package Manager
 # -----------------------------
