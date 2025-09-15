@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  ReadRhythm
 //
-//  Created by Vu Minh Khoi Ha on 12.09.25.
+//  Created by Vu Minh Khoi Ha on 15.09.25.
 //
 
 import SwiftUI
@@ -55,4 +55,7 @@ struct ContentView: View {
     }
 }
 
-
+#Preview {
+    ContentView()
+        .modelContainer(for: Item.self, inMemory: true)
+}

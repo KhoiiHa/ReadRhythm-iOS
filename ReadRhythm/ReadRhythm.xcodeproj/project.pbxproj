@@ -7,40 +7,40 @@
 	objects = {
 
 /* Begin PBXContainerItemProxy section */
-		A6F29D812E74467C00ED1A23 /* PBXContainerItemProxy */ = {
+		A65A224A2E781DF20050403A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A6F29D692E74467A00ED1A23 /* Project object */;
+			containerPortal = A65A22322E781DF00050403A /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A6F29D702E74467A00ED1A23;
+			remoteGlobalIDString = A65A22392E781DF00050403A;
 			remoteInfo = ReadRhythm;
 		};
-		A6F29D8B2E74467C00ED1A23 /* PBXContainerItemProxy */ = {
+		A65A22542E781DF20050403A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A6F29D692E74467A00ED1A23 /* Project object */;
+			containerPortal = A65A22322E781DF00050403A /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A6F29D702E74467A00ED1A23;
+			remoteGlobalIDString = A65A22392E781DF00050403A;
 			remoteInfo = ReadRhythm;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		A6F29D712E74467A00ED1A23 /* ReadRhythm.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReadRhythm.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A6F29D802E74467C00ED1A23 /* ReadRhythmTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReadRhythmTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A6F29D8A2E74467C00ED1A23 /* ReadRhythmUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReadRhythmUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A65A223A2E781DF00050403A /* ReadRhythm.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReadRhythm.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A65A22492E781DF20050403A /* ReadRhythmTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReadRhythmTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A65A22532E781DF20050403A /* ReadRhythmUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReadRhythmUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A6F29D732E74467A00ED1A23 /* ReadRhythm */ = {
+		A65A223C2E781DF00050403A /* ReadRhythm */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ReadRhythm;
 			sourceTree = "<group>";
 		};
-		A6F29D832E74467C00ED1A23 /* ReadRhythmTests */ = {
+		A65A224C2E781DF20050403A /* ReadRhythmTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ReadRhythmTests;
 			sourceTree = "<group>";
 		};
-		A6F29D8D2E74467C00ED1A23 /* ReadRhythmUITests */ = {
+		A65A22562E781DF20050403A /* ReadRhythmUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ReadRhythmUITests;
 			sourceTree = "<group>";
@@ -48,21 +48,21 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A6F29D6E2E74467A00ED1A23 /* Frameworks */ = {
+		A65A22372E781DF00050403A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A6F29D7D2E74467C00ED1A23 /* Frameworks */ = {
+		A65A22462E781DF20050403A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A6F29D872E74467C00ED1A23 /* Frameworks */ = {
+		A65A22502E781DF20050403A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -72,22 +72,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A6F29D682E74467900ED1A23 = {
+		A65A22312E781DF00050403A = {
 			isa = PBXGroup;
 			children = (
-				A6F29D732E74467A00ED1A23 /* ReadRhythm */,
-				A6F29D832E74467C00ED1A23 /* ReadRhythmTests */,
-				A6F29D8D2E74467C00ED1A23 /* ReadRhythmUITests */,
-				A6F29D722E74467A00ED1A23 /* Products */,
+				A65A223C2E781DF00050403A /* ReadRhythm */,
+				A65A224C2E781DF20050403A /* ReadRhythmTests */,
+				A65A22562E781DF20050403A /* ReadRhythmUITests */,
+				A65A223B2E781DF00050403A /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		A6F29D722E74467A00ED1A23 /* Products */ = {
+		A65A223B2E781DF00050403A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A6F29D712E74467A00ED1A23 /* ReadRhythm.app */,
-				A6F29D802E74467C00ED1A23 /* ReadRhythmTests.xctest */,
-				A6F29D8A2E74467C00ED1A23 /* ReadRhythmUITests.xctest */,
+				A65A223A2E781DF00050403A /* ReadRhythm.app */,
+				A65A22492E781DF20050403A /* ReadRhythmTests.xctest */,
+				A65A22532E781DF20050403A /* ReadRhythmUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,134 +95,134 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A6F29D702E74467A00ED1A23 /* ReadRhythm */ = {
+		A65A22392E781DF00050403A /* ReadRhythm */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A6F29D942E74467C00ED1A23 /* Build configuration list for PBXNativeTarget "ReadRhythm" */;
+			buildConfigurationList = A65A225D2E781DF20050403A /* Build configuration list for PBXNativeTarget "ReadRhythm" */;
 			buildPhases = (
-				A6F29D6D2E74467A00ED1A23 /* Sources */,
-				A6F29D6E2E74467A00ED1A23 /* Frameworks */,
-				A6F29D6F2E74467A00ED1A23 /* Resources */,
+				A65A22362E781DF00050403A /* Sources */,
+				A65A22372E781DF00050403A /* Frameworks */,
+				A65A22382E781DF00050403A /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A6F29D732E74467A00ED1A23 /* ReadRhythm */,
+				A65A223C2E781DF00050403A /* ReadRhythm */,
 			);
 			name = ReadRhythm;
 			packageProductDependencies = (
 			);
 			productName = ReadRhythm;
-			productReference = A6F29D712E74467A00ED1A23 /* ReadRhythm.app */;
+			productReference = A65A223A2E781DF00050403A /* ReadRhythm.app */;
 			productType = "com.apple.product-type.application";
 		};
-		A6F29D7F2E74467C00ED1A23 /* ReadRhythmTests */ = {
+		A65A22482E781DF20050403A /* ReadRhythmTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A6F29D972E74467C00ED1A23 /* Build configuration list for PBXNativeTarget "ReadRhythmTests" */;
+			buildConfigurationList = A65A22602E781DF20050403A /* Build configuration list for PBXNativeTarget "ReadRhythmTests" */;
 			buildPhases = (
-				A6F29D7C2E74467C00ED1A23 /* Sources */,
-				A6F29D7D2E74467C00ED1A23 /* Frameworks */,
-				A6F29D7E2E74467C00ED1A23 /* Resources */,
+				A65A22452E781DF20050403A /* Sources */,
+				A65A22462E781DF20050403A /* Frameworks */,
+				A65A22472E781DF20050403A /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				A6F29D822E74467C00ED1A23 /* PBXTargetDependency */,
+				A65A224B2E781DF20050403A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				A6F29D832E74467C00ED1A23 /* ReadRhythmTests */,
+				A65A224C2E781DF20050403A /* ReadRhythmTests */,
 			);
 			name = ReadRhythmTests;
 			packageProductDependencies = (
 			);
 			productName = ReadRhythmTests;
-			productReference = A6F29D802E74467C00ED1A23 /* ReadRhythmTests.xctest */;
+			productReference = A65A22492E781DF20050403A /* ReadRhythmTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		A6F29D892E74467C00ED1A23 /* ReadRhythmUITests */ = {
+		A65A22522E781DF20050403A /* ReadRhythmUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A6F29D9A2E74467C00ED1A23 /* Build configuration list for PBXNativeTarget "ReadRhythmUITests" */;
+			buildConfigurationList = A65A22632E781DF20050403A /* Build configuration list for PBXNativeTarget "ReadRhythmUITests" */;
 			buildPhases = (
-				A6F29D862E74467C00ED1A23 /* Sources */,
-				A6F29D872E74467C00ED1A23 /* Frameworks */,
-				A6F29D882E74467C00ED1A23 /* Resources */,
+				A65A224F2E781DF20050403A /* Sources */,
+				A65A22502E781DF20050403A /* Frameworks */,
+				A65A22512E781DF20050403A /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				A6F29D8C2E74467C00ED1A23 /* PBXTargetDependency */,
+				A65A22552E781DF20050403A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				A6F29D8D2E74467C00ED1A23 /* ReadRhythmUITests */,
+				A65A22562E781DF20050403A /* ReadRhythmUITests */,
 			);
 			name = ReadRhythmUITests;
 			packageProductDependencies = (
 			);
 			productName = ReadRhythmUITests;
-			productReference = A6F29D8A2E74467C00ED1A23 /* ReadRhythmUITests.xctest */;
+			productReference = A65A22532E781DF20050403A /* ReadRhythmUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		A6F29D692E74467A00ED1A23 /* Project object */ = {
+		A65A22322E781DF00050403A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
-					A6F29D702E74467A00ED1A23 = {
+					A65A22392E781DF00050403A = {
 						CreatedOnToolsVersion = 16.4;
 					};
-					A6F29D7F2E74467C00ED1A23 = {
+					A65A22482E781DF20050403A = {
 						CreatedOnToolsVersion = 16.4;
-						TestTargetID = A6F29D702E74467A00ED1A23;
+						TestTargetID = A65A22392E781DF00050403A;
 					};
-					A6F29D892E74467C00ED1A23 = {
+					A65A22522E781DF20050403A = {
 						CreatedOnToolsVersion = 16.4;
-						TestTargetID = A6F29D702E74467A00ED1A23;
+						TestTargetID = A65A22392E781DF00050403A;
 					};
 				};
 			};
-			buildConfigurationList = A6F29D6C2E74467A00ED1A23 /* Build configuration list for PBXProject "ReadRhythm" */;
+			buildConfigurationList = A65A22352E781DF00050403A /* Build configuration list for PBXProject "ReadRhythm" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = A6F29D682E74467900ED1A23;
+			mainGroup = A65A22312E781DF00050403A;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = A6F29D722E74467A00ED1A23 /* Products */;
+			productRefGroup = A65A223B2E781DF00050403A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A6F29D702E74467A00ED1A23 /* ReadRhythm */,
-				A6F29D7F2E74467C00ED1A23 /* ReadRhythmTests */,
-				A6F29D892E74467C00ED1A23 /* ReadRhythmUITests */,
+				A65A22392E781DF00050403A /* ReadRhythm */,
+				A65A22482E781DF20050403A /* ReadRhythmTests */,
+				A65A22522E781DF20050403A /* ReadRhythmUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A6F29D6F2E74467A00ED1A23 /* Resources */ = {
+		A65A22382E781DF00050403A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A6F29D7E2E74467C00ED1A23 /* Resources */ = {
+		A65A22472E781DF20050403A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A6F29D882E74467C00ED1A23 /* Resources */ = {
+		A65A22512E781DF20050403A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -232,21 +232,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A6F29D6D2E74467A00ED1A23 /* Sources */ = {
+		A65A22362E781DF00050403A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A6F29D7C2E74467C00ED1A23 /* Sources */ = {
+		A65A22452E781DF20050403A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A6F29D862E74467C00ED1A23 /* Sources */ = {
+		A65A224F2E781DF20050403A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -256,20 +256,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A6F29D822E74467C00ED1A23 /* PBXTargetDependency */ = {
+		A65A224B2E781DF20050403A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A6F29D702E74467A00ED1A23 /* ReadRhythm */;
-			targetProxy = A6F29D812E74467C00ED1A23 /* PBXContainerItemProxy */;
+			target = A65A22392E781DF00050403A /* ReadRhythm */;
+			targetProxy = A65A224A2E781DF20050403A /* PBXContainerItemProxy */;
 		};
-		A6F29D8C2E74467C00ED1A23 /* PBXTargetDependency */ = {
+		A65A22552E781DF20050403A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A6F29D702E74467A00ED1A23 /* ReadRhythm */;
-			targetProxy = A6F29D8B2E74467C00ED1A23 /* PBXContainerItemProxy */;
+			target = A65A22392E781DF00050403A /* ReadRhythm */;
+			targetProxy = A65A22542E781DF20050403A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		A6F29D922E74467C00ED1A23 /* Debug */ = {
+		A65A225B2E781DF20050403A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -333,7 +333,7 @@
 			};
 			name = Debug;
 		};
-		A6F29D932E74467C00ED1A23 /* Release */ = {
+		A65A225C2E781DF20050403A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -390,7 +390,7 @@
 			};
 			name = Release;
 		};
-		A6F29D952E74467C00ED1A23 /* Debug */ = {
+		A65A225E2E781DF20050403A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -418,7 +418,7 @@
 			};
 			name = Debug;
 		};
-		A6F29D962E74467C00ED1A23 /* Release */ = {
+		A65A225F2E781DF20050403A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -446,7 +446,7 @@
 			};
 			name = Release;
 		};
-		A6F29D982E74467C00ED1A23 /* Debug */ = {
+		A65A22612E781DF20050403A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -465,7 +465,7 @@
 			};
 			name = Debug;
 		};
-		A6F29D992E74467C00ED1A23 /* Release */ = {
+		A65A22622E781DF20050403A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -484,7 +484,7 @@
 			};
 			name = Release;
 		};
-		A6F29D9B2E74467C00ED1A23 /* Debug */ = {
+		A65A22642E781DF20050403A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -501,7 +501,7 @@
 			};
 			name = Debug;
 		};
-		A6F29D9C2E74467C00ED1A23 /* Release */ = {
+		A65A22652E781DF20050403A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -521,43 +521,43 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A6F29D6C2E74467A00ED1A23 /* Build configuration list for PBXProject "ReadRhythm" */ = {
+		A65A22352E781DF00050403A /* Build configuration list for PBXProject "ReadRhythm" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A6F29D922E74467C00ED1A23 /* Debug */,
-				A6F29D932E74467C00ED1A23 /* Release */,
+				A65A225B2E781DF20050403A /* Debug */,
+				A65A225C2E781DF20050403A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A6F29D942E74467C00ED1A23 /* Build configuration list for PBXNativeTarget "ReadRhythm" */ = {
+		A65A225D2E781DF20050403A /* Build configuration list for PBXNativeTarget "ReadRhythm" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A6F29D952E74467C00ED1A23 /* Debug */,
-				A6F29D962E74467C00ED1A23 /* Release */,
+				A65A225E2E781DF20050403A /* Debug */,
+				A65A225F2E781DF20050403A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A6F29D972E74467C00ED1A23 /* Build configuration list for PBXNativeTarget "ReadRhythmTests" */ = {
+		A65A22602E781DF20050403A /* Build configuration list for PBXNativeTarget "ReadRhythmTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A6F29D982E74467C00ED1A23 /* Debug */,
-				A6F29D992E74467C00ED1A23 /* Release */,
+				A65A22612E781DF20050403A /* Debug */,
+				A65A22622E781DF20050403A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A6F29D9A2E74467C00ED1A23 /* Build configuration list for PBXNativeTarget "ReadRhythmUITests" */ = {
+		A65A22632E781DF20050403A /* Build configuration list for PBXNativeTarget "ReadRhythmUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A6F29D9B2E74467C00ED1A23 /* Debug */,
-				A6F29D9C2E74467C00ED1A23 /* Release */,
+				A65A22642E781DF20050403A /* Debug */,
+				A65A22652E781DF20050403A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = A6F29D692E74467A00ED1A23 /* Project object */;
+	rootObject = A65A22322E781DF00050403A /* Project object */;
 }
