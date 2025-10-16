@@ -5,15 +5,10 @@ import SwiftData
 struct ReadRhythmApp: App {
     var body: some Scene {
         WindowGroup {
-            RootPlaceholderView()
+            MainTabView()
         }
         .modelContainer(for: [BookEntity.self, ReadingSessionEntity.self])
     }
 }
 
-private struct RootPlaceholderView: View {
-    var body: some View {
-        Text("ReadRhythm startet 🎧📚")
-            .padding()
-    }
-}
+
