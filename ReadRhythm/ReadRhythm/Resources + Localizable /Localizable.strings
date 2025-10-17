@@ -1,0 +1,28 @@
+//
+//  Localizable.strings
+//  ReadRhythm
+//
+//  Created by Vu Minh Khoi Ha on 17.10.25.
+//
+
+"library.title" = "Library";
+"library.add.title" = "Add Book";
+"library.add.title.placeholder" = "Title";
+"library.add.author.placeholder" = "Author (optional)";
+"library.error.title" = "Something went wrong";
+"library.add.error" = "Could not add the book.";
+"library.delete.error" = "Could not delete the book.";
+
+"bookdetail.title" = "Book";
+"bookdetail.addsession" = "Add Session";
+
+"session.add.title" = "New Session";
+"session.add.date" = "Date & Time";
+"session.add.minutes.placeholder" = "Minutes";
+"session.add.validation.minutes" = "Please enter a positive number of minutes.";
+"session.add.error" = "Could not add the reading session.";
+"session.error.title" = "Something went wrong";
+
+"common.save" = "Save";
+"common.cancel" = "Cancel";
+"common.ok" = "OK";

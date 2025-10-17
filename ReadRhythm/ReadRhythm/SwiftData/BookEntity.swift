@@ -15,6 +15,10 @@ final class BookEntity {
     var author: String
     var createdAt: Date
 
+    // Relationship zu ReadingSessionEntity
+    @Relationship(deleteRule: .cascade, inverse: \ReadingSessionEntity.book)
+    var sessions: [ReadingSessionEntity] = []
+
     init(id: UUID = UUID(),
          title: String,
          author: String,

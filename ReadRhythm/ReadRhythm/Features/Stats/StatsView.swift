@@ -19,10 +19,21 @@ struct StatsView: View {
                 .accessibilityIdentifier("stats.totalReadingTime")
 #if DEBUG
             Button("+5 min Session (DEBUG)") {
-                let start = Date().addingTimeInterval(-5 * 60)
-                let session = ReadingSessionEntity(startedAt: start, endedAt: Date(), durationSeconds: 5 * 60)
+                // Finde vorhandenes Buch oder erzeuge ein Debug-Buch
+                let bookFetch = FetchDescriptor<BookEntity>()
+                let existingBook = (try? context.fetch(bookFetch))?.first
+                let book = existingBook ?? {
+                    let b = BookEntity(title: "Debug Book", author: "")
+                    context.insert(b)
+                    return b
+                }()
+
+                // Neue Session im neuen Schema: date + minutes + book
+                let session = ReadingSessionEntity(date: Date(), minutes: 5, book: book)
                 context.insert(session)
                 try? context.save()
+
+                // Aktualisiere Anzeige
                 totalSeconds = StatsService.shared.totalReadingTime(context: context)
             }
             .buttonStyle(.borderedProminent)

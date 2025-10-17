@@ -19,9 +19,9 @@ final class StatsService {
             let descriptor = FetchDescriptor<ReadingSessionEntity>()
             let sessions = try context.fetch(descriptor)
             
-            // Nutzt jetzt die Property aus Entity
-            return sessions.reduce(0) { sum, session in
-                sum + session.calculatedDuration
+            // Summe der Lesezeit in **Sekunden** (TimeInterval = Double)
+            return sessions.reduce(0.0) { sum, session in
+                sum + TimeInterval(session.minutes * 60)
             }
         } catch {
             #if DEBUG

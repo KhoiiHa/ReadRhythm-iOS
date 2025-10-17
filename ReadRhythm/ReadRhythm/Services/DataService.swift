@@ -57,11 +57,13 @@ extension DataService {
 
         // Beispiel-Session (30 Minuten)
         let session = ReadingSessionEntity(
-            startedAt: Date().addingTimeInterval(-30 * 60),
-            endedAt: Date(),
-            durationSeconds: 30 * 60
+            date: Date(),
+            minutes: 30,
+            book: book
         )
         context.insert(session)
+        // Optional: Relationship am Buch pflegen (falls genutzt)
+        // book.sessions.append(session)
 
         do { try context.save() } catch {
             #if DEBUG
