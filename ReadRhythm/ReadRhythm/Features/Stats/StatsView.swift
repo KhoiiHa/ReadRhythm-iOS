@@ -16,6 +16,7 @@ struct StatsView: View {
             // Titel
             Text("rr.stats.title")
                 .font(.title2).bold()
+                .foregroundStyle(AppColors.Semantic.textPrimary)
 
             // Zeitraum (Segmented Picker): 7 / 14 / 30 Tage
             Picker("", selection: $viewModel.days) {
@@ -58,6 +59,7 @@ struct StatsView: View {
                         x: .value(String(localized: "rr.stats.day"), item.date, unit: .day),
                         y: .value(String(localized: "rr.stats.minutes"), item.minutes)
                     )
+                    .foregroundStyle(AppColors.Semantic.chartBar)
                     .annotation(position: .top, alignment: .center) {
                         if item.minutes > 0 {
                             Text("\(item.minutes)")
@@ -68,7 +70,7 @@ struct StatsView: View {
                 }
                 .chartXAxis {
                     AxisMarks(values: .stride(by: .day)) {
-                        AxisGridLine()
+                        AxisGridLine().foregroundStyle(AppColors.Semantic.chartAxis)
                         AxisValueLabel(format: .dateTime.weekday(.abbreviated))
                     }
                 }
@@ -129,7 +131,7 @@ struct StatsView: View {
                 // Daten neu laden
                 viewModel.reload(context: modelContext)
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(SecondaryButtonStyle())
             .accessibilityIdentifier("rr-stats-debug-add10")
             #endif
         }
@@ -138,5 +140,7 @@ struct StatsView: View {
             viewModel.reload(context: modelContext)
         }
         .accessibilityIdentifier("stats.view")
+        .background(AppColors.Semantic.bgPrimary)
+        .tint(AppColors.Semantic.tintPrimary)
     }
 }

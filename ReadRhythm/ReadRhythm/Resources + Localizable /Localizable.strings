@@ -42,3 +42,10 @@
 "rr.tab.discover" = "Discover";
 "rr.tab.stats" = "Stats";
 "rr.tab.settings" = "Settings";
+
+
+"settings.appearance.section" = "Appearance";
+"settings.theme.title" = "Theme";
+"settings.theme.system" = "System";
+"settings.theme.light" = "Light";
+"settings.theme.dark" = "Dark";

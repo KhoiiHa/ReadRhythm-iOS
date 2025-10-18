@@ -38,6 +38,7 @@ struct BookDetailView: View {
                 } label: {
                     Label("bookdetail.addsession", systemImage: "plus.circle.fill")
                 }
+                .buttonStyle(PrimaryButtonStyle())
                 .accessibilityIdentifier("bookdetail.addsession.button")
             }
             
@@ -82,13 +83,17 @@ struct BookDetailView: View {
                             Label("bookdetail.addsession", systemImage: "plus.circle.fill")
                                 .font(.footnote)
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(PrimaryButtonStyle())
                         .accessibilityIdentifier("bookdetail.addsession.cta")
                     }
                     .frame(maxWidth: .infinity)
                 }
             }
         }
+        .listSectionSpacing(AppSpace._12)
+        .scrollContentBackground(.hidden)
+        .background(AppColors.Semantic.bgPrimary)
+        .tint(AppColors.Semantic.tintPrimary)
         .navigationTitle(Text("bookdetail.title"))
         .accessibilityIdentifier("bookdetail.view")
         .sheet(

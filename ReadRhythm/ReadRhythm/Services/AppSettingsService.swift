@@ -7,25 +7,44 @@
 //
 
 import Foundation
+import SwiftUI
+import Combine
 
-final class AppSettingsService {
+@MainActor
+final class AppSettingsService: ObservableObject {
     static let shared = AppSettingsService()
+
     private let defaults = UserDefaults.standard
+    private let themeKey = "settings.theme.mode"
+    private let languageKey = "preferredLanguage"
 
-    private enum Keys {
-        static let preferredLanguage = "preferredLanguage"
-        static let darkModeEnabled = "darkModeEnabled"
+    // MARK: - Published Settings
+    @Published var themeMode: AppThemeMode {
+        didSet {
+            defaults.set(themeMode.rawValue, forKey: themeKey)
+            #if DEBUG
+            print("[AppSettings] Theme updated → \(themeMode.rawValue)")
+            #endif
+        }
     }
 
-    private init() {}
-
-    var preferredLanguage: String {
-        get { defaults.string(forKey: Keys.preferredLanguage) ?? "de" }
-        set { defaults.set(newValue, forKey: Keys.preferredLanguage) }
+    @Published var preferredLanguage: String {
+        didSet {
+            defaults.set(preferredLanguage, forKey: languageKey)
+        }
     }
 
-    var darkModeEnabled: Bool {
-        get { defaults.bool(forKey: Keys.darkModeEnabled) }
-        set { defaults.set(newValue, forKey: Keys.darkModeEnabled) }
+    // MARK: - Init
+    private init() {
+        // Theme
+        if let raw = defaults.string(forKey: themeKey),
+           let mode = AppThemeMode(rawValue: raw) {
+            self.themeMode = mode
+        } else {
+            self.themeMode = .system
+        }
+
+        // Sprache
+        self.preferredLanguage = defaults.string(forKey: languageKey) ?? "de"
     }
 }
