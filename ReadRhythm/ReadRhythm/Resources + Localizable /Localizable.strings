@@ -26,3 +26,19 @@
 "common.save" = "Save";
 "common.cancel" = "Cancel";
 "common.ok" = "OK";
+
+"rr.stats.title" = "Reading Stats";
+"rr.stats.minutes" = "Minutes";
+"rr.stats.minutes.total" = "min total";
+"rr.stats.day" = "Day";
+"rr.stats.debug.add10" = "+10 min (DEBUG)";
+"rr.stats.streak.days" = "day streak";
+
+"bookdetail.sessions" = "Sessions";
+"bookdetail.sessions.empty" = "No sessions yet";
+"session.error.delete" = "Could not delete the session.";
+
+"rr.tab.library" = "Library";
+"rr.tab.discover" = "Discover";
+"rr.tab.stats" = "Stats";
+"rr.tab.settings" = "Settings";

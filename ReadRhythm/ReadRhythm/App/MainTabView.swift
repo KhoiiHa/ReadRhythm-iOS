@@ -13,21 +13,29 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
-            LibraryView()
-                .tabItem { Label("Library", systemImage: "books.vertical") } // TODO: i18n key
-                .accessibilityIdentifier("tab.library")
+            NavigationStack {
+                LibraryView()
+            }
+            .tabItem { Label("Library", systemImage: "books.vertical") } // TODO: i18n key
+            .accessibilityIdentifier("tab.library")
 
-            DiscoverView()
-                .tabItem { Label("Discover", systemImage: "sparkles") } // TODO: i18n key
-                .accessibilityIdentifier("tab.discover")
+            NavigationStack {
+                DiscoverView()
+            }
+            .tabItem { Label("Discover", systemImage: "sparkles") } // TODO: i18n key
+            .accessibilityIdentifier("tab.discover")
 
-            StatsView()
-                .tabItem { Label("Stats", systemImage: "chart.bar") } // TODO: i18n key
-                .accessibilityIdentifier("tab.stats")
+            NavigationStack {
+                StatsView()
+            }
+            .tabItem { Label("Stats", systemImage: "chart.bar") } // TODO: i18n key
+            .accessibilityIdentifier("tab.stats")
 
-            SettingsView()
-                .tabItem { Label("Settings", systemImage: "gearshape") } // TODO: i18n key
-                .accessibilityIdentifier("tab.settings")
+            NavigationStack {
+                SettingsView()
+            }
+            .tabItem { Label("Settings", systemImage: "gearshape") } // TODO: i18n key
+            .accessibilityIdentifier("tab.settings")
         }
         .accessibilityIdentifier("main.tabview")
         .task {

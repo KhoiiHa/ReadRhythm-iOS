@@ -15,4 +15,5 @@ import Foundation
 protocol SessionRepository {
     @discardableResult
     func addSession(for book: BookEntity, minutes: Int, date: Date) throws -> ReadingSessionEntity
+    func deleteSession(_ session: ReadingSessionEntity) throws
 }

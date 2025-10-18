@@ -5,7 +5,6 @@
 //  Created by Vu Minh Khoi Ha on 17.10.25.
 //
 
-
 //
 //  BookDetailViewModel.swift
 //  ReadRhythm
@@ -59,6 +58,26 @@ final class BookDetailViewModel: ObservableObject {
             print("[BookDetailVM] Add session failed: \(error.localizedDescription)")
             #endif
             errorMessageKey = "session.add.error"
+        }
+    }
+
+    /// Löscht eine vorhandene Session und propagiert Fehler nach oben.
+    /// Kontext → Warum → Wie:
+    /// - Kontext: UI (BookDetailView) nutzt diese Methode für Swipe-to-Delete.
+    /// - Warum: Die Persistenz-Logik bleibt im Repository; das VM orchestriert nur.
+    /// - Wie: Delegation an `SessionRepository.deleteSession(_:)`, Fehler werden nach oben gereicht.
+    func deleteSession(_ session: ReadingSessionEntity) throws {
+        guard let repo = sessionRepo else { return }
+        do {
+            try repo.deleteSession(session)
+            #if DEBUG
+            print("[BookDetailVM] -Session @\(session.date) (\(session.minutes)m)")
+            #endif
+        } catch {
+            #if DEBUG
+            print("[BookDetailVM] Delete failed: \(error.localizedDescription)")
+            #endif
+            throw error
         }
     }
 }

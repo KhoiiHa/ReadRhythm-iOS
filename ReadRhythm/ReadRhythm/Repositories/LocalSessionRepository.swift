@@ -38,4 +38,24 @@ final class LocalSessionRepository: SessionRepository {
             throw error
         }
     }
+
+    /// Löscht eine ReadingSessionEntity aus SwiftData.
+    /// Kontext → Warum → Wie:
+    /// - Kontext: Diese Methode ergänzt die Repository-Schnittstelle um die Delete-Logik.
+    /// - Warum: Sessions sollen über die UI (z. B. Swipe-to-Delete) entfernt werden können.
+    /// - Wie: Die Session wird aus dem ModelContext gelöscht und gespeichert.
+    func deleteSession(_ session: ReadingSessionEntity) throws {
+        context.delete(session)
+        do {
+            try context.save()
+            #if DEBUG
+            print("[LocalSessionRepository] Deleted session \(session.id)")
+            #endif
+        } catch {
+            #if DEBUG
+            print("[LocalSessionRepository] Delete failed: \(error.localizedDescription)")
+            #endif
+            throw error
+        }
+    }
 }

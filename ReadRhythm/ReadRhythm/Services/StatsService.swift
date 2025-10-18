@@ -31,6 +31,72 @@ final class StatsService {
         }
     }
 
+    /// Aggregiert die Leseminuten pro Tag für die letzten `days` (Standard: 7 Tage)
+    /// - Returns: Array aus (Datum, Minuten)
+    func minutesPerDay(context: ModelContext, days: Int = 7) -> [(date: Date, minutes: Int)] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        guard let fromDate = calendar.date(byAdding: .day, value: -(days - 1), to: today) else { return [] }
+
+        // Filter: Nur Sessions innerhalb der letzten N Tage
+        let predicate = #Predicate<ReadingSessionEntity> { $0.date >= fromDate }
+        let descriptor = FetchDescriptor<ReadingSessionEntity>(predicate: predicate)
+
+        do {
+            let sessions = try context.fetch(descriptor)
+            var bucket: [Date: Int] = [:]
+
+            for session in sessions {
+                let day = calendar.startOfDay(for: session.date)
+                bucket[day, default: 0] += session.minutes
+            }
+
+            // Lücken füllen, sortieren
+            return (0..<days).compactMap { offset in
+                guard let day = calendar.date(byAdding: .day, value: -((days - 1) - offset), to: today) else { return nil }
+                return (day, bucket[day, default: 0])
+            }
+        } catch {
+            #if DEBUG
+            print("⚠️ Fehler beim Berechnen der Minuten pro Tag: \(error)")
+            #endif
+            return []
+        }
+    }
+
+    /// Ermittelt die aktuelle Lese-"Streak" (aufeinanderfolgende Tage mit >0 Minuten) bis heute.
+    /// - Parameters:
+    ///   - context: SwiftData-ModelContext
+    ///   - daysLimit: Sicherheitslimit, wie weit rückwärts gezählt wird (Default 365)
+    /// - Returns: Anzahl der Tage in Folge (heute eingeschlossen, wenn heute >0 Minuten)
+    func currentStreak(context: ModelContext, daysLimit: Int = 365) -> Int {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        guard let from = cal.date(byAdding: .day, value: -(daysLimit - 1), to: today) else { return 0 }
+
+        // Sessions im betrachteten Zeitraum laden
+        let predicate = #Predicate<ReadingSessionEntity> { $0.date >= from }
+        let fd = FetchDescriptor<ReadingSessionEntity>(predicate: predicate)
+        let sessions = (try? context.fetch(fd)) ?? []
+
+        // Tage, an denen gelesen wurde (Minuten > 0)
+        var readDays: Set<Date> = []
+        for s in sessions where s.minutes > 0 {
+            readDays.insert(cal.startOfDay(for: s.date))
+        }
+
+        // Ab heute rückwärts zählen, bis ein Tag ohne Eintrag kommt
+        var streak = 0
+        var cursor = today
+        while readDays.contains(cursor) {
+            streak += 1
+            if streak >= daysLimit { break }
+            guard let prev = cal.date(byAdding: .day, value: -1, to: cursor) else { break }
+            cursor = prev
+        }
+        return streak
+    }
+
     // Anzahl gespeicherter Bücher
     func totalBooksRead(context: ModelContext) -> Int {
         do {
