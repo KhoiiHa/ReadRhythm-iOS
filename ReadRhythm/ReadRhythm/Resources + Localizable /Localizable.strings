@@ -12,21 +12,38 @@
 "library.error.title" = "Something went wrong";
 "library.add.error" = "Could not add the book.";
 "library.delete.error" = "Could not delete the book.";
+"library.add.section.info" = "Book information";
+"library.add.hint" = "You can add the author later. Only the title is required.";
 
-"bookdetail.title" = "Book";
-"bookdetail.addsession" = "Add Session";
+// Book Detail
+"book.detail.title" = "Book";
+"book.detail.sessions" = "Sessions";
+"book.detail.minutes" = "Total Minutes";
+"book.detail.sessions.header" = "Reading sessions";
+"book.detail.sessions.empty" = "No sessions yet. Add your first one.";
 
-"session.add.title" = "New Session";
-"session.add.date" = "Date & Time";
-"session.add.minutes.placeholder" = "Minutes";
+// Add Session
+"session.add.cta" = "Add Session";
+"session.add.title" = "Add session";
+"session.add.section.info" = "Session details";
+"session.add.date" = "Date & time";
+"session.add.minutes" = "Minutes";
+"session.add.minutes.placeholder" = "e.g. 25";
+"session.add.hint" = "A focused sprint of 15–30 minutes often works best.";
 "session.add.validation.minutes" = "Please enter a positive number of minutes.";
 "session.add.error" = "Could not add the reading session.";
 "session.error.title" = "Something went wrong";
+"session.error.delete" = "Could not delete the session.";
+"session.minutes.suffix" = "min";
+"session.a11y.minutes" = "Duration in minutes:";
+"session.date" = "Date";
 
+// Common
 "common.save" = "Save";
 "common.cancel" = "Cancel";
 "common.ok" = "OK";
 
+// Stats
 "rr.stats.title" = "Reading Stats";
 "rr.stats.minutes" = "Minutes";
 "rr.stats.minutes.total" = "min total";
@@ -34,18 +51,44 @@
 "rr.stats.debug.add10" = "+10 min (DEBUG)";
 "rr.stats.streak.days" = "day streak";
 
-"bookdetail.sessions" = "Sessions";
-"bookdetail.sessions.empty" = "No sessions yet";
-"session.error.delete" = "Could not delete the session.";
-
+// Tabs
 "rr.tab.library" = "Library";
 "rr.tab.discover" = "Discover";
 "rr.tab.stats" = "Stats";
 "rr.tab.settings" = "Settings";
 
-
+// Settings
 "settings.appearance.section" = "Appearance";
 "settings.theme.title" = "Theme";
 "settings.theme.system" = "System";
 "settings.theme.light" = "Light";
 "settings.theme.dark" = "Dark";
+"settings.preview.section" = "Preview";
+"settings.debug.resetData" = "Reset Demo Data";
+
+// Discover
+"discover.search.placeholder" = "Search books…";
+"discover.seeAll" = "See all";
+"discover.section.recommended" = "Recommended";
+"discover.section.fromLibrary" = "From your library";
+"discover.section.trending" = "Trending";
+"discover.cat.recent" = "Recent";
+"discover.cat.popular" = "Popular";
+"discover.cat.fiction" = "Fiction";
+"discover.cat.nonfiction" = "Non-fiction";
+"discover.empty.title" = "No books yet";
+"discover.empty.subtitle" = "Add a few books to your library to see recommendations here.";
+
+// Misc
+"book.unknownAuthor" = "Unknown author";
+
+
+
+"rr.stats.range.week" = "Week";
+"rr.stats.range.month" = "Month";
+"rr.stats.range.year" = "Year";
+"rr.stats.range.all" = "All";
+
+
+"rr.stats.empty.title" = "No data yet";
+"rr.stats.empty.subtitle" = "Start tracking your reading sessions to see your progress here.";

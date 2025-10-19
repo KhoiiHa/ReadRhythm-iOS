@@ -29,11 +29,17 @@ enum AppRadius {
 
 enum AppSpace {
     static let _4: CGFloat = 4
+    static let _6: CGFloat = 6
     static let _8: CGFloat = 8
     static let _12: CGFloat = 12
     static let _16: CGFloat = 16
     static let _24: CGFloat = 24
     static let _32: CGFloat = 32
+
+    // Convenience gaps for stacks
+    static let stackTight: CGFloat = _8
+    static let stack: CGFloat = _12
+    static let stackLoose: CGFloat = _16
 }
 
 enum AppShadow {
@@ -59,8 +65,39 @@ struct CardBackground: ViewModifier {
     }
 }
 
+struct MetricTile: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .padding(.vertical, AppSpace._12)
+            .padding(.horizontal, AppSpace._16)
+            .background(AppColors.Semantic.bgElevated)
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: AppRadius.l)
+                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+            )
+    }
+}
+
+struct TagCapsule: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(.subheadline)
+            .padding(.vertical, 6)
+            .padding(.horizontal, AppSpace._12)
+            .background(AppColors.Semantic.bgElevated)
+            .clipShape(Capsule(style: .continuous))
+            .overlay(
+                Capsule(style: .continuous)
+                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+            )
+    }
+}
+
 extension View {
     func cardBackground() -> some View { modifier(CardBackground()) }
+    func metricTile() -> some View { modifier(MetricTile()) }
+    func tagCapsule() -> some View { modifier(TagCapsule()) }
 }
 
 // MARK: - Button Styles

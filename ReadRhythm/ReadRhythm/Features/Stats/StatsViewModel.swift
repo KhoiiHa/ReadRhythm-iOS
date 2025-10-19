@@ -20,17 +20,40 @@ import SwiftData
 @MainActor
 final class StatsViewModel: ObservableObject {
     // MARK: - Published Properties
-    @Published var days: Int = 7
+    @Published var days: Int = 7 {
+        didSet {
+            #if DEBUG
+            if days < 1 && days != Int.max {
+                print("[StatsViewModel] invalid days=\(days) → clamped to 1")
+            }
+            #endif
+            if days < 1 && days != Int.max { days = 1 }
+        }
+    }
     @Published private(set) var daily: [(date: Date, minutes: Int)] = []
     @Published private(set) var totalMinutes: Int = 0
     @Published private(set) var currentStreak: Int = 0
 
+    // MARK: - Convenience
+    /// True, wenn es mindestens einen Tag mit >0 Minuten gibt
+    func hasData() -> Bool {
+        daily.contains { $0.minutes > 0 }
+    }
+
+    /// Optionales Reload, das gleichzeitig die Tage setzt (MVP-Helper)
+    func reload(context: ModelContext, days: Int) {
+        self.days = days
+        reload(context: context)
+    }
+
     // MARK: - Load Data
     func reload(context: ModelContext) {
         let service = StatsService.shared
+        // defensive clamp: große Zeiträume begrenzen (außer Int.max für "All")
+        let window = (days == Int.max) ? Int.max : max(1, min(days, 3650))
         
         // Hole aggregierte Tageswerte (letzte X Tage)
-        let items = service.minutesPerDay(context: context, days: days)
+        let items = service.minutesPerDay(context: context, days: window)
         daily = items
         
         // Gesamtminuten summieren

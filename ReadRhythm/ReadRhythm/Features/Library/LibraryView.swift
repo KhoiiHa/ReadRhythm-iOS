@@ -6,6 +6,7 @@
 
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct LibraryView: View {
     @Environment(\.modelContext) private var modelContext
@@ -19,17 +20,20 @@ struct LibraryView: View {
         List {
             ForEach(books) { book in
                 NavigationLink(value: book) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(book.title)
-                            .font(.headline)
-                            .accessibilityIdentifier("library.row.title.\(book.persistentModelID.hashValue)")
-                        if !book.author.isEmpty {
-                            Text(book.author)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .accessibilityIdentifier("library.row.author.\(book.persistentModelID.hashValue)")
+                    BookRowView(book: book)
+                }
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button(role: .destructive) {
+                        // Haptik + Delete-Logik über bestehendes ViewModel API
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.notificationOccurred(.success)
+                        if let idx = books.firstIndex(where: { $0.persistentModelID == book.persistentModelID }) {
+                            viewModel.delete(at: IndexSet(integer: idx), from: books)
                         }
+                    } label: {
+                        Label("Delete", systemImage: "trash")
                     }
+                    .tint(Color("accent.error"))
                 }
             }
             .onDelete { offsets in
@@ -37,6 +41,9 @@ struct LibraryView: View {
             }
             .accessibilityIdentifier("library.list")
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(AppColors.Semantic.bgPrimary)
         .navigationTitle(Text("library.title"))
         .toolbar {
             ToolbarItem(placement: .topBarLeading) { EditButton() }

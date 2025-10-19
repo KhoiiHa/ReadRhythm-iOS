@@ -2,8 +2,8 @@
 //  AppSettingsService.swift
 //  ReadRhythm
 //
-//  Verwaltet App-weite Einstellungen mit UserDefaults.
-//  Ziel: Speichern von Sprache, Theme und anderen Nutzerpräferenzen.
+//  Verwaltet App-weite Nutzerpräferenzen (Theme, Sprache etc.)
+//  Phase 3: Refactor/Portfolio – mit persistenter Speicherung über UserDefaults.
 //
 
 import Foundation
@@ -14,37 +14,45 @@ import Combine
 final class AppSettingsService: ObservableObject {
     static let shared = AppSettingsService()
 
+    // MARK: - Keys & Defaults
     private let defaults = UserDefaults.standard
-    private let themeKey = "settings.theme.mode"
-    private let languageKey = "preferredLanguage"
+    private enum Keys {
+        static let themeMode = "settings.theme.mode"
+        static let language = "settings.language"
+    }
 
-    // MARK: - Published Settings
+    // MARK: - Published Properties
+    /// Das aktuelle App-Theme (System / Light / Dark)
     @Published var themeMode: AppThemeMode {
         didSet {
-            defaults.set(themeMode.rawValue, forKey: themeKey)
+            defaults.set(themeMode.rawValue, forKey: Keys.themeMode)
             #if DEBUG
             print("[AppSettings] Theme updated → \(themeMode.rawValue)")
             #endif
         }
     }
 
+    /// Gewählte App-Sprache (ISO-Code, z. B. „de“ oder „en“)
     @Published var preferredLanguage: String {
         didSet {
-            defaults.set(preferredLanguage, forKey: languageKey)
+            defaults.set(preferredLanguage, forKey: Keys.language)
+            #if DEBUG
+            print("[AppSettings] Language updated → \(preferredLanguage)")
+            #endif
         }
     }
 
     // MARK: - Init
     private init() {
-        // Theme
-        if let raw = defaults.string(forKey: themeKey),
-           let mode = AppThemeMode(rawValue: raw) {
+        // Theme laden
+        if let rawValue = defaults.string(forKey: Keys.themeMode),
+           let mode = AppThemeMode(rawValue: rawValue) {
             self.themeMode = mode
         } else {
             self.themeMode = .system
         }
 
-        // Sprache
-        self.preferredLanguage = defaults.string(forKey: languageKey) ?? "de"
+        // Sprache laden
+        self.preferredLanguage = defaults.string(forKey: Keys.language) ?? Locale.current.language.languageCode?.identifier ?? "en"
     }
 }

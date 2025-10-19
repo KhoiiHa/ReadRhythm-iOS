@@ -13,13 +13,19 @@ final class StatsService {
     static let shared = StatsService()
     private init() {}
 
+    /// Liefert (from, todayStart) für die letzten `days` Tage. Clamped auf >= 1.
+    private func dateWindow(days: Int, calendar: Calendar = .current) -> (from: Date, today: Date)? {
+        let cal = calendar
+        let today = cal.startOfDay(for: Date())
+        let d = max(1, days)
+        return cal.date(byAdding: .day, value: -(d - 1), to: today).map { ($0, today) }
+    }
+
     // Gesamt-Lesezeit in Sekunden (TimeInterval = Double)
     func totalReadingTime(context: ModelContext) -> TimeInterval {
         do {
             let descriptor = FetchDescriptor<ReadingSessionEntity>()
             let sessions = try context.fetch(descriptor)
-            
-            // Summe der Lesezeit in **Sekunden** (TimeInterval = Double)
             return sessions.reduce(0.0) { sum, session in
                 sum + TimeInterval(session.minutes * 60)
             }
@@ -34,9 +40,8 @@ final class StatsService {
     /// Aggregiert die Leseminuten pro Tag für die letzten `days` (Standard: 7 Tage)
     /// - Returns: Array aus (Datum, Minuten)
     func minutesPerDay(context: ModelContext, days: Int = 7) -> [(date: Date, minutes: Int)] {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        guard let fromDate = calendar.date(byAdding: .day, value: -(days - 1), to: today) else { return [] }
+        let cal = Calendar.current
+        guard let (fromDate, today) = dateWindow(days: days, calendar: cal) else { return [] }
 
         // Filter: Nur Sessions innerhalb der letzten N Tage
         let predicate = #Predicate<ReadingSessionEntity> { $0.date >= fromDate }
@@ -47,13 +52,14 @@ final class StatsService {
             var bucket: [Date: Int] = [:]
 
             for session in sessions {
-                let day = calendar.startOfDay(for: session.date)
+                let day = cal.startOfDay(for: session.date)
                 bucket[day, default: 0] += session.minutes
             }
 
-            // Lücken füllen, sortieren
-            return (0..<days).compactMap { offset in
-                guard let day = calendar.date(byAdding: .day, value: -((days - 1) - offset), to: today) else { return nil }
+            // Lücken füllen, sortiert (ältester → heute)
+            let d = max(1, days)
+            return (0..<d).compactMap { offset in
+                guard let day = cal.date(byAdding: .day, value: -((d - 1) - offset), to: today) else { return nil }
                 return (day, bucket[day, default: 0])
             }
         } catch {
@@ -61,6 +67,24 @@ final class StatsService {
             print("⚠️ Fehler beim Berechnen der Minuten pro Tag: \(error)")
             #endif
             return []
+        }
+    }
+
+    /// Summiert Leseminuten – optional für ein Zeitfenster, sonst "All time".
+    func totalMinutes(context: ModelContext, days: Int? = nil) -> Int {
+        if let d = days {
+            return minutesPerDay(context: context, days: d).reduce(0) { $0 + $1.minutes }
+        } else {
+            do {
+                let fd = FetchDescriptor<ReadingSessionEntity>()
+                let sessions = try context.fetch(fd)
+                return sessions.reduce(0) { $0 + $1.minutes }
+            } catch {
+                #if DEBUG
+                print("⚠️ Fehler beim Summieren der Minuten: \(error)")
+                #endif
+                return 0
+            }
         }
     }
 
