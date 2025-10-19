@@ -5,14 +5,6 @@
 //  Created by Vu Minh Khoi Ha on 15.10.25.
 //
 
-
-//
-//  AppTheme.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 15.10.25.
-//
-
 import SwiftUI
 
 /// Kontext → Warum → Wie
@@ -24,25 +16,39 @@ enum AppRadius {
     static let s: CGFloat = 4
     static let m: CGFloat = 8
     static let l: CGFloat = 16
+    /// Alias for large radius
+    static let lg: CGFloat = l
     static let xl: CGFloat = 24
 }
 
 enum AppSpace {
-    static let _4: CGFloat = 4
-    static let _6: CGFloat = 6
-    static let _8: CGFloat = 8
+    // Base scale (legacy-safe)
+    static let _4:  CGFloat = 4
+    static let _6:  CGFloat = 6
+    static let _8:  CGFloat = 8
     static let _12: CGFloat = 12
     static let _16: CGFloat = 16
     static let _24: CGFloat = 24
     static let _32: CGFloat = 32
 
+    // Semantic aliases (preferred)
+    static let xs: CGFloat = _4
+    static let sm: CGFloat = _8
+    static let md: CGFloat = _12
+    static let lg: CGFloat = _16
+    static let xl: CGFloat = _24
+    static let xxl: CGFloat = _32
+
     // Convenience gaps for stacks
-    static let stackTight: CGFloat = _8
-    static let stack: CGFloat = _12
-    static let stackLoose: CGFloat = _16
+    static let stackTight: CGFloat = sm
+    static let stack: CGFloat = md
+    static let stackLoose: CGFloat = lg
 }
 
 enum AppShadow {
+    struct Spec { let color: Color; let radius: CGFloat; let x: CGFloat; let y: CGFloat }
+    /// Sanfter Schatten für Karten/Tiles (Phase 4)
+    static let card = Spec(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
     static let elevation1 = Color.black.opacity(0.08)
     static let elevation2 = Color.black.opacity(0.12)
     static let elevation3 = Color.black.opacity(0.16)

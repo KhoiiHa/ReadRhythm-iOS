@@ -45,6 +45,15 @@ struct MainTabView: View {
             }
             .accessibilityIdentifier("tab.stats")
 
+            // MARK: Goals (Phase 4)
+            NavigationStack {
+                ReadingGoalsView(context: context)
+            }
+            .tabItem {
+                Label(String(localized: "rr.tab.goals"), systemImage: "target")
+            }
+            .accessibilityIdentifier("tab.goals")
+
             NavigationStack {
                 SettingsView()
             }
@@ -57,8 +66,6 @@ struct MainTabView: View {
         .preferredColorScheme(settings.themeMode.colorScheme)
         .tint(AppColors.Semantic.tintPrimary)
         .accessibilityIdentifier("main.tabview")
-        .navigationTitle(Text("rr.tab.settings"))
-        .navigationBarTitleDisplayMode(.inline)
 
         // MARK: - Seed Demo Data (DEBUG)
         .task {

@@ -88,6 +88,41 @@ final class StatsService {
         }
     }
 
+    // MARK: - Goals Helpers (date-range based)
+    /// Summe der Leseminuten im [start, end) Intervall (halb-offen).
+    /// - Parameters:
+    ///   - start: inklusiver Startzeitpunkt
+    ///   - end: exklusiver Endzeitpunkt
+    ///   - context: SwiftData-ModelContext
+    /// - Returns: Gesamtminuten im Intervall
+    func totalMinutes(from start: Date, to end: Date, in context: ModelContext) -> Int {
+        let predicate = #Predicate<ReadingSessionEntity> { session in
+            session.date >= start && session.date < end
+        }
+        let fd = FetchDescriptor<ReadingSessionEntity>(predicate: predicate)
+        do {
+            let sessions = try context.fetch(fd)
+            return sessions.reduce(0) { $0 + $1.minutes }
+        } catch {
+            #if DEBUG
+            print("⚠️ Fehler beim Laden der Sessions (range): \(error)")
+            #endif
+            return 0
+        }
+    }
+
+    /// Leseminuten für einen konkreten Kalendertag (lokaler Kalender).
+    /// - Parameters:
+    ///   - day: Irgendein Zeitpunkt an diesem Tag
+    ///   - context: SwiftData-ModelContext
+    /// - Returns: Minuten an diesem Tag
+    func minutes(on day: Date, in context: ModelContext) -> Int {
+        let cal = Calendar.current
+        let start = cal.startOfDay(for: day)
+        let end = cal.date(byAdding: .day, value: 1, to: start) ?? start
+        return totalMinutes(from: start, to: end, in: context)
+    }
+
     /// Ermittelt die aktuelle Lese-"Streak" (aufeinanderfolgende Tage mit >0 Minuten) bis heute.
     /// - Parameters:
     ///   - context: SwiftData-ModelContext

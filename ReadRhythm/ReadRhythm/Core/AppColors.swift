@@ -68,4 +68,15 @@ enum AppColors {
         static var chartAxis: Color      { Neutral._300 }
         static var chartSelection: Color { Accent.warning }
     }
+    // MARK: - Aliases (Phase 4 convenience)
+    /// Für Views, die mit systemweiten Tokens arbeiten wollen, ohne die Palette zu kennen.
+    /// Diese Aliase mappen auf die bestehende semantische Palette oben.
+    static var brandPrimary: Color { Brand.primary }
+
+    static var surfacePrimary: Color { Semantic.bgPrimary }
+    static var surfaceSecondary: Color { Semantic.bgSecondary }
+
+    static var textPrimary: Color { Semantic.textPrimary }
+    static var textSecondary: Color { Semantic.textSecondary }
+    static var textInverse: Color { Semantic.textInverse }
 }

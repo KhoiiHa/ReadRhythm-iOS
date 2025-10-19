@@ -55,6 +55,7 @@
 "rr.tab.library" = "Library";
 "rr.tab.discover" = "Discover";
 "rr.tab.stats" = "Stats";
+"rr.tab.goals" = "Ziele";
 "rr.tab.settings" = "Settings";
 
 // Settings
@@ -92,3 +93,12 @@
 
 "rr.stats.empty.title" = "No data yet";
 "rr.stats.empty.subtitle" = "Start tracking your reading sessions to see your progress here.";
+
+"goals.title" = "Lesziele";
+"goals.cta.edit" = "Ziel anpassen";
+"goals.cta.set" = "Ziel festlegen";
+"goals.target.minutes" = "%d Minuten Ziel";
+"goals.accessibility.progress" = "Fortschritt";
+"goals.streak.days" = "Tage in Folge";
+"goals.metric.readThisPeriod" = "Gelesen in dieser Periode";
+"goals.metric.minutes" = "Minuten";
