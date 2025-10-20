@@ -169,4 +169,53 @@ final class StatsService {
             return 0
         }
     }
+
+    // MARK: - Insights Helpers
+
+    /// Anzahl der Sessions im Intervall [start, end)
+    func totalSessions(from start: Date, to end: Date, in context: ModelContext) -> Int {
+        let pred = #Predicate<ReadingSessionEntity> { s in
+            s.date >= start && s.date < end
+        }
+        let fd = FetchDescriptor<ReadingSessionEntity>(predicate: pred)
+        do {
+            return try context.fetch(fd).count
+        } catch {
+            #if DEBUG
+            print("⚠️ Fehler beim Zählen der Sessions (range): \(error)")
+            #endif
+            return 0
+        }
+    }
+
+    /// Minuten je Wochentag (0=So ... 6=Sa) im Intervall [start, end)
+    func minutesByWeekday(from start: Date, to end: Date, in context: ModelContext) -> [Int: Int] {
+        let pred = #Predicate<ReadingSessionEntity> { s in
+            s.date >= start && s.date < end
+        }
+        let fd = FetchDescriptor<ReadingSessionEntity>(predicate: pred)
+        let cal = Calendar.current
+        var bucket: [Int: Int] = [:]
+        do {
+            let sessions = try context.fetch(fd)
+            for s in sessions {
+                let idx = cal.component(.weekday, from: s.date) - 1 // 0..6
+                bucket[idx, default: 0] += s.minutes
+            }
+            return bucket
+        } catch {
+            #if DEBUG
+            print("⚠️ Fehler bei minutesByWeekday: \(error)")
+            #endif
+            return [:]
+        }
+    }
+
+    /// Durchschnitts-Minuten pro Tag im Intervall [start, end) (inkl. Nulltage)
+    func averageMinutesPerDay(from start: Date, to end: Date, in context: ModelContext) -> Double {
+        let total = totalMinutes(from: start, to: end, in: context)
+        let days = Calendar.current.dateComponents([.day], from: start, to: end).day ?? 1
+        let d = max(1, days)
+        return Double(total) / Double(d)
+    }
 }

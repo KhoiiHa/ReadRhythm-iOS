@@ -25,7 +25,7 @@ struct MainTabView: View {
                 LibraryView()
             }
             .tabItem {
-                Label(String(localized: "rr.tab.library"), systemImage: "books.vertical")
+                Label(LocalizedStringKey("rr.tab.library"), systemImage: "books.vertical")
             }
             .accessibilityIdentifier("tab.library")
 
@@ -33,7 +33,7 @@ struct MainTabView: View {
                 DiscoverView()
             }
             .tabItem {
-                Label(String(localized: "rr.tab.discover"), systemImage: "sparkles")
+                Label(LocalizedStringKey("rr.tab.discover"), systemImage: "sparkles")
             }
             .accessibilityIdentifier("tab.discover")
 
@@ -41,7 +41,7 @@ struct MainTabView: View {
                 StatsView()
             }
             .tabItem {
-                Label(String(localized: "rr.tab.stats"), systemImage: "chart.bar")
+                Label(LocalizedStringKey("rr.tab.stats"), systemImage: "chart.bar")
             }
             .accessibilityIdentifier("tab.stats")
 
@@ -50,15 +50,24 @@ struct MainTabView: View {
                 ReadingGoalsView(context: context)
             }
             .tabItem {
-                Label(String(localized: "rr.tab.goals"), systemImage: "target")
+                Label(LocalizedStringKey("rr.tab.goals"), systemImage: "target")
             }
             .accessibilityIdentifier("tab.goals")
+
+            // MARK: Profile (Phase 4)
+            NavigationStack {
+                ProfileView(context: context)
+            }
+            .tabItem {
+                Label(LocalizedStringKey("rr.tab.profile"), systemImage: "person.circle")
+            }
+            .accessibilityIdentifier("tab.profile")
 
             NavigationStack {
                 SettingsView()
             }
             .tabItem {
-                Label(String(localized: "rr.tab.settings"), systemImage: "gearshape")
+                Label(LocalizedStringKey("rr.tab.settings"), systemImage: "gearshape")
             }
             .accessibilityIdentifier("tab.settings")
         }

@@ -5,6 +5,7 @@
 //  Created by Vu Minh Khoi Ha on 17.10.25.
 //
 
+// Library
 "library.title" = "Library";
 "library.add.title" = "Add Book";
 "library.add.title.placeholder" = "Title";
@@ -57,6 +58,7 @@
 "rr.tab.stats" = "Stats";
 "rr.tab.goals" = "Ziele";
 "rr.tab.settings" = "Settings";
+"rr.tab.profile" = "Profil";
 
 // Settings
 "settings.appearance.section" = "Appearance";
@@ -79,21 +81,91 @@
 "discover.cat.nonfiction" = "Non-fiction";
 "discover.empty.title" = "No books yet";
 "discover.empty.subtitle" = "Add a few books to your library to see recommendations here.";
+"discover.search.placeholder" = "Bücher suchen…";
+"discover.section.recommended" = "Empfohlen";
+"discover.seeAll" = "Alle anzeigen";
+"discover.cat.recent" = "Aktuell";
+"discover.cat.popular" = "Beliebt";
+"discover.cat.fiction" = "Belletristik";
+"discover.cat.nonfiction" = "Sachbuch";
+
+
+"discover.all.title" = "Alle Bücher";
+"discover.all.fromLibrary.title" = "Alle aus deiner Bibliothek";
+"discover.all.trending.title" = "Alle Trends";
+"discover.all.title" = "Alle Bücher";
+
+
+// Profile
+"profile.title" = "Profil";
+"profile.greeting" = "Dein Leseprofil";
+"profile.subtitle" = "Überblick über deine Lesegewohnheiten";
+"profile.cta.insights" = "Insights anzeigen";
+
+"profile.metric.monthMinutes" = "Minuten (diesen Monat)";
+"profile.metric.monthSessions" = "Sessions (diesen Monat)";
+"profile.metric.avgPerDay" = "Ø pro Tag";
+"profile.metric.streak" = "Aktuelle Serie";
+"profile.metric.bestWeekday" = "Stärkster Wochentag";
+
+// Insights
+"insights.nav.title" = "Insights";
+"insights.title" = "Leser-Insights";
+"insights.section.weekday" = "Minuten je Wochentag";
+"insights.section.weekday.subtitle" = "Welche Tage sind deine stärksten?";
+
+// Achievements
+"achv.title" = "Erfolge";
+"achv.headline" = "Deine Lese-Erfolge";
+"achv.subtitle" = "Meilensteine, die deinen Fortschritt sichtbar machen";
+"achv.locked.hint" = "Noch nicht freigeschaltet";
+
+"achv.week.150.title" = "150 Minuten pro Woche";
+"achv.week.150.subtitle" = "Konstant lesen zahlt sich aus";
+
+"achv.month.500.title" = "500 Minuten in diesem Monat";
+"achv.month.500.subtitle" = "Starkes Monatstempo";
+
+"achv.streak.7.title" = "7-Tage-Serie";
+"achv.streak.7.subtitle" = "Jeden Tag gelesen – klasse!";
+
+"achv.week.5sessions.title" = "5 Sessions pro Woche";
+"achv.week.5sessions.subtitle" = "Regelmäßigkeit gewinnt";
+
+// Audio / Audiobook Light
+"audio.nav.title" = "Audiobook Light";
+"audio.title" = "Audiobook Light";
+"audio.subtitle" = "Lass Texte vorlesen – minimal, schnell, fokussiert";
+
+"audio.input.label" = "Text zum Vorlesen";
+"audio.action.play" = "Abspielen";
+"audio.action.pause" = "Pausieren";
+"audio.action.stop" = "Stoppen";
+
+"audio.progress.chars" = "Zeichen";
+"audio.slider.rate" = "Sprechgeschwindigkeit";
+"audio.slider.pitch" = "Tonhöhe";
+
+// Discover Detail
+"discover.detail.title" = "Buchdetails";
+"discover.detail.about" = "Über dieses Buch";
+"discover.detail.cta.open" = "In Bibliothek öffnen";
+
 
 // Misc
-"book.unknownAuthor" = "Unknown author";
+"book.unknownAuthor" = "Unbekannter Autor";
 
+// Stats Range
+"rr.stats.range.week" = "Woche";
+"rr.stats.range.month" = "Monat";
+"rr.stats.range.year" = "Jahr";
+"rr.stats.range.all" = "Gesamt";
 
+// Stats Empty State
+"rr.stats.empty.title" = "Noch keine Daten";
+"rr.stats.empty.subtitle" = "Starte mit dem Tracking deiner Lesesessions, um hier Fortschritt zu sehen.";
 
-"rr.stats.range.week" = "Week";
-"rr.stats.range.month" = "Month";
-"rr.stats.range.year" = "Year";
-"rr.stats.range.all" = "All";
-
-
-"rr.stats.empty.title" = "No data yet";
-"rr.stats.empty.subtitle" = "Start tracking your reading sessions to see your progress here.";
-
+// Goals
 "goals.title" = "Lesziele";
 "goals.cta.edit" = "Ziel anpassen";
 "goals.cta.set" = "Ziel festlegen";
@@ -102,3 +174,21 @@
 "goals.streak.days" = "Tage in Folge";
 "goals.metric.readThisPeriod" = "Gelesen in dieser Periode";
 "goals.metric.minutes" = "Minuten";
+
+
+// History
+"history.title" = "Lesehistorie";
+"history.today" = "Heute";
+"history.yesterday" = "Gestern";
+"history.empty.title" = "Noch keine Einträge";
+"history.empty.subtitle" = "Sobald du Sessions speicherst, erscheint hier deine Historie.";
+
+// Focus Mode
+"focus.nav.title" = "Focus Mode";
+"focus.title" = "Lese-Fokus";
+"focus.subtitle" = "Starte einen konzentrierten Lesetimer";
+"focus.duration" = "Dauer (Minuten)";
+"focus.action.start" = "Start";
+"focus.action.pause" = "Pause";
+"focus.action.stop" = "Stop";
+

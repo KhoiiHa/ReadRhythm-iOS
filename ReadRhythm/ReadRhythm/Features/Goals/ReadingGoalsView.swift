@@ -9,6 +9,7 @@ import SwiftData
 
 struct ReadingGoalsView: View {
     @StateObject private var viewModel: ReadingGoalsViewModel
+    @Environment(\.modelContext) private var context
     // Init mit explizitem Context (aus Environment vom Aufrufer übergeben)
     init(context: ModelContext, statsService: StatsService = .shared) {
         _viewModel = StateObject(wrappedValue: ReadingGoalsViewModel(context: context, statsService: statsService))
@@ -17,6 +18,21 @@ struct ReadingGoalsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: AppSpace.lg) {
+
+                NavigationLink {
+                    FocusModeView(context: context)
+                } label: {
+                    Label(LocalizedStringKey("focus.title"), systemImage: "timer")
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(AppColors.surfacePrimary)
+                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: AppRadius.l)
+                                .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+                        )
+                }
+                .accessibilityIdentifier("Goals.FocusLink")
 
                 // MARK: Progress Ring
                 ZStack {
