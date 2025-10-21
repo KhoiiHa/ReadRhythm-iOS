@@ -230,3 +230,10 @@
 "focus.picker.choose" = "Buch auswählen";
 "focus.picker.nav" = "Buch wählen";
 
+
+"reviews.title" = "Rezensionen";
+"reviews.navtitle" = "Rezensionen";
+"reviews.badge.verified" = "Verifiziert";
+"reviews.stars.a11y.label" = "Bewertung Sterne";
+"reviews.empty.title" = "Noch keine Rezensionen";
+"reviews.empty.subtitle" = "Sei die erste Person und teile deine Leseerfahrung.";
