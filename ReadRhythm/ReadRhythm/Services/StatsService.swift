@@ -6,8 +6,21 @@
 //  Ziel: Anzeige von Fortschritt, gelesenen Seiten und Lesezeit.
 //
 
+
 import Foundation
 import SwiftData
+
+// MARK: - Protocol & DTO for Insights/Charts
+protocol StatsServiceProtocol {
+    /// Returns last `days` items with date + per-day minutes (reading/listening).
+    func fetchDailyStats(context: ModelContext, days: Int) -> [DailyStatDTO]
+}
+
+struct DailyStatDTO: Hashable {
+    let date: Date
+    let readingMinutes: Int
+    let listeningMinutes: Int
+}
 
 final class StatsService {
     static let shared = StatsService()
@@ -37,7 +50,9 @@ final class StatsService {
         }
     }
 
-    /// Aggregiert die Leseminuten pro Tag für die letzten `days` (Standard: 7 Tage)
+    /// Aggregiert die Leseminuten pro Kalendertag für die letzten `days` (Default 7).
+    /// Lücken werden mit 0 gefüllt und die Reihenfolge ist aufsteigend (ältester → heute).
+    /// Hinweis: Für zukünftige Audiobook-Light-Erweiterungen liefert `fetchDailyStats` zusätzlich Hörminuten.
     /// - Returns: Array aus (Datum, Minuten)
     func minutesPerDay(context: ModelContext, days: Int = 7) -> [(date: Date, minutes: Int)] {
         let cal = Calendar.current
@@ -199,7 +214,8 @@ final class StatsService {
         do {
             let sessions = try context.fetch(fd)
             for s in sessions {
-                let idx = cal.component(.weekday, from: s.date) - 1 // 0..6
+                let weekday = cal.component(.weekday, from: s.date) // 1..7 (depends on locale)
+                let idx = (weekday - cal.firstWeekday + 7) % 7 // 0..6, starting at firstWeekday
                 bucket[idx, default: 0] += s.minutes
             }
             return bucket
@@ -217,5 +233,45 @@ final class StatsService {
         let days = Calendar.current.dateComponents([.day], from: start, to: end).day ?? 1
         let d = max(1, days)
         return Double(total) / Double(d)
+    }
+}
+
+// MARK: - StatsServiceProtocol
+extension StatsService: StatsServiceProtocol {
+    /// Aggregates per-day minutes for the last `days` (reading + listening).
+    /// Listening minutes are currently not modeled -> default 0 (forward-compatible with Audiobook-Light).
+    func fetchDailyStats(context: ModelContext, days: Int) -> [DailyStatDTO] {
+        let cal = Calendar.current
+        guard let (fromDate, today) = dateWindow(days: days, calendar: cal) else { return [] }
+
+        // Load sessions in window
+        let predicate = #Predicate<ReadingSessionEntity> { $0.date >= fromDate }
+        let descriptor = FetchDescriptor<ReadingSessionEntity>(predicate: predicate)
+
+        do {
+            let sessions = try context.fetch(descriptor)
+
+            // Bucket per startOfDay
+            var bucket: [Date: Int] = [:]
+            for s in sessions {
+                let day = cal.startOfDay(for: s.date)
+                bucket[day, default: 0] += s.minutes
+            }
+
+            // Fill gaps oldest -> today
+            let d = max(1, days)
+            return (0..<d).compactMap { offset in
+                guard let day = cal.date(byAdding: .day, value: -((d - 1) - offset), to: today) else { return nil }
+                let reading = bucket[day, default: 0]
+                // Listening not yet persisted; keep 0 for forward compatibility
+                let listening = 0
+                return DailyStatDTO(date: day, readingMinutes: reading, listeningMinutes: listening)
+            }
+        } catch {
+            #if DEBUG
+            print("⚠️ fetchDailyStats error: \(error)")
+            #endif
+            return []
+        }
     }
 }

@@ -15,6 +15,10 @@ final class ReadingGoalsViewModel: ObservableObject {
     @Published var streakCount: Int = 0
     @Published var totalMinutes: Int = 0
 
+    // Edit Sheet State
+    @Published var isEditing: Bool = false
+    @Published var editTargetMinutes: Int = 60
+
     private let context: ModelContext
     private let statsService: StatsService
 
@@ -23,6 +27,57 @@ final class ReadingGoalsViewModel: ObservableObject {
         self.statsService = statsService
         loadActiveGoal()
         calculateProgress()
+    }
+
+    // MARK: - Editing API (used by Edit-Goal Sheet)
+
+    /// Prefills the edit value from the active goal and opens the sheet.
+    func startEditing() {
+        if let goal = activeGoal {
+            editTargetMinutes = max(5, goal.targetMinutes)
+        } else {
+            // sensible default when no goal exists yet
+            editTargetMinutes = max(5, 60)
+        }
+        isEditing = true
+        #if DEBUG
+        print("[Goals] startEditing – prefill target=\(editTargetMinutes)")
+        #endif
+    }
+
+    /// Clamps the value to a sane range for UI controls (5…600 minutes)
+    func validateTarget(_ value: Int) -> Int {
+        return min(max(value, 5), 600)
+    }
+
+    /// Persists the new target on the active goal and recomputes progress.
+    /// Returns true on success; false if no active goal is available.
+    @discardableResult
+    func saveGoal(targetMinutes: Int, period: GoalPeriod? = nil) -> Bool {
+        guard let goal = activeGoal else {
+            #if DEBUG
+            print("[Goals] saveGoal – no active goal to update")
+            #endif
+            return false
+        }
+        let newValue = validateTarget(targetMinutes)
+        goal.targetMinutes = newValue
+        if let p = period { goal.period = p }
+        do {
+            try context.save()
+            // reflect in UI
+            isEditing = false
+            calculateProgress()
+            #if DEBUG
+            print("[Goals] saveGoal – saved target=\(newValue), period=\(goal.period)")
+            #endif
+            return true
+        } catch {
+            #if DEBUG
+            print("⚠️ [Goals] saveGoal error: \(error)")
+            #endif
+            return false
+        }
     }
 
     func loadActiveGoal() {
@@ -72,5 +127,10 @@ final class ReadingGoalsViewModel: ObservableObject {
             if minutes > 0 { streak += 1 } else { break }
         }
         return streak
+    }
+    /// Helper for UI previews / labels
+    func progressPercentageString() -> String {
+        let pct = Int((progress * 100).rounded())
+        return "\(pct)%"
     }
 }

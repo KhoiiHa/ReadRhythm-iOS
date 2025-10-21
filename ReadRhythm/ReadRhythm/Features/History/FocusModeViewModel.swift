@@ -51,6 +51,10 @@ final class FocusModeViewModel: ObservableObject {
         }
     }
 
+    func select(book: BookEntity) {
+        selectedBook = book
+    }
+
     private func scheduleTimer() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
