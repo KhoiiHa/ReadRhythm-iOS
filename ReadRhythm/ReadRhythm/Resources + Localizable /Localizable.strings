@@ -237,3 +237,12 @@
 "reviews.stars.a11y.label" = "Bewertung Sterne";
 "reviews.empty.title" = "Noch keine Rezensionen";
 "reviews.empty.subtitle" = "Sei die erste Person und teile deine Leseerfahrung.";
+
+
+"discover.category.mindfulness" = "Achtsamkeit & Balance";
+"discover.category.self_help" = "Selbstfindung & Motivation";
+"discover.category.philosophy" = "Philosophie & Lebenskunst";
+"discover.category.fiction_romance" = "Romane & Emotionen";
+"discover.category.creativity" = "Kreativität & Inspiration";
+"discover.category.wellness" = "Gesundheit & Wohlbefinden";
+"discover.category.psychology" = "Psychologie & Alltag";

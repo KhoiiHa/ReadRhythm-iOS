@@ -162,15 +162,6 @@ public struct URLRequestBuilder {
 
 // MARK: - Helpers
 
-#if DEBUG
-/// Dauer in Millisekunden (nur für Logs).
-private func durationMillis(since start: DispatchTime) -> Int {
-    let end = DispatchTime.now()
-    let nanos = end.uptimeNanoseconds - start.uptimeNanoseconds
-    return Int(nanos / 1_000_000)
-}
-#endif
-
 /// Wrapper, damit `Encodable` in `JSONEncoder` ohne Generic-Zirkus funktioniert.
 private struct AnyEncodable: Encodable {
     private let _encode: (Encoder) throws -> Void
