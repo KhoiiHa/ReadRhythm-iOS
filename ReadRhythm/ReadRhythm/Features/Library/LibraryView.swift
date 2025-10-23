@@ -17,32 +17,41 @@ struct LibraryView: View {
     private var books: [BookEntity]
 
     var body: some View {
-        List {
-            ForEach(books) { book in
-                NavigationLink(value: book) {
-                    BookRowView(book: book)
+        Group {
+            if books.isEmpty {
+                LibraryEmptyStateView {
+                    // Öffnet das Add-Sheet
+                    viewModel.showAddSheet = true
                 }
-                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                    Button(role: .destructive) {
-                        // Haptik + Delete-Logik über bestehendes ViewModel API
-                        let generator = UINotificationFeedbackGenerator()
-                        generator.notificationOccurred(.success)
-                        if let idx = books.firstIndex(where: { $0.persistentModelID == book.persistentModelID }) {
-                            viewModel.delete(at: IndexSet(integer: idx), from: books)
+            } else {
+                List {
+                    ForEach(books) { book in
+                        NavigationLink(value: book) {
+                            BookRowView(book: book)
                         }
-                    } label: {
-                        Label("Delete", systemImage: "trash")
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                // Haptik + Delete-Logik über bestehendes ViewModel API
+                                let generator = UINotificationFeedbackGenerator()
+                                generator.notificationOccurred(.success)
+                                if let idx = books.firstIndex(where: { $0.persistentModelID == book.persistentModelID }) {
+                                    viewModel.delete(at: IndexSet(integer: idx), from: books)
+                                }
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                            .tint(Color("accent.error"))
+                        }
                     }
-                    .tint(Color("accent.error"))
+                    .onDelete { offsets in
+                        viewModel.delete(at: offsets, from: books)
+                    }
+                    .accessibilityIdentifier("library.list")
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
             }
-            .onDelete { offsets in
-                viewModel.delete(at: offsets, from: books)
-            }
-            .accessibilityIdentifier("library.list")
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
         .background(AppColors.Semantic.bgPrimary)
         .navigationTitle(Text("library.title"))
         .toolbar {
@@ -65,18 +74,62 @@ struct LibraryView: View {
         .navigationDestination(for: BookEntity.self) { book in
             BookDetailView(book: book)
         }
-        .alert(Text("library.error.title"),
-               isPresented: .constant(viewModel.errorMessageKey != nil)) {
-            Button("common.ok") { viewModel.errorMessageKey = nil }
-        } message: {
-            if let key = viewModel.errorMessageKey {
-                Text(key)
+        .accessibilityIdentifier("library.view")
+        .overlay(alignment: .bottom) {
+            if let key = viewModel.toastMessageKey {
+                Text(LocalizedStringKey(key))
+                    .font(.footnote)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule().fill(AppColors.Semantic.bgElevated)
+                            .overlay(Capsule().stroke(AppColors.Semantic.borderMuted, lineWidth: 1))
+                    )
+                    .padding(.bottom, 24)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.easeInOut(duration: 0.2), value: viewModel.toastMessageKey)
+                    .accessibilityIdentifier("toast.\(key)")
             }
         }
-        .accessibilityIdentifier("library.view")
         .onAppear {
             // Einmalig den echten SwiftData-Context an das Repository binden
             viewModel.bind(context: modelContext)
         }
+    }
+}
+
+private struct LibraryEmptyStateView: View {
+    let onAddTapped: () -> Void
+
+    var body: some View {
+        VStack(spacing: AppSpace._12) {
+            Image(systemName: "books.vertical")
+                .font(.system(size: 44))
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+
+            Text(LocalizedStringKey("library.empty.title"))
+                .font(.headline)
+
+            Text(LocalizedStringKey("library.empty.subtitle"))
+                .font(.subheadline)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, AppSpace._16)
+
+            Button {
+                #if os(iOS)
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                #endif
+                onAddTapped()
+            } label: {
+                Label(LocalizedStringKey("library.empty.add"), systemImage: "plus")
+            }
+            .buttonStyle(.borderedProminent)
+            .accessibilityIdentifier("library.empty.add")
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, AppSpace._16)
+        .background(AppColors.Semantic.bgPrimary)
+        .accessibilityIdentifier("library.emptyState")
     }
 }

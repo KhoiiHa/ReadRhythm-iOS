@@ -20,6 +20,7 @@ struct DiscoverView: View {
     // MARK: - Environment / ViewModel
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = DiscoverViewModel()
+    @State private var didAutoLoad = false
 
     var body: some View {
         ScrollView {
@@ -91,9 +92,36 @@ struct DiscoverView: View {
         .navigationTitle(Text(LocalizedStringKey("rr.tab.discover")))
         .tint(AppColors.Semantic.tintPrimary)
         .accessibilityIdentifier("discover.view")
+        .overlay(alignment: .bottom) {
+            if let key = viewModel.toastMessageKey {
+                Text(LocalizedStringKey(key))
+                    .font(.footnote)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule().fill(AppColors.Semantic.bgElevated)
+                            .overlay(Capsule().stroke(AppColors.Semantic.borderMuted, lineWidth: 1))
+                    )
+                    .padding(.bottom, 24)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.easeInOut(duration: 0.2), value: viewModel.toastMessageKey)
+                    .accessibilityIdentifier("toast.\(key)")
+            }
+        }
         .onAppear {
             // Lokale Library laden (für Fallback & "aus deiner Library")
             viewModel.loadBooks(from: modelContext)
+            
+            // Einmalig beim ersten Öffnen: Default-Kategorie setzen und initiale Suche anstoßen
+            if !didAutoLoad {
+                didAutoLoad = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    viewModel.applyFilter(category: .mindfulness)
+                    // Immer eine nicht-leere Query setzen und Suche starten (robust gegen leere Zustände)
+                    viewModel.searchQuery = DiscoverCategory.mindfulness.query
+                    viewModel.applySearch()
+                }
+            }
         }
     }
 
@@ -166,7 +194,26 @@ struct DiscoverView: View {
         LazyVStack(spacing: AppSpace._12) {
             ForEach(items, id: \.id) { book in
                 BookCoverCard(title: book.title, author: book.authors, coverURL: book.thumbnailURL, coverAssetName: nil)
-                    .accessibilityIdentifier("discover.result.\(book.id)")
+                  HStack {
+                      Spacer()
+                      Button {
+                          #if os(iOS)
+                          UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                          #endif
+                          do {
+                              try viewModel.addToLibrary(from: book, in: modelContext)
+                          } catch {
+                              print("⛔️ Add failed: \(error)")
+                          }
+                      } label: {
+                          Image(systemName: "plus.circle.fill")
+                              .font(.title3)
+                              .foregroundStyle(AppColors.brandPrimary)
+                              .accessibilityLabel(Text(LocalizedStringKey("discover.addToLibrary")))
+                              .accessibilityIdentifier("discover.addButton.\(book.id)")
+                      }
+                      .buttonStyle(.plain)
+                  }
                 Divider().opacity(0.1)
             }
         }

@@ -26,6 +26,8 @@ final class LibraryViewModel: ObservableObject {
     private var repository: BookRepository?
     @Published var showAddSheet = false
     @Published var errorMessageKey: LocalizedStringKey?
+    /// Kurzlebige UI-Rückmeldung (i18n-Key), z. B. "toast.added" / "toast.deleted" / "toast.error"
+    @Published var toastMessageKey: String? = nil
 
     // MARK: - Setup
     /// Bindet den SwiftData-Kontext und initialisiert das Repository, falls nicht vorhanden.
@@ -38,6 +40,21 @@ final class LibraryViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Toast Helper
+
+    /// Zeigt eine kurze Rückmeldung an und blendet sie automatisch wieder aus.
+    private func showToast(_ key: String, duration: UInt64 = 1_500_000_000) {
+        toastMessageKey = key
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: duration)
+            await MainActor.run {
+                if self?.toastMessageKey == key {
+                    self?.toastMessageKey = nil
+                }
+            }
+        }
+    }
+
     // MARK: - Actions
     /// Fügt ein Buch hinzu, nutzt Repository und behandelt Fehler.
     func addBook(title: String, author: String?) {
@@ -47,11 +64,13 @@ final class LibraryViewModel: ObservableObject {
             #if DEBUG
             print("[LibraryViewModel] Book added: \(title)")
             #endif
+            showToast("toast.added")
         } catch {
             #if DEBUG
             print("[LibraryViewModel] Add failed: \(error.localizedDescription)")
             #endif
             errorMessageKey = "library.add.error"
+            showToast("toast.error")
         }
     }
 
@@ -65,11 +84,13 @@ final class LibraryViewModel: ObservableObject {
                 #if DEBUG
                 print("[LibraryViewModel] Deleted book: \(book.title)")
                 #endif
+                showToast("toast.deleted")
             } catch {
                 #if DEBUG
                 print("[LibraryViewModel] Delete failed: \(error.localizedDescription)")
                 #endif
                 errorMessageKey = "library.delete.error"
+                showToast("toast.error")
             }
         }
     }

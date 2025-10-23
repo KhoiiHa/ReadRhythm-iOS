@@ -34,6 +34,7 @@ struct AddBookView: View {
 
                     TextField(String(localized: "library.add.author.placeholder"), text: $author)
                         .textInputAutocapitalization(.words)
+                        .textContentType(.name)
                         .submitLabel(.done)
                         .focused($focusedField, equals: .author)
                         .onSubmit { performSave() }
@@ -59,12 +60,22 @@ struct AddBookView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("common.save") { performSave() }
-                        .disabled(trimmedTitle.isEmpty)
+                        .disabled(!isSaveEnabled)
                         .accessibilityIdentifier("addbook.save")
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("common.done") { focusedField = nil }
+                        .accessibilityIdentifier("addbook.keyboard.done")
                 }
             }
             .onAppear { focusedField = .title }
         }
+    }
+
+    // Save ist nur erlaubt, wenn der Titel mind. 2 Zeichen hat
+    private var isSaveEnabled: Bool {
+        trimmedTitle.count >= 2
     }
 
     // MARK: - Helpers
@@ -72,9 +83,11 @@ struct AddBookView: View {
     private var trimmedAuthor: String { author.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     private func performSave() {
-        guard trimmedTitle.isEmpty == false else { return }
+        guard isSaveEnabled else { return }
+        #if os(iOS)
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        #endif
         onSave(trimmedTitle, trimmedAuthor.isEmpty ? nil : trimmedAuthor)
         dismiss()
     }
 }
-

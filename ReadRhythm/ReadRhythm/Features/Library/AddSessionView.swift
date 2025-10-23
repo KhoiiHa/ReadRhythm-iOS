@@ -46,6 +46,9 @@ struct AddSessionView: View {
                             .focused($focused, equals: .minutes)
                             .accessibilityIdentifier("session.add.minutes")
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityHint(Text("session.add.minutes.hint"))
+                    .accessibilityValue(Text(minutesText.isEmpty ? "0" : minutesText))
                     .onChange(of: minutesText) { oldValue, newValue in
                         // Nur Ziffern erlauben und weich auf max cappen
                         let filtered = newValue.filter { $0.isNumber }
@@ -76,6 +79,11 @@ struct AddSessionView: View {
                         .disabled(!isValid)
                         .accessibilityIdentifier("session.add.save")
                 }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("common.done") { focused = nil }
+                        .accessibilityIdentifier("session.add.keyboard.done")
+                }
             }
             .onAppear { focused = .minutes }
             .presentationDetents([.medium])
@@ -90,8 +98,13 @@ struct AddSessionView: View {
 
     private func performSave() {
         guard let m = Int(minutesText), m >= minMinutes, m <= maxMinutes else { return }
+        #if os(iOS)
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        #endif
+        #if DEBUG
+        print("📝 [AddSession] save minutes=\(m) date=\(date.ISO8601Format())")
+        #endif
         onSave(m, date)
         dismiss()
     }
 }
-

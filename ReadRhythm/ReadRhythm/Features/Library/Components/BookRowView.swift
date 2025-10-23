@@ -5,14 +5,6 @@
 //  Created by Vu Minh Khoi Ha on 19.10.25.
 //
 
-
-//
-//  BookRowView.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 19.10.25.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -46,6 +38,7 @@ struct BookRowView: View {
                     .font(.headline)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
+                    .accessibilityIdentifier("library.row.title.\(book.persistentModelID.hashValue)")
 
                 Text(authorText)
                     .font(.subheadline)
@@ -56,6 +49,7 @@ struct BookRowView: View {
 
             Spacer()
         }
+        .accessibilityLabel(Text("\(book.title), \(authorText)"))
         .padding(.vertical, 6)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("library.row.\(book.persistentModelID.hashValue)")
@@ -72,17 +66,16 @@ private struct CoverThumbnail: View {
     var body: some View {
         ZStack {
             // Hintergrund/Card – bitte später an das App-Design-System anbinden
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color(uiColor: .secondarySystemBackground))
+            RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
+                .fill(AppColors.Semantic.bgElevated)
 
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(Color(uiColor: .separator), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
+                .strokeBorder(AppColors.Semantic.borderMuted, lineWidth: 0.5)
 
             Text(initials)
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
         }
-        .frame(width: 44, height: 60)
+        .frame(width: 44, height: 60) // uses fixed size; adjust via design tokens if needed
     }
 }
-

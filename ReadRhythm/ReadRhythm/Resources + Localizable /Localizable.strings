@@ -38,6 +38,7 @@
 "session.minutes.suffix" = "Min.";
 "session.a11y.minutes" = "Dauer in Minuten:";
 "session.date" = "Datum";
+"session.add.minutes.hint" = "Gib die Anzahl der Minuten für diese Lesesitzung ein.";
 
 // Common
 "common.save" = "Speichern";
@@ -246,3 +247,35 @@
 "discover.category.creativity" = "Kreativität & Inspiration";
 "discover.category.wellness" = "Gesundheit & Wohlbefinden";
 "discover.category.psychology" = "Psychologie & Alltag";
+
+
+// Discover (API + Fallback)
+"discover.addToLibrary" = "Zur Bibliothek hinzufügen";
+"discover.loading" = "Lade Bücher …";
+"discover.section.results" = "Ergebnisse";
+"discover.error.generic" = "Etwas ist schiefgelaufen. Bitte versuche es erneut.";
+"error.network.offline" = "Keine Internetverbindung. Zeige lokale Bibliothek.";
+"error.network.invalid_url" = "Ungültige Netzwerkadresse.";
+"error.network.timeout" = "Zeitüberschreitung. Bitte versuche es später erneut.";
+"error.network.cancelled" = "Anfrage wurde abgebrochen.";
+"error.network.no_response" = "Keine Antwort vom Server.";
+"error.network.http" = "Serverfehler. Bitte später erneut versuchen.";
+"error.network.transport" = "Netzwerkfehler. Prüfe deine Verbindung.";
+"error.network.unknown" = "Unerwarteter Netzwerkfehler.";
+
+// Common additions
+"common.loading" = "Lädt …";
+"common.retry" = "Erneut versuchen";
+"common.noInternet" = "Keine Internetverbindung";
+"common.done" = "Fertig";
+
+
+// Toasts
+"toast.added" = "Zur Bibliothek hinzugefügt";
+"toast.duplicate" = "Bereits in deiner Bibliothek";
+"toast.deleted" = "Aus Bibliothek entfernt";
+"toast.error"   = "Aktion fehlgeschlagen";
+
+"library.empty.title" = "Deine Bibliothek ist noch leer";
+"library.empty.subtitle" = "Füge dein erstes Buch hinzu – manuell oder direkt aus der Discover-Suche.";
+"library.empty.add" = "Buch hinzufügen";

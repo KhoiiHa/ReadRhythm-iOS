@@ -5,14 +5,6 @@
 //  Created by Vu Minh Khoi Ha on 17.10.25.
 //
 
-
-//
-//  LocalBookRepository.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 17.10.25.
-//
-
 import Foundation
 import SwiftData
 

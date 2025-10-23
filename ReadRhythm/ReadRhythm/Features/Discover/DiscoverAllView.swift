@@ -12,41 +12,33 @@ import SwiftData
 import UIKit
 #endif
 
-typealias Category = DiscoverView.Category
 
 /// Vollansicht für Discover – zeigt alle Bücher mit Such- und Chip-Filter.
 /// Kontext: Wird aus DiscoverView via "Alle anzeigen" geöffnet und übernimmt den aktuellen Filterzustand.
 struct DiscoverAllView: View {
     // Eingehender Filter-Zustand aus Discover
     let initialSearchText: String
-    let initialCategory: Category?
+    let initialCategory: DiscoverCategory?
 
     @Environment(\.modelContext) private var context
     @Query(sort: [SortDescriptor(\BookEntity.createdAt, order: .reverse)])
     private var allBooks: [BookEntity]
 
-    // Lokaler, editierbarer State
-    @State private var searchText: String
-    @State private var selectedCategory: Category?
+    // ViewModel für Remote-Suche (API + Offline-Fallback)
+    @StateObject private var viewModel = DiscoverViewModel()
 
     private enum SortOption: String, CaseIterable, Identifiable { case title, author, date; var id: String { rawValue } }
     @State private var sortOption: SortOption = .title
 
-    init(searchText: String, category: Category?) {
+    init(searchText: String, category: DiscoverCategory?) {
         self.initialSearchText = searchText
         self.initialCategory = category
-        _searchText = State(initialValue: searchText)
-        _selectedCategory = State(initialValue: category)
     }
     
     private var navTitleKey: LocalizedStringKey {
-        if let cat = selectedCategory {
-            switch cat {
-            case .recent: return LocalizedStringKey("discover.all.title.recent")
-            case .popular: return LocalizedStringKey("discover.all.title.popular")
-            case .fiction: return LocalizedStringKey("discover.all.title.fiction")
-            case .nonfiction: return LocalizedStringKey("discover.all.title.nonfiction")
-            }
+        if let cat = viewModel.selectedCategory {
+            // Verwende den i18n-Key der Kategorie (rawValue), nicht den bereits lokalisierten displayName
+            return LocalizedStringKey(cat.rawValue)
         } else {
             return LocalizedStringKey("discover.all.title")
         }
@@ -57,35 +49,50 @@ struct DiscoverAllView: View {
             VStack(spacing: AppSpace._16) {
                 searchBar
                 categoryChips
-                grid
-                    .padding(.horizontal, AppSpace._16)
 
-                if displayedBooks.isEmpty {
-                    VStack(spacing: AppSpace._12) {
-                        Text(LocalizedStringKey("discover.empty.title"))
-                            .font(.headline)
-                            .foregroundStyle(AppColors.textSecondary)
-                        Text(LocalizedStringKey("discover.empty.subtitle"))
-                            .font(.subheadline)
-                            .foregroundStyle(AppColors.textSecondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, AppSpace._16)
-                        Button {
-                            #if os(iOS)
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            #endif
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                searchText = ""
-                                selectedCategory = nil
+                // Zustand: Laden / Fehler / Ergebnisse
+                if viewModel.isLoading {
+                    ProgressView(LocalizedStringKey("discover.loading"))
+                        .frame(maxWidth: .infinity, minHeight: 120)
+                } else if let msg = viewModel.errorMessage {
+                    Text(LocalizedStringKey(msg))
+                        .font(.footnote)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .padding(.horizontal, AppSpace._16)
+                } else if !viewModel.results.isEmpty {
+                    resultsGrid(viewModel.results)
+                        .padding(.horizontal, AppSpace._16)
+                } else {
+                    grid
+                        .padding(.horizontal, AppSpace._16)
+
+                    if displayedBooks.isEmpty {
+                        VStack(spacing: AppSpace._12) {
+                            Text(LocalizedStringKey("discover.empty.title"))
+                                .font(.headline)
+                                .foregroundStyle(AppColors.textSecondary)
+                            Text(LocalizedStringKey("discover.empty.subtitle"))
+                                .font(.subheadline)
+                                .foregroundStyle(AppColors.textSecondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, AppSpace._16)
+                            Button {
+                                #if os(iOS)
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                #endif
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    viewModel.searchQuery = ""
+                                    viewModel.applyFilter(category: nil)
+                                }
+                            } label: {
+                                Label(LocalizedStringKey("discover.empty.resetFilters"), systemImage: "arrow.counterclockwise")
                             }
-                        } label: {
-                            Label(LocalizedStringKey("discover.empty.resetFilters"), systemImage: "arrow.counterclockwise")
+                            .buttonStyle(.bordered)
+                            .accessibilityIdentifier("discover.all.resetFilters")
                         }
-                        .buttonStyle(.bordered)
-                        .accessibilityIdentifier("discover.all.resetFilters")
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, AppSpace._16)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, AppSpace._16)
                 }
 
                 Spacer(minLength: AppSpace._16)
@@ -111,6 +118,33 @@ struct DiscoverAllView: View {
         }
         .tint(AppColors.Semantic.tintPrimary)
         .accessibilityIdentifier("discover.all.view")
+        .overlay(alignment: .bottom) {
+            if let key = viewModel.toastMessageKey {
+                Text(LocalizedStringKey(key))
+                    .font(.footnote)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule().fill(AppColors.Semantic.bgElevated)
+                            .overlay(Capsule().stroke(AppColors.Semantic.borderMuted, lineWidth: 1))
+                    )
+                    .padding(.bottom, 24)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.easeInOut(duration: 0.2), value: viewModel.toastMessageKey)
+                    .accessibilityIdentifier("toast.\(key)")
+            }
+        }
+        .onAppear {
+            // Lokale Library laden (für Fallback)
+            viewModel.loadBooks(from: context)
+            // Eingehende Filter anwenden
+            viewModel.searchQuery = initialSearchText
+            viewModel.applyFilter(category: initialCategory)
+            // Falls ein manueller Suchstring vorhanden ist, Suche starten
+            if !initialSearchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                viewModel.applySearch()
+            }
+        }
     }
 
     // MARK: - Subviews
@@ -118,11 +152,12 @@ struct DiscoverAllView: View {
     private var searchBar: some View {
         HStack(spacing: AppSpace._8) {
             Image(systemName: "magnifyingglass")
-            TextField(text: $searchText) {
+            TextField(text: $viewModel.searchQuery) {
                 Text(LocalizedStringKey("discover.search.placeholder"))
             }
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled(true)
+            .onSubmit { viewModel.applySearch() }
             .accessibilityLabel(Text(LocalizedStringKey("discover.search.placeholder")))
         }
         .font(.subheadline)
@@ -143,27 +178,62 @@ struct DiscoverAllView: View {
     private var categoryChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: AppSpace._8) {
-                ForEach(Category.allCases, id: \.self) { cat in
-                    let isActive = selectedCategory == cat
+                ForEach(DiscoverCategory.ordered, id: \.id) { cat in
+                    let isActive = (viewModel.selectedCategory == cat)
                     Button {
                         withAnimation(.easeInOut(duration: 0.25)) {
-                            selectedCategory = (isActive ? nil : cat)
+                            let newSelection: DiscoverCategory? = isActive ? nil : cat
+                            viewModel.applyFilter(category: newSelection)
                         }
                     } label: {
-                        Text(catTitle(cat))
-                            .font(.footnote)
-                            .padding(.horizontal, AppSpace._12)
-                            .padding(.vertical, AppSpace._8)
-                            .background(Capsule().fill(AppColors.Semantic.bgElevated))
-                            .overlay(
-                                Capsule().stroke(isActive ? AppColors.brandPrimary : AppColors.Semantic.borderMuted, lineWidth: 1)
-                            )
+                        HStack(spacing: AppSpace._6) {
+                            Image(systemName: cat.systemImage)
+                            Text(cat.displayName)
+                        }
+                        .font(.footnote)
+                        .padding(.horizontal, AppSpace._12)
+                        .padding(.vertical, AppSpace._8)
+                        .background(Capsule().fill(AppColors.Semantic.bgElevated))
+                        .overlay(
+                            Capsule().stroke(isActive ? AppColors.brandPrimary : AppColors.Semantic.borderMuted, lineWidth: 1)
+                        )
                     }
                     .buttonStyle(.plain)
-                    .accessibilityIdentifier("discover.all.chip.\(cat.rawValue)")
+                    .accessibilityIdentifier("discover.all.chip.\(cat.id)")
                 }
             }
             .padding(.horizontal, AppSpace._16)
+        }
+    }
+
+    /// Zeigt Remote-Ergebnisse (Google Books) in einem adaptiven Grid.
+    private func resultsGrid(_ items: [RemoteBook]) -> some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: AppSpace._12)], spacing: AppSpace._12) {
+            ForEach(items, id: \.id) { book in
+                BookCoverCard(title: book.title, author: book.authors, coverURL: book.thumbnailURL, coverAssetName: nil)
+                    .contentShape(Rectangle())
+                    .accessibilityIdentifier("discover.all.result.\(book.id)")
+                HStack {
+                    Spacer()
+                    Button {
+                        #if os(iOS)
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        #endif
+                        do {
+                            try viewModel.addToLibrary(from: book, in: context)
+                        } catch {
+                            print("⛔️ Add failed: \(error)")
+                        }
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title3)
+                            .foregroundStyle(AppColors.brandPrimary)
+                            .accessibilityLabel(Text(LocalizedStringKey("discover.addToLibrary")))
+                            .accessibilityIdentifier("discover.all.addButton.\(book.id)")
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
         }
     }
 
@@ -182,12 +252,12 @@ struct DiscoverAllView: View {
                 .accessibilityIdentifier("discover.all.card.\(book.id.uuidString.prefix(6))")
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: selectedCategory)
+        .animation(.easeInOut(duration: 0.25), value: viewModel.selectedCategory)
     }
 
-    // MARK: - Filtering (wie in DiscoverView)
+    // MARK: - Lokale Filterlogik (Fallback)
     private var filteredBooks: [BookEntity] {
-        let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = viewModel.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         let base: [BookEntity]
         if trimmed.isEmpty {
             base = allBooks
@@ -197,16 +267,16 @@ struct DiscoverAllView: View {
                 b.title.lowercased().contains(q) || (b.author?.lowercased().contains(q) ?? false)
             }
         }
-        guard let cat = selectedCategory else { return base }
+        guard let cat = viewModel.selectedCategory else { return base }
         switch cat {
-        case .recent:
-            return Array(base.prefix(40))
-        case .popular:
-            return base.sorted { $0.title < $1.title }
-        case .fiction:
-            return base.filter { $0.title.localizedCaseInsensitiveContains("novel") || $0.title.localizedCaseInsensitiveContains("story") }
-        case .nonfiction:
-            return base.filter { titleIn($0, matchesAnyOf: ["guide","clean","design","architecture"]) }
+        case .fictionRomance:
+            return base.filter { $0.title.localizedCaseInsensitiveContains("novel") || $0.title.localizedCaseInsensitiveContains("story") || $0.title.localizedCaseInsensitiveContains("love") }
+        case .mindfulness, .philosophy:
+            return base.filter { titleIn($0, matchesAnyOf: ["mind", "meditation", "philosophy", "zen"]) }
+        case .selfHelp, .psychology:
+            return base.filter { titleIn($0, matchesAnyOf: ["habit", "better", "change", "think", "psychology"]) }
+        case .creativity, .wellness:
+            return base.filter { titleIn($0, matchesAnyOf: ["creative", "art", "design", "health", "wellness"]) }
         }
     }
 
@@ -226,15 +296,6 @@ struct DiscoverAllView: View {
     private func titleIn(_ book: BookEntity, matchesAnyOf parts: [String]) -> Bool {
         parts.contains { p in book.title.range(of: p, options: [.caseInsensitive, .diacriticInsensitive]) != nil }
     }
-
-    private func catTitle(_ c: Category) -> LocalizedStringKey {
-        switch c {
-        case .recent: return LocalizedStringKey("discover.cat.recent")
-        case .popular: return LocalizedStringKey("discover.cat.popular")
-        case .fiction: return LocalizedStringKey("discover.cat.fiction")
-        case .nonfiction: return LocalizedStringKey("discover.cat.nonfiction")
-        }
-    }
 }
 
 #if DEBUG
@@ -243,11 +304,10 @@ import SwiftUI
 struct DiscoverAllPreviewHarness: View {
     private enum SortOption: String, CaseIterable, Identifiable { case title, author, date; var id: String { rawValue } }
     @State private var searchText: String = ""
-    @State private var selectedCategory: Category? = nil
     @State private var sortOption: SortOption = .title
 
     var body: some View {
-        DiscoverAllView(searchText: searchText, category: selectedCategory)
+        DiscoverAllView(searchText: searchText, category: nil)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
