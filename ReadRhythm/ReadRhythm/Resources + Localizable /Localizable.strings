@@ -94,6 +94,7 @@
 "discover.empty.title" = "Keine Bücher gefunden";
 "discover.empty.subtitle" = "Passe Suche oder Filter an, um mehr Ergebnisse zu sehen.";
 "discover.empty.resetFilters" = "Filter zurücksetzen";
+"discover.empty.noResultsForCategory" = "Für diese Kategorie wurden keine Bücher gefunden.";
 
 "discover.sort.title" = "Sortieren";
 "discover.sort.title.short" = "Sortieren";

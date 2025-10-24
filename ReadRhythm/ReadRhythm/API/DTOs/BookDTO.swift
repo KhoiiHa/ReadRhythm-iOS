@@ -18,7 +18,7 @@ struct BooksSearchResponseDTO: Codable {
 /// Einzelnes Volume (Buch) in der Suche.
 struct VolumeDTO: Codable {
     let id: String
-    let volumeInfo: VolumeInfoDTO
+    let volumeInfo: VolumeInfoDTO?
 }
 
 /// Metadaten eines Buchs (Teilmenge für MVP).

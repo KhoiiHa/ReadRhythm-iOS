@@ -30,6 +30,12 @@ struct DiscoverAllView: View {
     private enum SortOption: String, CaseIterable, Identifiable { case title, author, date; var id: String { rawValue } }
     @State private var sortOption: SortOption = .title
 
+    /// true, wenn Nutzer:in aktiv filtert/sucht (Kategorie gewählt oder Suchtext vorhanden)
+    private var hasActiveFilter: Bool {
+        let q = viewModel.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        return viewModel.selectedCategory != nil || !q.isEmpty
+    }
+
     init(searchText: String, category: DiscoverCategory?) {
         self.initialSearchText = searchText
         self.initialCategory = category
@@ -62,7 +68,15 @@ struct DiscoverAllView: View {
                 } else if !viewModel.results.isEmpty {
                     resultsGrid(viewModel.results)
                         .padding(.horizontal, AppSpace._16)
-                } else {
+                } else if !viewModel.isLoading && viewModel.results.isEmpty && hasActiveFilter {
+                    // Keine Treffer für aktive Suche / Kategorie
+                    noResultsForCategory
+                        .padding(.horizontal, AppSpace._16)
+                }
+
+                // Lokaler Fallback (Library / gespeicherte Bücher) nur zeigen,
+                // wenn aktuell kein aktiver Filter/Suchstring gesetzt ist
+                if !hasActiveFilter {
                     grid
                         .padding(.horizontal, AppSpace._16)
 
@@ -207,15 +221,16 @@ struct DiscoverAllView: View {
     }
 
     /// Zeigt Remote-Ergebnisse (Google Books) in einem adaptiven Grid.
-    private func resultsGrid(_ items: [RemoteBook]) -> some View {
+    private func resultsGrid(_ items: [RemoteBook]) -> some View
+    {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: AppSpace._12)], spacing: AppSpace._12) {
             ForEach(items, id: \.id) { book in
-                BookCoverCard(title: book.title, author: book.authors, coverURL: book.thumbnailURL, coverAssetName: nil)
-                    .contentShape(Rectangle())
-                    .accessibilityIdentifier("discover.all.result.\(book.id)")
-                HStack {
-                    Spacer()
-                    Button {
+                BookCoverCard(
+                    title: book.title,
+                    author: book.authors,
+                    coverURL: book.thumbnailURL,
+                    coverAssetName: nil,
+                    onAddToLibrary: {
                         #if os(iOS)
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         #endif
@@ -224,15 +239,10 @@ struct DiscoverAllView: View {
                         } catch {
                             print("⛔️ Add failed: \(error)")
                         }
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title3)
-                            .foregroundStyle(AppColors.brandPrimary)
-                            .accessibilityLabel(Text(LocalizedStringKey("discover.addToLibrary")))
-                            .accessibilityIdentifier("discover.all.addButton.\(book.id)")
                     }
-                    .buttonStyle(.plain)
-                }
+                )
+                .contentShape(Rectangle())
+                .accessibilityIdentifier("discover.all.result.\(book.id)")
             }
         }
     }
@@ -245,8 +255,14 @@ struct DiscoverAllView: View {
                 } label: {
                     // Falls dein BookCoverCard den BookEntity-Init hat, kannst du ihn direkt verwenden:
                     // BookCoverCard(book: book)
-                    BookCoverCard(title: book.title, author: book.author, coverURL: nil, coverAssetName: nil)
-                        .contentShape(Rectangle())
+                    BookCoverCard(
+                        title: book.title,
+                        author: book.author,
+                        coverURL: nil,
+                        coverAssetName: nil,
+                        onAddToLibrary: nil
+                    )
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("discover.all.card.\(book.id.uuidString.prefix(6))")
@@ -295,6 +311,24 @@ struct DiscoverAllView: View {
 
     private func titleIn(_ book: BookEntity, matchesAnyOf parts: [String]) -> Bool {
         parts.contains { p in book.title.range(of: p, options: [.caseInsensitive, .diacriticInsensitive]) != nil }
+    }
+
+    /// Spezifischer leerer Zustand: aktive Suche / Kategorie liefert nichts
+    private var noResultsForCategory: some View {
+        VStack(spacing: AppSpace._16) {
+            Image(systemName: "questionmark.book")
+                .font(.system(size: 36))
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+
+            Text(LocalizedStringKey("discover.empty.noResultsForCategory"))
+                .font(.subheadline)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, AppSpace._16)
+        }
+        .frame(maxWidth: .infinity, minHeight: 200)
+        .padding(.horizontal, AppSpace._16)
+        .accessibilityIdentifier("discover.empty.category")
     }
 }
 

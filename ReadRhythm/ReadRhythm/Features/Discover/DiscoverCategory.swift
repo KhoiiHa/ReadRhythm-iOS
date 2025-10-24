@@ -34,26 +34,54 @@ enum DiscoverCategory: String, CaseIterable, Identifiable {
     /// Query für Google Books API (wird direkt an `BookSearchRepository` gegeben).
     var query: String {
         switch self {
-        case .mindfulness:    return "subject:mindfulness OR subject:meditation"
-        case .selfHelp:       return "subject:self-help OR subject:personal+growth"
-        case .philosophy:     return "subject:philosophy OR subject:spirituality"
-        case .fictionRomance: return "subject:fiction OR subject:romance"
-        case .creativity:     return "subject:art OR subject:creativity"
-        case .wellness:       return "subject:health OR subject:wellness"
-        case .psychology:     return "subject:psychology"
+        case .mindfulness:
+            // Breiter gefasst: enthält Mindfulness, Meditation, Stressabbau
+            return #"subject:"mindfulness" OR subject:"meditation" OR mindfulness OR meditation OR "stress relief" OR "inner peace""#
+        case .selfHelp:
+            // Persönlichkeitsentwicklung, Motivation, Selbsthilfe
+            return #"self-help OR personal growth OR motivation OR "self improvement" OR habits OR inspiration"#
+        case .philosophy:
+            // Lebenskunst, Ethik, Stoizismus
+            return #"philosophy OR stoicism OR ethics OR spirituality OR wisdom OR "life philosophy""#
+        case .fictionRomance:
+            // Belletristik & Romantik
+            return #"fiction OR romance OR love story OR novel OR literature"#
+        case .creativity:
+            // Kreativität, Kunst, Schreiben
+            return #"art OR creativity OR design OR writing OR imagination OR "creative process""#
+        case .wellness:
+            // Gesundheit, Wohlbefinden, Körper & Geist
+            return #"health OR wellness OR fitness OR nutrition OR mindfulness OR "body mind spirit""#
+        case .psychology:
+            // Psychologie, Emotionen, mentales Wohlbefinden
+            return #"psychology OR mental health OR wellbeing OR "emotional intelligence" OR "self awareness""#
         }
     }
 
-    /// SF Symbol für UI-Buttons/Chips (Portfolio-polish, optional).
+    /// SF Symbol für UI-Buttons/Chips (visuell klar + thematisch passend zur Zielgruppe).
     var systemImage: String {
         switch self {
-        case .mindfulness:    return "leaf"
-        case .selfHelp:       return "sparkles"
-        case .philosophy:     return "book.closed"
-        case .fictionRomance: return "heart.text.square"
-        case .creativity:     return "paintpalette"
-        case .wellness:       return "cross.case" // alternativ: "heart"
-        case .psychology:     return "brain.head.profile"
+        case .mindfulness:
+            // ruhig, Balance, Achtsamkeit
+            return "leaf"
+        case .selfHelp:
+            // Selbstentwicklung / Wachstum / innere Arbeit
+            return "figure.mind.and.body"
+        case .philosophy:
+            // Nachdenken, Lebenskunst, Weisheit
+            return "book.closed"
+        case .fictionRomance:
+            // Emotionale Geschichten, Nähe, Beziehungen
+            return "book.heart"
+        case .creativity:
+            // Ausdruck, Gestaltung, eigene Stimme
+            return "paintpalette"
+        case .wellness:
+            // Wohlbefinden, Self-Care, Für-sich-sorgen
+            return "heart.text.square"
+        case .psychology:
+            // Kopf & Gefühle verstehen
+            return "brain.head.profile"
         }
     }
 

@@ -20,28 +20,49 @@ public struct RemoteBook: Equatable, Sendable {
 // MARK: - Mapping
 
 extension VolumeDTO {
-    /// Mappt ein einzelnes VolumeDTO in ein `RemoteBook`.
-    func toRemoteBook() -> RemoteBook {
-        let title = volumeInfo.title?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
-                    ?? "—"
-        let authorsJoined = (volumeInfo.authors ?? [])
+    /// Mappt ein einzelnes VolumeDTO in ein `RemoteBook`,
+    /// oder `nil`, wenn die Daten unbrauchbar sind.
+    func toRemoteBook() -> RemoteBook? {
+        // volumeInfo ist laut API optional – wenn's fehlt, können wir das Buch nicht darstellen
+        guard let info = volumeInfo else {
+            return nil
+        }
+
+        // Titel ist Pflicht. Ohne echten Titel zeigen wir das Buch gar nicht.
+        let rawTitle = info.title?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .nilIfEmpty
+
+        guard let safeTitle = rawTitle else {
+            return nil
+        }
+
+        // Autorenliste ist optional → wir erlauben "—" als Fallback
+        let authorsJoined = (info.authors ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
             .joined(separator: ", ")
             .nilIfEmpty ?? "—"
 
-        let thumb = volumeInfo.imageLinks?.thumbnail
-                    ?? volumeInfo.imageLinks?.smallThumbnail
+        // Thumbnail kann an mehreren Stellen stehen; wir upgraden http → https
+        let thumb = info.imageLinks?.thumbnail
+                 ?? info.imageLinks?.smallThumbnail
         let normalizedURL = thumb.flatMap { URL(string: $0) }?.forcingHTTPS()
 
-        return RemoteBook(id: id, title: title, authors: authorsJoined, thumbnailURL: normalizedURL)
+        return RemoteBook(
+            id: id,
+            title: safeTitle,
+            authors: authorsJoined,
+            thumbnailURL: normalizedURL
+        )
     }
 }
 
 extension BooksSearchResponseDTO {
     /// Extrahiert eine Liste von `RemoteBook` aus der Suchantwort (defensiv, stabil).
+    /// Ungültige / unvollständige Volumes werden dabei übersprungen.
     func toRemoteBooks() -> [RemoteBook] {
-        (items ?? []).map { $0.toRemoteBook() }
+        (items ?? []).compactMap { $0.toRemoteBook() }
     }
 }
 

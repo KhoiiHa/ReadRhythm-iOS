@@ -21,6 +21,13 @@ struct DiscoverView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = DiscoverViewModel()
     @State private var didAutoLoad = false
+    @State private var showFilterSheet = false
+
+    /// true, wenn der Nutzer aktiv filtert/sucht (Kategorie gewählt oder Text eingegeben)
+    private var hasActiveFilter: Bool {
+        let q = viewModel.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        return viewModel.selectedCategory != nil || !q.isEmpty
+    }
 
     var body: some View {
         ScrollView {
@@ -46,44 +53,50 @@ struct DiscoverView: View {
                         showSeeAll: false
                     )
                     resultsList(viewModel.results)
+                } else if !viewModel.isLoading && viewModel.results.isEmpty && hasActiveFilter {
+                    // Keine Treffer für aktive Suche / Kategorie
+                    noResultsForCategory
                 }
 
-                // Lokaler Fallback / kuratierte Sektionen (bleiben wie gehabt)
-                if allBooks.isEmpty && viewModel.results.isEmpty && !viewModel.isLoading {
-                    emptyState
-                } else {
-                    // Sektion 1: Empfohlen
-                    DiscoverSectionHeader(
-                        titleKey: "discover.section.recommended",
-                        showSeeAll: true,
-                        seeAllDestination: AnyView(
-                            DiscoverAllView(searchText: viewModel.searchQuery, category: (nil as DiscoverCategory?))
+                // Lokaler Fallback / kuratierte Sektionen:
+                // nur zeigen, wenn der Nutzer NICHT gerade filtert / sucht
+                if !hasActiveFilter {
+                    if allBooks.isEmpty && viewModel.results.isEmpty && !viewModel.isLoading {
+                        emptyState
+                    } else {
+                        // Sektion 1: Empfohlen
+                        DiscoverSectionHeader(
+                            titleKey: "discover.section.recommended",
+                            showSeeAll: true,
+                            seeAllDestination: AnyView(
+                                DiscoverAllView(searchText: viewModel.searchQuery, category: (nil as DiscoverCategory?))
+                            )
                         )
-                    )
-                    let recommended = Array(allBooks.prefix(8))
-                    horizontalBooks(recommended)
+                        let recommended = Array(allBooks.prefix(8))
+                        horizontalBooks(recommended)
 
-                    // Sektion 2: Aus deiner Library
-                    let libraryVisible = Array(allBooks.suffix(8))
-                    DiscoverSectionHeader(
-                        titleKey: "discover.section.fromLibrary",
-                        showSeeAll: allBooks.count > 8,
-                        seeAllDestination: AnyView(
-                            DiscoverAllView(searchText: viewModel.searchQuery, category: (nil as DiscoverCategory?))
+                        // Sektion 2: Aus deiner Library
+                        let libraryVisible = Array(allBooks.suffix(8))
+                        DiscoverSectionHeader(
+                            titleKey: "discover.section.fromLibrary",
+                            showSeeAll: allBooks.count > 8,
+                            seeAllDestination: AnyView(
+                                DiscoverAllView(searchText: viewModel.searchQuery, category: (nil as DiscoverCategory?))
+                            )
                         )
-                    )
-                    horizontalBooks(libraryVisible)
+                        horizontalBooks(libraryVisible)
 
-                    // Sektion 3: Trending
-                    let trendingVisible = Array(allBooks.shuffled().prefix(8))
-                    DiscoverSectionHeader(
-                        titleKey: "discover.section.trending",
-                        showSeeAll: allBooks.count > 8,
-                        seeAllDestination: AnyView(
-                            DiscoverAllView(searchText: viewModel.searchQuery, category: (nil as DiscoverCategory?))
+                        // Sektion 3: Trending
+                        let trendingVisible = Array(allBooks.shuffled().prefix(8))
+                        DiscoverSectionHeader(
+                            titleKey: "discover.section.trending",
+                            showSeeAll: allBooks.count > 8,
+                            seeAllDestination: AnyView(
+                                DiscoverAllView(searchText: viewModel.searchQuery, category: (nil as DiscoverCategory?))
+                            )
                         )
-                    )
-                    horizontalBooks(trendingVisible)
+                        horizontalBooks(trendingVisible)
+                    }
                 }
             }
             .padding(.vertical, AppSpace._16)
@@ -108,19 +121,93 @@ struct DiscoverView: View {
                     .accessibilityIdentifier("toast.\(key)")
             }
         }
+        .sheet(isPresented: $showFilterSheet) {
+            VStack(spacing: AppSpace._16) {
+                HStack {
+                    Text("Filter")
+                        .font(.headline)
+                    Spacer()
+                    Button {
+                        showFilterSheet = false
+                    } label: {
+                        Text("Fertig")
+                            .font(.subheadline)
+                            .bold()
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("discover.filter.done")
+                }
+                .padding(.horizontal, AppSpace._16)
+                .padding(.top, AppSpace._16)
+
+                Divider()
+
+                VStack(alignment: .leading, spacing: AppSpace._12) {
+                    Text("Aktive Kategorie")
+                        .font(.footnote)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+
+                    if let cat = viewModel.selectedCategory {
+                        HStack(spacing: AppSpace._8) {
+                            Image(systemName: cat.systemImage)
+                            Text(cat.displayName)
+                        }
+                        .font(.subheadline)
+                        .padding(.horizontal, AppSpace._12)
+                        .padding(.vertical, AppSpace._8)
+                        .background(
+                            Capsule().fill(AppColors.Semantic.bgElevated)
+                                .overlay(
+                                    Capsule().stroke(AppColors.Semantic.borderMuted, lineWidth: 1)
+                                )
+                        )
+                    } else {
+                        Text("Keine Kategorie ausgewählt")
+                            .font(.subheadline)
+                            .foregroundStyle(AppColors.Semantic.textSecondary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, AppSpace._16)
+
+                Divider()
+
+                VStack(spacing: AppSpace._12) {
+                    Button {
+                        // Reset: Kategorie weg, Suchfeld leeren, lokale Fallback-Sektionen zeigen
+                        viewModel.searchQuery = ""
+                        viewModel.applyFilter(category: nil)
+                        showFilterSheet = false
+                        #if DEBUG
+                        print("🧼 [DiscoverView] filters reset")
+                        #endif
+                    } label: {
+                        Label(
+                            LocalizedStringKey("discover.empty.resetFilters"),
+                            systemImage: "arrow.counterclockwise"
+                        )
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(AppColors.Semantic.tintPrimary)
+                    .accessibilityIdentifier("discover.filter.reset")
+                }
+                .padding(.horizontal, AppSpace._16)
+
+                Spacer()
+            }
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
         .onAppear {
             // Lokale Library laden (für Fallback & "aus deiner Library")
             viewModel.loadBooks(from: modelContext)
-            
-            // Einmalig beim ersten Öffnen: Default-Kategorie setzen und initiale Suche anstoßen
+
+            // Erste API-Ladung nur einmal anstoßen.
             if !didAutoLoad {
                 didAutoLoad = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    viewModel.applyFilter(category: .mindfulness)
-                    // Immer eine nicht-leere Query setzen und Suche starten (robust gegen leere Zustände)
-                    viewModel.searchQuery = DiscoverCategory.mindfulness.query
-                    viewModel.applySearch()
-                }
+                // Kategorien-Start (z. B. Achtsamkeit & Balance)
+                viewModel.applyFilter(category: .mindfulness)
             }
         }
     }
@@ -136,11 +223,15 @@ struct DiscoverView: View {
             .onSubmit { viewModel.applySearch() }
             Spacer()
             Button {
-                // future: filters sheet
+                #if DEBUG
+                print("🔬 [DiscoverView] filter tapped")
+                #endif
+                showFilterSheet = true
             } label: {
                 Image(systemName: "slider.horizontal.3")
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("discover.filterButton")
         }
         .font(.subheadline)
         .padding(.horizontal, AppSpace._16)
@@ -193,27 +284,22 @@ struct DiscoverView: View {
     private func resultsList(_ items: [RemoteBook]) -> some View {
         LazyVStack(spacing: AppSpace._12) {
             ForEach(items, id: \.id) { book in
-                BookCoverCard(title: book.title, author: book.authors, coverURL: book.thumbnailURL, coverAssetName: nil)
-                  HStack {
-                      Spacer()
-                      Button {
-                          #if os(iOS)
-                          UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                          #endif
-                          do {
-                              try viewModel.addToLibrary(from: book, in: modelContext)
-                          } catch {
-                              print("⛔️ Add failed: \(error)")
-                          }
-                      } label: {
-                          Image(systemName: "plus.circle.fill")
-                              .font(.title3)
-                              .foregroundStyle(AppColors.brandPrimary)
-                              .accessibilityLabel(Text(LocalizedStringKey("discover.addToLibrary")))
-                              .accessibilityIdentifier("discover.addButton.\(book.id)")
-                      }
-                      .buttonStyle(.plain)
-                  }
+                BookCoverCard(
+                    title: book.title,
+                    author: book.authors,
+                    coverURL: book.thumbnailURL,
+                    coverAssetName: nil,
+                    onAddToLibrary: {
+                        #if os(iOS)
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        #endif
+                        do {
+                            try viewModel.addToLibrary(from: book, in: modelContext)
+                        } catch {
+                            print("\u{26D4}\u{FE0F} Add failed:", error)
+                        }
+                    }
+                )
                 Divider().opacity(0.1)
             }
         }
@@ -227,8 +313,14 @@ struct DiscoverView: View {
                     NavigationLink {
                         DiscoverDetailView(book: book)
                     } label: {
-                        BookCoverCard(title: book.title, author: book.author, coverURL: nil, coverAssetName: nil)
-                            .contentShape(Rectangle())
+                        BookCoverCard(
+                            title: book.title,
+                            author: book.author,
+                            coverURL: nil,
+                            coverAssetName: nil,
+                            onAddToLibrary: nil
+                        )
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                 }
@@ -259,5 +351,25 @@ struct DiscoverView: View {
         .frame(maxWidth: .infinity, minHeight: 320)
         .background(AppColors.Semantic.bgPrimary)
         .accessibilityIdentifier("discover.empty")
+    }
+    
+    /// Spezifischer leerer Zustand: aktive Suche / Kategorie liefert nichts
+    private var noResultsForCategory: some View {
+        VStack(spacing: AppSpace._16) {
+            Image(systemName: "questionmark.book")
+                .font(.system(size: 36))
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+
+            Text(LocalizedStringKey("discover.empty.noResultsForCategory"))
+                .font(.subheadline)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, AppSpace._16)
+
+            // Optional später: Button "Filter zurücksetzen"
+        }
+        .frame(maxWidth: .infinity, minHeight: 200)
+        .padding(.horizontal, AppSpace._16)
+        .accessibilityIdentifier("discover.empty.category")
     }
 }

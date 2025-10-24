@@ -13,42 +13,66 @@ struct BookCoverCard: View {
     let coverURL: URL?
     let coverAssetName: String?
 
+    /// Wird aufgerufen, wenn der Nutzer auf "+" tippt.
+    var onAddToLibrary: (() -> Void)?
+
     private let coverSize = CGSize(width: 120, height: 180)
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpace._8) {
-            // Cover Image or Placeholder
-            if let coverAssetName = coverAssetName {
-                Image(coverAssetName)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: coverSize.width, height: coverSize.height)
-                    .clipped()
-                    .cornerRadius(AppRadius.l)
-                    .shadow(color: AppShadow.elevation1, radius: 4, x: 0, y: 2)
-                    .accessibilityHidden(true)
-            } else if let coverURL = coverURL {
-                AsyncImage(url: coverURL) { phase in
-                    switch phase {
-                    case .empty:
-                        placeholderCover
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: coverSize.width, height: coverSize.height)
-                            .clipped()
-                            .cornerRadius(AppRadius.l)
-                            .shadow(color: AppShadow.elevation1, radius: 4, x: 0, y: 2)
-                            .accessibilityHidden(true)
-                    case .failure:
-                        placeholderCover
-                    @unknown default:
-                        placeholderCover
+            ZStack(alignment: .topTrailing) {
+                // Cover Image or Placeholder
+                if let coverAssetName = coverAssetName {
+                    Image(coverAssetName)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: coverSize.width, height: coverSize.height)
+                        .clipped()
+                        .cornerRadius(AppRadius.l)
+                        .shadow(color: AppShadow.elevation1, radius: 4, x: 0, y: 2)
+                        .accessibilityHidden(true)
+                } else if let coverURL = coverURL {
+                    AsyncImage(url: coverURL) { phase in
+                        switch phase {
+                        case .empty:
+                            placeholderCover
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: coverSize.width, height: coverSize.height)
+                                .clipped()
+                                .cornerRadius(AppRadius.l)
+                                .shadow(color: AppShadow.elevation1, radius: 4, x: 0, y: 2)
+                                .accessibilityHidden(true)
+                        case .failure:
+                            placeholderCover
+                        @unknown default:
+                            placeholderCover
+                        }
                     }
+                } else {
+                    placeholderCover
                 }
-            } else {
-                placeholderCover
+
+                // Add-to-Library Button
+                if let onAddToLibrary = onAddToLibrary {
+                    Button(action: {
+                        #if os(iOS)
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        #endif
+                        onAddToLibrary()
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 26))
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(AppColors.Semantic.tintPrimary)
+                            .shadow(radius: 2)
+                    }
+                    .padding(6)
+                    .accessibilityLabel(Text("book.addToLibrary"))
+                    .accessibilityIdentifier("bookcard.addButton")
+                }
             }
 
             // Texte
