@@ -19,11 +19,13 @@ final class LocalSessionRepository: SessionRepository {
     func addSession(for book: BookEntity, minutes: Int, date: Date) throws -> ReadingSessionEntity {
         precondition(minutes > 0, "Session minutes must be positive")
 
+        // Neue Leseeinheit anlegen und mit dem Buch verknüpfen
         let session = ReadingSessionEntity(date: date, minutes: minutes, book: book)
+
+        // In den Context einfügen
         context.insert(session)
 
-        // Relationship pflegen, falls BookEntity.sessions existiert
-        book.sessions.append(session)
+        // ⚠️ kein book.sessions.append(session) mehr – BookEntity hat kein sessions-[...] Feld
 
         do {
             try context.save()
@@ -38,7 +40,6 @@ final class LocalSessionRepository: SessionRepository {
             throw error
         }
     }
-
     /// Löscht eine ReadingSessionEntity aus SwiftData.
     /// Kontext → Warum → Wie:
     /// - Kontext: Diese Methode ergänzt die Repository-Schnittstelle um die Delete-Logik.

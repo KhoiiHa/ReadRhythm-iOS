@@ -12,8 +12,8 @@ struct LibraryView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = LibraryViewModel()
 
-    // Sortierung nach Erstellungsdatum (neueste zuerst). Passe an, falls dein Modell anders ist.
-    @Query(sort: [SortDescriptor(\BookEntity.createdAt, order: .reverse)])
+    // Sortierung nach Hinzugefügt-am-Datum (neueste zuerst).
+    @Query(sort: [SortDescriptor(\BookEntity.dateAdded, order: .reverse)])
     private var books: [BookEntity]
 
     var body: some View {

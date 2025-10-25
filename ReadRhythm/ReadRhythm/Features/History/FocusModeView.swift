@@ -5,6 +5,13 @@
 //  Created by Vu Minh Khoi Ha on 20.10.25.
 //
 
+//
+//  FocusModeView.swift
+//  ReadRhythm
+//
+//  Created by Vu Minh Khoi Ha on 20.10.25.
+//
+
 import SwiftUI
 import SwiftData
 #if os(iOS)
@@ -24,11 +31,13 @@ struct FocusModeView: View {
 
     var body: some View {
         VStack(spacing: AppSpace.xl) {
+
             // Header
             VStack(spacing: AppSpace.xs) {
                 Text(LocalizedStringKey("focus.title"))
                     .font(.title2).bold()
                     .accessibilityIdentifier("Focus.Title")
+
                 Text(LocalizedStringKey("focus.subtitle"))
                     .font(.subheadline)
                     .foregroundStyle(AppColors.textSecondary)
@@ -43,16 +52,20 @@ struct FocusModeView: View {
                     Image(systemName: "book.closed")
                         .imageScale(.medium)
                         .foregroundStyle(AppColors.textSecondary)
+
                     VStack(alignment: .leading, spacing: 2) {
                         Text(LocalizedStringKey("focus.picker.title"))
                             .font(.footnote)
                             .foregroundStyle(AppColors.textSecondary)
+
                         Text(selectedBookTitle ?? String(localized: "focus.picker.choose"))
                             .font(.callout.weight(.semibold))
                             .lineLimit(1)
                             .truncationMode(.tail)
                     }
+
                     Spacer()
+
                     Image(systemName: "chevron.right")
                         .font(.footnote)
                         .foregroundStyle(AppColors.textSecondary)
@@ -61,7 +74,10 @@ struct FocusModeView: View {
                 .frame(maxWidth: .infinity)
                 .background(AppColors.surfacePrimary)
                 .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: AppRadius.l).stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75))
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppRadius.l)
+                        .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+                )
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("Focus.BookPicker")
@@ -81,8 +97,16 @@ struct FocusModeView: View {
                 .frame(maxWidth: .infinity)
                 .background(AppColors.surfacePrimary)
                 .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: AppRadius.xl).stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75))
-                .shadow(color: AppShadow.card.color, radius: AppShadow.card.radius, x: AppShadow.card.x, y: AppShadow.card.y)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppRadius.xl)
+                        .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+                )
+                .shadow(
+                    color: AppShadow.card.color,
+                    radius: AppShadow.card.radius,
+                    x: AppShadow.card.x,
+                    y: AppShadow.card.y
+                )
                 .accessibilityIdentifier("Focus.Timer")
 
             // Duration Slider
@@ -90,10 +114,16 @@ struct FocusModeView: View {
                 Text(LocalizedStringKey("focus.duration"))
                     .font(.footnote)
                     .foregroundStyle(AppColors.textSecondary)
-                Slider(value: Binding(
-                    get: { Double(vm.durationMinutes) },
-                    set: { vm.updateDuration(Int($0)) }
-                ), in: 5...120, step: 5)
+
+                Slider(
+                    value: Binding(
+                        get: { Double(vm.durationMinutes) },
+                        set: { vm.updateDuration(Int($0)) }
+                    ),
+                    in: 5...120,
+                    step: 5
+                )
+
                 Text("\(vm.durationMinutes) " + String(localized: "goals.metric.minutes"))
                     .font(.caption)
                     .foregroundStyle(AppColors.textSecondary)
@@ -102,6 +132,7 @@ struct FocusModeView: View {
 
             // Controls
             HStack(spacing: AppSpace.md) {
+
                 Button {
                     #if DEBUG
                     print("[Focus] Start pressed, duration=\(vm.durationMinutes)")
@@ -154,6 +185,7 @@ private struct BookPickerSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
     @Query(sort: \BookEntity.title) private var books: [BookEntity]
+
     let onSelect: (BookEntity) -> Void
 
     init(onSelect: @escaping (BookEntity) -> Void) {
@@ -172,8 +204,10 @@ private struct BookPickerSheet: View {
                             Text(book.title)
                                 .font(.body)
                                 .foregroundStyle(AppColors.textPrimary)
-                            if let author = book.author, !author.isEmpty {
-                                Text(author)
+
+                            // author is now a non-optional String on BookEntity
+                            if !book.author.isEmpty {
+                                Text(book.author)
                                     .font(.caption)
                                     .foregroundStyle(AppColors.textSecondary)
                             }
@@ -181,7 +215,9 @@ private struct BookPickerSheet: View {
                         Spacer()
                     }
                 }
-                .accessibilityIdentifier("Focus.BookPicker.Row.\(String(describing: book.persistentModelID))")
+                .accessibilityIdentifier(
+                    "Focus.BookPicker.Row.\(String(describing: book.persistentModelID))"
+                )
             }
             .navigationTitle(Text(LocalizedStringKey("focus.picker.nav")))
             .toolbar {
@@ -213,3 +249,39 @@ private extension FocusModeView {
         #endif
     }
 }
+
+#if DEBUG
+import SwiftData
+
+struct FocusModeView_Previews: PreviewProvider {
+    static var previews: some View {
+
+        // 1. In-Memory SwiftData Container für Preview bauen
+        let container = try! ModelContainer(
+            for: BookEntity.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+
+        // 2. Einen ModelContext ableiten
+        let previewContext = ModelContext(container)
+
+        // 3. Dummy-Buch einfügen, damit der Picker was hat
+        //    WICHTIG:
+        //    - `source:` ist jetzt ein String, kein Enum mehr.
+        //    - also einfach "userAdded" (oder "googleBooks")
+        previewContext.insert(
+            BookEntity(
+                sourceID: "demo-id",
+                title: "Atomic Habits",
+                author: "James Clear",
+                thumbnailURL: nil,
+                source: "userAdded"
+            )
+        )
+
+        // 4. Die View mit diesem Context zurückgeben
+        return FocusModeView(context: previewContext)
+            .modelContainer(container)
+    }
+}
+#endif

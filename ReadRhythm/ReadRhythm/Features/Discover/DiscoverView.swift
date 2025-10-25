@@ -69,7 +69,7 @@ struct DiscoverView: View {
                             titleKey: "discover.section.recommended",
                             showSeeAll: true,
                             seeAllDestination: AnyView(
-                                DiscoverAllView(searchText: viewModel.searchQuery, category: (nil as DiscoverCategory?))
+                                DiscoverAllView(initialSearchText: viewModel.searchQuery, initialCategory: nil)
                             )
                         )
                         let recommended = Array(allBooks.prefix(8))
@@ -81,7 +81,7 @@ struct DiscoverView: View {
                             titleKey: "discover.section.fromLibrary",
                             showSeeAll: allBooks.count > 8,
                             seeAllDestination: AnyView(
-                                DiscoverAllView(searchText: viewModel.searchQuery, category: (nil as DiscoverCategory?))
+                                DiscoverAllView(initialSearchText: viewModel.searchQuery, initialCategory: nil)
                             )
                         )
                         horizontalBooks(libraryVisible)
@@ -92,7 +92,7 @@ struct DiscoverView: View {
                             titleKey: "discover.section.trending",
                             showSeeAll: allBooks.count > 8,
                             seeAllDestination: AnyView(
-                                DiscoverAllView(searchText: viewModel.searchQuery, category: (nil as DiscoverCategory?))
+                                DiscoverAllView(initialSearchText: viewModel.searchQuery, initialCategory: nil)
                             )
                         )
                         horizontalBooks(trendingVisible)
@@ -106,7 +106,7 @@ struct DiscoverView: View {
         .tint(AppColors.Semantic.tintPrimary)
         .accessibilityIdentifier("discover.view")
         .overlay(alignment: .bottom) {
-            if let key = viewModel.toastMessageKey {
+            if let key = viewModel.toastText {
                 Text(LocalizedStringKey(key))
                     .font(.footnote)
                     .padding(.horizontal, 12)
@@ -117,7 +117,7 @@ struct DiscoverView: View {
                     )
                     .padding(.bottom, 24)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .animation(.easeInOut(duration: 0.2), value: viewModel.toastMessageKey)
+                    .animation(.easeInOut(duration: 0.2), value: viewModel.toastText)
                     .accessibilityIdentifier("toast.\(key)")
             }
         }
@@ -293,11 +293,7 @@ struct DiscoverView: View {
                         #if os(iOS)
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         #endif
-                        do {
-                            try viewModel.addToLibrary(from: book, in: modelContext)
-                        } catch {
-                            print("\u{26D4}\u{FE0F} Add failed:", error)
-                        }
+                        viewModel.addToLibrary(from: book, in: modelContext)
                     }
                 )
                 Divider().opacity(0.1)

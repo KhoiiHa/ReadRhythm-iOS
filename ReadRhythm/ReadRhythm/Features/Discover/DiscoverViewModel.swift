@@ -1,340 +1,236 @@
-//
-//  DiscoverViewModel.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 15.10.25.
-//
-
 import Foundation
+import Combine
 import SwiftData
-// Remote search domain model & repo live in API/ and Repositories/
-// (Make sure these targets are included in the same build)
 
-/// ViewModel für den Discover-Screen.
-/// Zuständigkeiten:
-///  - Lädt Bücher aus der Google Books API (über BookSearchRepository)
-///  - Steuert Suchfeld, Kategorien und Ladezustände im UI
-///  - Trennt Nutzer-Suchtext (`searchQuery`) von der tatsächlichen Request-Query (`activeRequestQuery`)
-///
-/// Warum diese Trennung?
-///  - `searchQuery` ist, was die Nutzerin eintippt (Autor, Titel, Keyword).
-///  - `activeRequestQuery` ist, was wir wirklich an die API schicken.
-///    Das kann z. B. die kuratierte Kategorie-Query aus `DiscoverCategory` sein.
-///
-/// Ergebnis:
-///  - Das Suchfeld zeigt keinen kryptischen Debug-String wie `subject:"mindfulness" OR ...`.
-///  - Kategorien liefern sofort kuratierte Treffer.
-///  - Eigene Eingaben der Nutzerin (z. B. "Colleen Hoover") überschreiben die Kategorie.
 @MainActor
 final class DiscoverViewModel: ObservableObject {
-    // MARK: - UI State (Discover)
+
+    // MARK: - Published State für UI
+
+    @Published var results: [RemoteBook] = []          // letzte API-Suchergebnisse
+    @Published var isLoading: Bool = false             // Spinner in DiscoverAllView
+    @Published var errorMessage: String? = nil         // lokalisierbarer Key für Fehler
+    @Published var searchQuery: String = ""            // Textfeld in DiscoverAllView
     @Published var selectedCategory: DiscoverCategory? = nil
-    @Published var searchQuery: String = ""
-    @Published private(set) var results: [RemoteBook] = []
-    @Published private(set) var isLoading: Bool = false
-    @Published private(set) var errorMessage: String? = nil
 
-    /// Kurzlebige UI-Rückmeldung (i18n-Key), z. B. "toast.added" / "toast.duplicate"
-    @Published var toastMessageKey: String? = nil
+    @Published var allBooks: [BookEntity] = []         // ganze lokale Bibliothek
+    @Published var filteredBooks: [BookEntity] = []    // ggf. gefiltert für UI
 
-    // MARK: - Local Library (kept for future cross-reference / "Add to Library" flow)
-    private var allBooks: [BookEntity] = []
-    private(set) var filteredBooks: [BookEntity] = []
-
-    // Debounce-Task für Tippen in der Suche (verhindert Request-Spam)
-    private var searchTask: Task<Void, Never>? = nil
-
-    /// Interne Query, die zuletzt wirklich zur API geschickt wurde.
-    /// Wichtig: `searchQuery` ist nur der sichtbare Text im Suchfeld.
-    /// `activeRequestQuery` kann eine kuratierte Kategorie-Query sein.
-    private var activeRequestQuery: String = ""
+    @Published var toastText: String? = nil            // "Hinzugefügt", "Schon vorhanden", etc.
 
     // MARK: - Dependencies
-    // Local data service stays for Library preview/Lookups
-    private let dataService = DataService.shared
-    // Remote search repository (injectable for tests)
-    private let searchRepository: BookSearchRepositoryProtocol
-    // Network status (injectable; default = NetworkStatusMonitor.shared)
-    private let networkStatus: NetworkStatusProviding
 
-    // MARK: - Init
-    init(
-        searchRepository: BookSearchRepositoryProtocol? = nil,
-        networkStatus: NetworkStatusProviding = NetworkStatusMonitor.shared
-    ) {
-        // DiscoverViewModel is @MainActor; Erzeugung des Default-Repos hier ist actor-sicher.
-        self.searchRepository = searchRepository ?? BookSearchRepository()
-        self.networkStatus = networkStatus
-    }
+    private let bookSearchRepository = BookSearchRepository()
 
-    func loadBooks(from context: ModelContext) {
-        allBooks = dataService.fetchBooks(from: context)
-        filteredBooks = allBooks
+    private func showToast(_ key: String) {
+        toastText = key
         #if DEBUG
-        print("📚 [DiscoverVM] loaded local library: \(allBooks.count) books")
+        print("🍞 [DiscoverVM] toast =", key)
         #endif
     }
 
-    /// Setzt die Discover-Kategorie (für vordefinierte Bundles) und triggert eine Suche.
+    // MARK: - SwiftData / Lokale Bibliothek laden
+
+    /// Holt alle gespeicherten Bücher aus SwiftData.
+    /// Sortierung: neueste zuerst.
+    func loadBooks(from context: ModelContext) {
+        do {
+            let fetched = try context.fetch(
+                FetchDescriptor<BookEntity>(
+                    sortBy: [SortDescriptor(\.dateAdded, order: .reverse)]
+                )
+            )
+            allBooks = fetched
+            filteredBooks = fetched
+            #if DEBUG
+            print("📚 [DiscoverVM] loadBooks fetched \(fetched.count) items from SwiftData")
+            #endif
+        } catch {
+            #if DEBUG
+            print("💥 [DiscoverVM] loadBooks failed:", error)
+            #endif
+        }
+    }
+
+    // MARK: - Suche / Kategorien
+
+    /// Wird aufgerufen, wenn der Nutzer einen Kategorie-Chip antippt.
+    /// Setzt `selectedCategory` und startet direkt eine Suche.
     func applyFilter(category: DiscoverCategory?) {
         selectedCategory = category
-
-        // laufende, getimte Suche abbrechen – Kategorie hat Vorrang
-        searchTask?.cancel()
-        searchTask = nil
-
-        // Wenn eine Kategorie gewählt wurde:
-        if let cat = category {
-            // Wir überschreiben NICHT das Suchfeld (`searchQuery` bleibt lesbar für die Userin).
-            // Stattdessen setzen wir nur die aktive Request-Query und holen Daten.
-            activeRequestQuery = cat.query
-
-            Task {
-                await fetch(query: activeRequestQuery, category: cat)
-            }
-            return
-        }
-
-        // Wenn Kategorie entfernt wurde:
-        activeRequestQuery = ""
-
-        // Falls User gerade nichts sucht -> wieder lokale Library zeigen
-        let trimmed = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.isEmpty {
-            results = []
-            filteredBooks = allBooks
-            errorMessage = nil
-        } else {
-            // User hat was eingegeben -> suche nach diesem Text
-            Task {
-                await fetch(query: trimmed, category: nil)
-            }
-        }
-    }
-
-    /// Führt eine Suche aus. Leerer String zeigt lokale Library (Fallback) an.
-    func applySearch() {
-        let q = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        // Wenn das Feld leer ist:
-        if q.isEmpty {
-            // Kein Remote-Call, einfach lokale Daten/Fallback zeigen
-            results = []
-            filteredBooks = allBooks
-            errorMessage = nil
-
-            // Laufende Debounce-Suche abbrechen
-            searchTask?.cancel()
-            searchTask = nil
-            return
-        }
-
-        // Wir haben Nutzereingabe -> sie dominiert jetzt die Kategorie-Query.
-        activeRequestQuery = q
-
-        // Debounce: alte Suche abbrechen, neue verzögert starten (300ms)
-        searchTask?.cancel()
-        searchTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 300_000_000) // 300ms
-            guard let self else { return }
-            await self.fetch(query: q, category: self.selectedCategory)
-        }
-    }
-
-    // MARK: - Centralized fetch via Repository (SWR)
-    @MainActor
-    private func fetch(query: String?, category: DiscoverCategory?) async {
-        // 1) Manuell übergebene Query trimmen
-        let manual = (query ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-
-        // 2) Effektive Query bestimmen:
-        //    - falls Nutzereingabe vorhanden, nimm diese
-        //    - sonst nimm die kuratierte Kategorie-Query
-        let effectiveQuery: String = {
-            if !manual.isEmpty { return manual }
-            if let cat = category { return cat.query }
-            return ""
-        }()
-
-        guard !effectiveQuery.isEmpty else {
-            // Nichts zu suchen -> zurück in lokalen Fallback-Zustand
-            results = []
-            errorMessage = nil
-            return
-        }
-
-        isLoading = true
-        errorMessage = nil
-
         #if DEBUG
-        print("🔎 [DiscoverVM] fetch query='\(effectiveQuery)' category=\(category?.id ?? "nil")")
+        print("🔎 [DiscoverVM] applyFilter -> \(category?.rawValue ?? "nil")")
         #endif
+        applySearch()
+    }
 
-        // Wenn wir offline sind, kein Netzwerk-Call.
-        // Stattdessen sofort lesbare Fehlermeldung anzeigen.
-        if networkStatus.isOnline == false {
+    /// Baut anhand von `searchQuery` oder der gesetzten `selectedCategory`
+    /// den finalen Query-String und ruft dann die API.
+    func applySearch() {
+        let trimmed = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let effectiveQuery: String
+        if let cat = selectedCategory {
+            // feste Kategorie --> eigener Query-String
+            effectiveQuery = categoryQuery(for: cat)
+        } else if !trimmed.isEmpty {
+            // freier Text
+            effectiveQuery = trimmed
+        } else {
+            // weder Kategorie noch Text -> keine Remote-Suche
             #if DEBUG
-            print("📵 [DiscoverVM] offline -> skip remote call")
+            print("🌐 [DiscoverVM] applySearch skipped (no query)")
             #endif
-
-            // Nur anzeigen, wenn wir nicht ohnehin schon Ergebnisse haben.
-            if results.isEmpty {
-                self.errorMessage = "error.network.offline"
-            }
-
+            results = []
+            errorMessage = nil
             isLoading = false
             return
         }
 
-        do {
-            let items = try await searchRepository.search(
-                query: effectiveQuery,
-                category: category,
-                maxResults: 20
-            )
+        #if DEBUG
+        print("🌐 [DiscoverVM] applySearch query='\(effectiveQuery)' category=\(selectedCategory?.rawValue ?? "nil")")
+        #endif
 
-            // Deduplizieren nach Buch-ID, weil Google Books bei OR-Queries
-            // manchmal identische Volumes mehrfach liefert.
-            let unique: [RemoteBook] = Array(
-                Dictionary(grouping: items, by: { $0.id })
-                    .values
-                    .compactMap { $0.first }
-            )
+        isLoading = true
+        errorMessage = nil
 
-            self.results = unique
+        Task {
+            let fetchResult = await repositoryFetch(query: effectiveQuery)
 
-            #if DEBUG
-            print("✅ [DiscoverVM] results(unique)=\(unique.count)")
-            #endif
-        } catch let netErr as NetworkError {
-            #if DEBUG
-            print("⛔️ [DiscoverVM] network error:", netErr)
-            #endif
-
-            if results.isEmpty {
-                // Zeig lokalisierbaren String aus Localizable.strings
-                self.errorMessage = netErr.asUserMessage
-            }
-        } catch {
-            #if DEBUG
-            print("⛔️ [DiscoverVM] unexpected error:", error)
-            #endif
-
-            if results.isEmpty {
-                // Fallback: generische Discover-Fehlermeldung
-                self.errorMessage = "discover.error.generic"
-            }
-        }
-
-        isLoading = false
-    }
-
-    /// Remote-Suche über das BookSearchRepository.
-    /// Regel: Wenn eine manuelle Suche (searchQuery) vorhanden ist, hat sie Vorrang vor der Kategorie.
-    func searchBooks(forceRefresh: Bool = false) async {
-        // Diese Methode delegiert jetzt an `fetch` mit entweder User-Query oder Kategorie.
-        let manual = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        // Priorität: Nutzereingabe > Kategorie
-        let effectiveQuery: String = {
-            if !manual.isEmpty { return manual }
-            if let cat = selectedCategory { return cat.query }
-            return ""
-        }()
-
-        guard !effectiveQuery.isEmpty else {
-            #if DEBUG
-            print("🔎 [DiscoverVM] search skipped (no query / no category)")
-            #endif
-            results = []
-            errorMessage = nil
-            return
-        }
-
-        activeRequestQuery = effectiveQuery
-        await fetch(query: effectiveQuery, category: selectedCategory)
-    }
-
-    // MARK: - Toast Helper
-
-    /// Zeigt eine kurze Rückmeldung im UI (Toast) und blendet sie wieder aus.
-    /// Erwartet i18n-Keys wie "toast.added" / "toast.duplicate" / "toast.error".
-    /// Läuft vollständig auf dem MainActor.
-    private func showToast(_ key: String, duration: UInt64 = 1_500_000_000) {
-        toastMessageKey = key
-        Task { [weak self] in
-            try? await Task.sleep(nanoseconds: duration)
             await MainActor.run {
-                // Nur ausblenden, wenn der Toast noch derselbe ist (Race-Condition vermeiden)
-                if self?.toastMessageKey == key {
-                    self?.toastMessageKey = nil
+                self.isLoading = false
+                switch fetchResult {
+                case .success(let books):
+                    self.results = books
+                    self.errorMessage = nil
+                case .failure(let err):
+                    #if DEBUG
+                    print("💥 [DiscoverVM] search failed:", err)
+                    #endif
+                    self.results = []
+                    self.errorMessage = "error.network.generic"
                 }
             }
         }
     }
 
-    // MARK: - Add to Library (MVP happy path)
+    /// Baut den Google-Books-Query-String für eine vorgegebene Kategorie.
+    private func categoryQuery(for category: DiscoverCategory) -> String {
+        switch category {
+        case .mindfulness:
+            return #"mindfulness OR meditation OR \"stress relief\" OR \"inner peace\""#
+        case .philosophy:
+            return #"philosophy OR stoicism OR \"meaning of life\""#
+        case .selfHelp, .psychology:
+            return #"self improvement OR habits OR motivation OR psychology"#
+        case .creativity:
+            return #"creativity OR design OR writing OR inspiration"#
+        case .wellness:
+            return #"health OR sleep OR burnout OR recovery OR nutrition"#
+        case .fictionRomance:
+            return #"romance novel OR love story OR relationship fiction"#
+        }
+    }
 
-    /// Legt ein `RemoteBook` lokal als `BookEntity` in SwiftData an.
-    /// - Parameters:
-    ///   - remote: Ergebnis aus der Discover-Suche (Google Books).
-    ///   - context: `ModelContext` aus der View (per `@Environment(\.modelContext)`).
-    /// - Throws: Reicht Fehler als `AppError.saveFailed` nach oben.
-    /// - Hinweis: MVP-Variante – **mit einfacher Duplikatsprüfung**, kein Cover-Download.
-    /// Hinweis:
-    /// Wenn beim allerersten App-Start SwiftData den Store noch initialisiert
-    /// (Migration/Seeding) und wir hier gleichzeitig speichern wollen,
-    /// kann der Simulator laute CoreData-/SQLite-Warnungen loggen.
-    /// Das fixen wir später separat durch einen kleinen "Store ready"-Check
-    /// bevor wir speichern. API / Suche müssen zuerst sauber laufen.
-    func addToLibrary(from remote: RemoteBook, in context: ModelContext) throws {
-        // Autorenplatzhalter „—“ nicht persistieren
-        let author: String? = {
+    /// Wrappt den eigentlichen Netzwerkaufruf ans Repository.
+    private func repositoryFetch(query: String) async -> Result<[RemoteBook], Error> {
+        do {
+            let books = try await bookSearchRepository.search(
+                query: query,
+                category: selectedCategory,
+                maxResults: 20
+            )
+            return .success(books)
+        } catch {
+            return .failure(error)
+        }
+    }
+
+    // MARK: - In Bibliothek speichern
+
+    /// Nimmt ein RemoteBook (API-Ergebnis), baut ein BookEntity,
+    /// speichert es in SwiftData und aktualisiert lokale Arrays + Toast.
+    func addToLibrary(from remote: RemoteBook, in context: ModelContext) {
+
+        // Autor normalisieren (API kann "—" schicken oder leere Strings liefern)
+        let normalizedAuthor: String = {
             let trimmed = remote.authors.trimmingCharacters(in: .whitespacesAndNewlines)
-            return trimmed == "—" ? nil : trimmed
+            if trimmed == "—" || trimmed.isEmpty {
+                return ""
+            }
+            return trimmed
         }()
 
-        // 🔎 Duplikat-Check (Titel + Autor, case-insensitive, getrimmt)
-        let newTitle = remote.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        let newAuthor = (author ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        if allBooks.contains(where: { existing in
-            existing.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == newTitle &&
-            (existing.author ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == newAuthor
-        }) {
+        // Duplikate verhindern:
+        // 1) gleiche sourceID (Google Books Volume ID)
+        // 2) gleicher (title + author), case-insensitive/trimmed
+        let newTitleLC = remote.title
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+
+        let newAuthorLC = normalizedAuthor
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+
+        let isDuplicate = allBooks.contains { existing in
+
+            // Fall 1: gleiche sourceID
+            if existing.sourceID == remote.id {
+                return true
+            }
+
+            // Fall 2: gleicher Titel + gleicher Autor
+            let existingTitleLC = existing.title
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased()
+
+            let existingAuthorLC = existing.author
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased()
+
+            return (existingTitleLC == newTitleLC && existingAuthorLC == newAuthorLC)
+        }
+
+        if isDuplicate {
             #if DEBUG
-            print("🔁 [DiscoverVM] duplicate ignored: \"\(remote.title)\" by \(author ?? "n/a")")
+            print("🔁 [DiscoverVM] duplicate -> \(remote.title)")
             #endif
             showToast("toast.duplicate")
             return
         }
 
-        // Passe bei Bedarf an dein BookEntity-Init an
-        let entity = BookEntity(
+        // Neues Model anlegen, inkl. Cover / Quelle / Timestamp
+        let newEntity = BookEntity(
+            sourceID: remote.id,
             title: remote.title,
-            author: author
-            // , createdAt: Date()
-            // , source: "googleBooks"
+            author: normalizedAuthor,
+            thumbnailURL: remote.thumbnailURL?.absoluteString,
+            source: "Google Books",
+            dateAdded: .now
         )
 
-        context.insert(entity)
+        // Persistieren
         do {
+            context.insert(newEntity)
             try context.save()
-            #if DEBUG
-            print("📥 [DiscoverVM] added to library: \"\(remote.title)\" by \(author ?? "n/a")")
-            #endif
+
+            // Sofort UI updaten → wichtig für direkte UI-Reaktion + Toast
+            allBooks.insert(newEntity, at: 0)
+            filteredBooks = allBooks
+
             showToast("toast.added")
 
-            // Lokale VM-Spiegelung aktualisieren (für Fallback/Sektionen)
-            // SwiftData-Modelle besitzen standardmäßig kein `objectID`; wir haben oben bereits
-            // einen Duplikat-Check (Titel+Autor). Daher können wir direkt einfügen.
-            allBooks.insert(entity, at: 0)
-            filteredBooks = allBooks
+            #if DEBUG
+            print("✅ [DiscoverVM] saved book -> \(newEntity.title) [sourceID=\(newEntity.sourceID)]")
+            #endif
         } catch {
             #if DEBUG
             print("⛔️ [DiscoverVM] save failed:", error)
+            if let nserr = error as NSError? {
+                print("⛔️ [DiscoverVM] save failed domain=\(nserr.domain) code=\(nserr.code) userInfo=\(nserr.userInfo)")
+            }
             #endif
             showToast("toast.error")
-            throw AppError.saveFailed
         }
     }
 }

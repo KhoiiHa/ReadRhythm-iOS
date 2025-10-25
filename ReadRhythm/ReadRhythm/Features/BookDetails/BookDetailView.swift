@@ -5,39 +5,25 @@
 //  Created by Vu Minh Khoi Ha on 19.10.25.
 //
 
-
-//
-//  BookDetailView.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 19.10.25.
-//
-
 import SwiftUI
 import SwiftData
 
 /// Kontext → Warum → Wie
-/// - Kontext: Detailansicht eines Buchs mit Lesesessions.
-/// - Warum: Kernfluss Library → Detail → Session; zeigt Fortschritt und erlaubt neue Sessions.
-/// - Wie: Theme-konsistenter Header, kompakte Stats, Session-Liste, Add-Session-Sheet. i18n/A11y-ready.
+/// Kontext: Detailansicht eines gespeicherten Buchs.
+/// Warum: Nutzer soll sehen, was er gespeichert hat (Titel, Autor, Quelle, hinzugefügt am, ggf. Cover),
+///        ohne dass hierfür Sessions oder Tracking vorausgesetzt wird.
+/// Wie: Leichtgewichtiger Screen, keine Abhängigkeit mehr von `book.sessions`
+///      (das Feld existiert im aktuellen `BookEntity` nicht mehr).
 struct BookDetailView: View {
     let book: BookEntity
 
-    @Environment(\.modelContext) private var context
-    @StateObject private var viewModel = BookDetailViewModel()
-
-    // MARK: - Derived
-    private var sessionsSorted: [ReadingSessionEntity] {
-        book.sessions.sorted { $0.date > $1.date }
-    }
-    private var totalMinutes: Int { sessionsSorted.reduce(0) { $0 + $1.minutes } }
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpace._16) {
-                header
-                stats
-                sessionsSection
+                headerSection
+                metaSection
             }
             .padding(.horizontal, AppSpace._16)
             .padding(.vertical, AppSpace._16)
@@ -45,71 +31,106 @@ struct BookDetailView: View {
         .background(AppColors.Semantic.bgPrimary)
         .navigationTitle(Text("book.detail.title"))
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { addSessionToolbar }
-        .onAppear { viewModel.bind(context: context) }
-        // Sheet: Add Session
-        .sheet(isPresented: $viewModel.showAddSessionSheet) {
-            AddSessionView { minutes, date in
-                viewModel.addSession(for: book, minutes: minutes, date: date)
-            }
-        }
-        // Fehler-Alert (i18n)
-        .alert(
-            Text("session.error.title"),
-            isPresented: Binding(
-                get: { viewModel.errorMessageKey != nil },
-                set: { if !$0 { viewModel.errorMessageKey = nil } }
-            )
-        ) {
-            Button("common.ok") { viewModel.errorMessageKey = nil }
-        } message: {
-            if let key = viewModel.errorMessageKey { Text(key) }
-        }
-    }
-
-    // MARK: - Header
-    private var header: some View {
-        VStack(alignment: .leading, spacing: AppSpace._12) {
-            // Dein kompakter Titel-/Autor-Header
-            BookHeaderView(title: book.title, author: book.author)
-
-            // CTA in eigener Zeile, links ausgerichtet + Top-Padding
-            HStack {
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    viewModel.showAddSessionSheet = true
+                    dismiss()
                 } label: {
-                    Label(String(localized: "session.add.cta"), systemImage: "plus")
+                    Image(systemName: "chevron.left")
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(AppColors.Semantic.tintPrimary)
-                .accessibilityIdentifier("bookdetail.addsession")
-
-                Spacer(minLength: 0)
+                .accessibilityIdentifier("bookdetail.back")
             }
-            .padding(.top, AppSpace._12)
         }
     }
 
-    // MARK: - Stats
-    private var stats: some View {
-        HStack(spacing: AppSpace._16) {
-            statTile(titleKey: "book.detail.sessions", value: "\(sessionsSorted.count)")
-            statTile(titleKey: "book.detail.minutes", value: "\(totalMinutes)")
+    // MARK: - Header (Cover + Titel + Autor + Quelle)
+    private var headerSection: some View {
+        HStack(alignment: .top, spacing: AppSpace._16) {
+
+            // unified cover component (remote cover or initials fallback)
+            CoverArtwork(
+                thumbnailURLString: book.thumbnailURL,
+                titleForInitials: book.title,
+                width: 100,
+                height: 140
+            )
+            .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: AppSpace._8) {
+                Text(book.title)
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(AppColors.Semantic.textPrimary)
+                    .multilineTextAlignment(.leading)
+                    .accessibilityIdentifier("bookdetail.title")
+
+                Text(authorText)
+                    .font(.subheadline)
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
+                    .lineLimit(2)
+                    .accessibilityIdentifier("bookdetail.author")
+
+                if isRemoteImported {
+                    Text("Google Books")
+                        .font(.caption2)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(
+                            Capsule()
+                                .fill(AppColors.Semantic.bgElevated)
+                                .overlay(
+                                    Capsule()
+                                        .stroke(
+                                            AppColors.Semantic.borderMuted,
+                                            lineWidth: 0.5
+                                        )
+                                )
+                        )
+                        .accessibilityIdentifier("bookdetail.badge.google")
+                }
+            }
+
             Spacer(minLength: 0)
         }
     }
 
-    private func statTile(titleKey: LocalizedStringKey, value: String) -> some View {
-        VStack(alignment: .leading, spacing: AppSpace._4) {
-            Text(value)
-                .font(.title3).bold()
+    // MARK: - Meta / Zusatzinfos
+    private var metaSection: some View {
+        VStack(alignment: .leading, spacing: AppSpace._12) {
+            Text("Details")
+                .font(.headline)
                 .foregroundStyle(AppColors.Semantic.textPrimary)
-            Text(titleKey)
-                .font(.footnote)
+                .accessibilityIdentifier("bookdetail.details.header")
+
+            if let addedText = addedDateText {
+                HStack(spacing: AppSpace._8) {
+                    Image(systemName: "calendar")
+                    Text(addedText)
+                }
+                .font(.subheadline)
                 .foregroundStyle(AppColors.Semantic.textSecondary)
+                .accessibilityIdentifier("bookdetail.details.added")
+            }
+
+            HStack(spacing: AppSpace._8) {
+                Image(systemName: "globe")
+                Text(sourceText)
+            }
+            .font(.subheadline)
+            .foregroundStyle(AppColors.Semantic.textSecondary)
+            .accessibilityIdentifier("bookdetail.details.source")
+
+            if book.thumbnailURL != nil {
+                HStack(spacing: AppSpace._8) {
+                    Image(systemName: "photo")
+                    Text(String(localized: "book.detail.cover.fromWeb"))
+                }
+                .font(.subheadline)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+                .accessibilityIdentifier("bookdetail.details.cover")
+            }
         }
-        .padding(AppSpace._12)
+        .padding()
         .background(
             RoundedRectangle(cornerRadius: AppRadius.m)
                 .fill(AppColors.Semantic.bgElevated)
@@ -118,46 +139,32 @@ struct BookDetailView: View {
             RoundedRectangle(cornerRadius: AppRadius.m)
                 .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.5)
         )
-        .accessibilityElement(children: .combine)
     }
 
-    // MARK: - Sessions List
-    private var sessionsSection: some View {
-        VStack(alignment: .leading, spacing: AppSpace._8) {
-            Text("book.detail.sessions.header")
-                .font(.headline)
-                .foregroundStyle(AppColors.Semantic.textPrimary)
-                .accessibilityIdentifier("bookdetail.sessions.header")
+    // MARK: - Derived helpers
 
-            if sessionsSorted.isEmpty {
-                Text("book.detail.sessions.empty")
-                    .font(.subheadline)
-                    .foregroundStyle(AppColors.Semantic.textSecondary)
-                    .padding(.vertical, AppSpace._8)
-                    .accessibilityIdentifier("bookdetail.sessions.empty")
-            } else {
-                ForEach(sessionsSorted) { session in
-                    SessionRow(date: session.date, minutes: session.minutes)
-                        .padding(.vertical, AppSpace._8)
-                        .accessibilityIdentifier("bookdetail.session.row")
-                    Divider()
-                        .overlay(AppColors.Semantic.borderMuted)
-                }
-            }
-        }
+    /// Ob das Buch aus der Google Books API stammt.
+    private var isRemoteImported: Bool {
+        book.source == "Google Books"
     }
 
-    // MARK: - Toolbar
-    @ToolbarContentBuilder
-    private var addSessionToolbar: some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
-            Button {
-                viewModel.showAddSessionSheet = true
-            } label: {
-                Image(systemName: "plus")
-            }
-            .accessibilityIdentifier("bookdetail.addsession.toolbar")
-        }
+    /// Lesbare Autorenzeile. Leer? Dann "Unbekannter Autor".
+    private var authorText: String {
+        book.author.isEmpty
+        ? String(localized: "book.unknownAuthor")
+        : book.author
+    }
+
+    /// Optional formatierter "hinzugefügt am"-Text.
+    private var addedDateText: String? {
+        let df = DateFormatter()
+        df.dateStyle = .medium
+        df.timeStyle = .none
+        return "Hinzugefügt am \(df.string(from: book.dateAdded))"
+    }
+
+    /// Source text or fallback
+    private var sourceText: String {
+        book.source.isEmpty ? String(localized: "book.unknownSource") : book.source
     }
 }
-

@@ -62,9 +62,10 @@ struct SettingsView: View {
 #if DEBUG
             Section {
                 Button(role: .destructive) {
-                    DataService.shared.resetDemoData(context)
+                    DataService.resetDemoData(context)
                 } label: {
-                    Label(String(localized: "settings.debug.resetData"), systemImage: "arrow.clockwise")
+                    Label(String(localized: "settings.debug.resetData"),
+                          systemImage: "arrow.clockwise")
                 }
                 .accessibilityIdentifier("settings.debug.resetData")
             } header: {

@@ -5,14 +5,6 @@
 //  Created by Vu Minh Khoi Ha on 23.10.25.
 //
 
-
-//
-//  BookSearchRepository.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 23.10.25.
-//
-
 import Foundation
 import SwiftData
 
@@ -27,7 +19,13 @@ protocol BookSearchRepositoryProtocol {
 }
 
 /// Repository, das API, In-Memory-Cache und SwiftData-Feed-Cache koordiniert.
-/// Implementiert SWR-Strategie (Stale-While-Revalidate).
+/// Implementiert eine Stale-While-Revalidate-Strategie (SWR).
+///
+/// Wichtig:
+/// - Verwendet denselben SwiftData-Container wie der Rest der App
+///   (PersistenceController.shared), damit Discover-Feed, gespeicherte Bücher
+///   und Library-Ansicht alle gegen dieselbe `default.store` gehen.
+/// - Dadurch vermeiden wir `no such table: ZBOOKENTITY`.
 @MainActor
 final class BookSearchRepository: BookSearchRepositoryProtocol {
 
@@ -50,11 +48,16 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
         self.feedCache = feedCache
     }
 
-    /// Bequemer Default-Initializer (ruft die korrekten Abhängigkeiten auf dem MainActor auf)
+    /// Bequemer Default-Initializer für die App-Laufzeit.
+    ///
+    /// WICHTIG:
+    /// Wir geben hier explizit `PersistenceController.shared` an den FeedCache weiter,
+    /// damit BookSearchRepository, DiscoverFeedCacheRepository und der Rest der App
+    /// garantiert im GLEICHEN SwiftData-Container laufen.
     convenience init() {
         self.init(
             apiClient: BooksAPIClient(network: NetworkClient()),
-            feedCache: DiscoverFeedCacheRepository()
+            feedCache: DiscoverFeedCacheRepository(container: PersistenceController.shared)
         )
     }
 

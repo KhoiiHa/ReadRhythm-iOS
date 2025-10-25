@@ -17,7 +17,10 @@ import Foundation
 import SwiftData
 
 /// Verwaltet den persistenten Discover-Feed-Cache in SwiftData.
-/// Nutzt eine separate Modell-Tabelle `DiscoverFeedItem` (nicht die Nutzer-Library).
+/// Ab jetzt läuft dieser Cache IM SELBEN SwiftData-Container wie die Nutzer-Library.
+/// Das bedeutet: Discover (API-Ergebnisse), gespeicherte Bücher (BookEntity)
+/// und Ziele/Sessions teilen sich eine einzige `default.store`.
+/// Dadurch vermeiden wir "no such table"-Fehler und machen Offline-Fallback möglich.
 @MainActor
 final class DiscoverFeedCacheRepository {
 
@@ -25,17 +28,14 @@ final class DiscoverFeedCacheRepository {
     private let container: ModelContainer
     private let context: ModelContext
 
-    /// Erzeugt ein Repository mit eigenem SwiftData-Container (oder einem injizierten).
-    /// - Hinweis: Für MVP genügt ein eigener Container. Für volle App-Integration
-    ///   kann ein bestehender Container injiziert werden, damit alle Modelle teilen.
+    /// Erzeugt ein Repository für den Discover-Feed-Cache.
+    /// Verwendet IMMER den gemeinsamen App-Container (`PersistenceController.shared`),
+    /// damit Discover-Cache und Nutzer-Library (BookEntity etc.) im selben Store leben.
     init(container: ModelContainer? = nil) {
-        if let container {
-            self.container = container
-        } else {
-            // Eigener Container nur für den Feed-Cache (MVP-freundlich)
-            self.container = try! ModelContainer(for: DiscoverFeedItem.self)
-        }
-        self.context = ModelContext(self.container)
+        let resolvedContainer = container ?? PersistenceController.shared
+        self.container = resolvedContainer
+
+        self.context = ModelContext(resolvedContainer)
         self.context.autosaveEnabled = true
     }
 

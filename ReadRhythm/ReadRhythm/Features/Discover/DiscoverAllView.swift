@@ -12,100 +12,173 @@ import SwiftData
 import UIKit
 #endif
 
-
-/// Vollansicht für Discover – zeigt alle Bücher mit Such- und Chip-Filter.
-/// Kontext: Wird aus DiscoverView via "Alle anzeigen" geöffnet und übernimmt den aktuellen Filterzustand.
+/// Vollansicht für Discover:
+/// - Zeigt Remote-Ergebnisse aus der API (viewModel.results)
+/// - Zeigt gespeicherte Bücher aus SwiftData als Fallback (allBooks)
+/// - Ermöglicht Speichern via "+"
+/// - Bietet Suche + Kategoriechips + Sortierung
+///
+/// Diese View hängt an DiscoverViewModel, das sowohl die API-State hält
+/// als auch die lokale Speicherlogik.
 struct DiscoverAllView: View {
-    // Eingehender Filter-Zustand aus Discover
+
+    // Startzustand, den wir vom Caller (z. B. DiscoverView) übernehmen wollen.
+    // Beispiel: User hat schon gesucht oder eine Kategorie getappt.
     let initialSearchText: String
     let initialCategory: DiscoverCategory?
 
+    // SwiftData-Kontext für Laden/Speichern
     @Environment(\.modelContext) private var context
-    @Query(sort: [SortDescriptor(\BookEntity.createdAt, order: .reverse)])
-    private var allBooks: [BookEntity]
 
-    // ViewModel für Remote-Suche (API + Offline-Fallback)
+    // Alle lokal gespeicherten Bücher, via SwiftData-Query
+    @Query(sort: [SortDescriptor(\BookEntity.title, order: .forward)])
+    private var allBooksQuery: [BookEntity]
+
+    // Unser Discover-ViewModel
+    // Wichtig: Wir behalten @StateObject, damit dieses ViewModel in dieser View "lebt".
+    // Für Bindings zu @Published-Properties verwenden wir unten eigene Binding-Wrapper.
     @StateObject private var viewModel = DiscoverViewModel()
 
-    private enum SortOption: String, CaseIterable, Identifiable { case title, author, date; var id: String { rawValue } }
+    // Sortierung für das lokale Grid (Fallback-Section)
+    private enum SortOption: String, CaseIterable, Identifiable {
+        case title, author, date
+        var id: String { rawValue }
+    }
     @State private var sortOption: SortOption = .title
 
-    /// true, wenn Nutzer:in aktiv filtert/sucht (Kategorie gewählt oder Suchtext vorhanden)
+    // MARK: - Computed Helpers
+
+    /// Gibt true zurück, wenn gerade eine aktive Suche/Kategorie gefiltert wird.
     private var hasActiveFilter: Bool {
         let q = viewModel.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         return viewModel.selectedCategory != nil || !q.isEmpty
     }
 
-    init(searchText: String, category: DiscoverCategory?) {
-        self.initialSearchText = searchText
-        self.initialCategory = category
+    /// Bindung für das Suchfeld, damit TextField nicht über `$viewModel.searchQuery`
+    /// meckert (was bei @StateObject in manchen SwiftUI-Versionen Probleme macht).
+    private var searchBinding: Binding<String> {
+        Binding(
+            get: { viewModel.searchQuery },
+            set: { viewModel.searchQuery = $0 }
+        )
     }
-    
+
+    /// Gefilterte Bücher aus SwiftData nach Suchtext/Kategorie.
+    /// (Das ist deine Offline/Library-Fallback-Sektion)
+    private var filteredBooks: [BookEntity] {
+        // 1. Suchfilter
+        let trimmed = viewModel.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let base: [BookEntity]
+        if trimmed.isEmpty {
+            base = allBooksQuery
+        } else {
+            let q = trimmed.lowercased()
+            base = allBooksQuery.filter { b in
+                b.title.lowercased().contains(q)
+                || (b.author.lowercased().contains(q))
+            }
+        }
+
+        // 2. Kategorie-Filter (DiscoverCategory)
+        guard let cat = viewModel.selectedCategory else {
+            return base
+        }
+
+        switch cat {
+        case .fictionRomance:
+            return base.filter {
+                $0.title.localizedCaseInsensitiveContains("novel")
+                || $0.title.localizedCaseInsensitiveContains("story")
+                || $0.title.localizedCaseInsensitiveContains("love")
+            }
+
+        case .mindfulness, .philosophy:
+            return base.filter {
+                titleIn($0, matchesAnyOf: ["mind", "meditation", "philosophy", "zen"])
+            }
+
+        case .selfHelp, .psychology:
+            return base.filter {
+                titleIn($0, matchesAnyOf: ["habit", "better", "change", "think", "psychology"])
+            }
+
+        case .creativity, .wellness:
+            return base.filter {
+                titleIn($0, matchesAnyOf: ["creative", "art", "design", "health", "wellness"])
+            }
+        }
+    }
+
+    /// Gefilterte Bücher zusätzlich sortiert für Anzeige im lokalen Grid.
+    private var displayedBooks: [BookEntity] {
+        let base = filteredBooks
+        switch sortOption {
+        case .title:
+            return base.sorted {
+                $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
+            }
+        case .author:
+            return base.sorted {
+                ($0.author).localizedCaseInsensitiveCompare($1.author) == .orderedAscending
+            }
+        case .date:
+            // Wir haben kein persistiertes createdAt Feld mehr – behalte Reihenfolge aus `filteredBooks` bei.
+            return base
+        }
+    }
+
+    /// Navigationstitel: wenn Kategorie aktiv → deren i18n-Key, sonst Standardtitel.
     private var navTitleKey: LocalizedStringKey {
         if let cat = viewModel.selectedCategory {
-            // Verwende den i18n-Key der Kategorie (rawValue), nicht den bereits lokalisierten displayName
+            // Wichtig: rawValue ist der i18n-Key, nicht der sichtbare Name
             return LocalizedStringKey(cat.rawValue)
         } else {
             return LocalizedStringKey("discover.all.title")
         }
     }
 
+    // MARK: - Body
+
     var body: some View {
         ScrollView {
             VStack(spacing: AppSpace._16) {
+
+                // Sucheingabe
                 searchBar
+
+                // Horizontale Kategorie-Chips
                 categoryChips
 
-                // Zustand: Laden / Fehler / Ergebnisse
+                // API-Resultate / Ladezustände / Fehleranzeige
                 if viewModel.isLoading {
                     ProgressView(LocalizedStringKey("discover.loading"))
                         .frame(maxWidth: .infinity, minHeight: 120)
+
                 } else if let msg = viewModel.errorMessage {
                     Text(LocalizedStringKey(msg))
                         .font(.footnote)
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                         .padding(.horizontal, AppSpace._16)
+
                 } else if !viewModel.results.isEmpty {
                     resultsGrid(viewModel.results)
                         .padding(.horizontal, AppSpace._16)
-                } else if !viewModel.isLoading && viewModel.results.isEmpty && hasActiveFilter {
-                    // Keine Treffer für aktive Suche / Kategorie
+
+                } else if !viewModel.isLoading,
+                          viewModel.results.isEmpty,
+                          hasActiveFilter {
                     noResultsForCategory
                         .padding(.horizontal, AppSpace._16)
                 }
 
-                // Lokaler Fallback (Library / gespeicherte Bücher) nur zeigen,
-                // wenn aktuell kein aktiver Filter/Suchstring gesetzt ist
+                // Lokaler Fallback: deine gespeicherten Bücher
                 if !hasActiveFilter {
                     grid
                         .padding(.horizontal, AppSpace._16)
 
                     if displayedBooks.isEmpty {
-                        VStack(spacing: AppSpace._12) {
-                            Text(LocalizedStringKey("discover.empty.title"))
-                                .font(.headline)
-                                .foregroundStyle(AppColors.textSecondary)
-                            Text(LocalizedStringKey("discover.empty.subtitle"))
-                                .font(.subheadline)
-                                .foregroundStyle(AppColors.textSecondary)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, AppSpace._16)
-                            Button {
-                                #if os(iOS)
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                #endif
-                                withAnimation(.easeInOut(duration: 0.25)) {
-                                    viewModel.searchQuery = ""
-                                    viewModel.applyFilter(category: nil)
-                                }
-                            } label: {
-                                Label(LocalizedStringKey("discover.empty.resetFilters"), systemImage: "arrow.counterclockwise")
-                            }
-                            .buttonStyle(.bordered)
-                            .accessibilityIdentifier("discover.all.resetFilters")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, AppSpace._16)
+                        emptyLibraryFallback
                     }
                 }
 
@@ -118,43 +191,41 @@ struct DiscoverAllView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Picker(LocalizedStringKey("discover.sort.title"), selection: $sortOption) {
-                        Text(LocalizedStringKey("discover.sort.byTitle")).tag(SortOption.title)
-                        Text(LocalizedStringKey("discover.sort.byAuthor")).tag(SortOption.author)
-                        Text(LocalizedStringKey("discover.sort.byDate")).tag(SortOption.date)
-                    }
-                } label: {
-                    Label(LocalizedStringKey("discover.sort.title.short"), systemImage: "arrow.up.arrow.down")
-                }
-                .accessibilityIdentifier("discover.all.sortMenu")
+                sortMenu
             }
         }
         .tint(AppColors.Semantic.tintPrimary)
         .accessibilityIdentifier("discover.all.view")
         .overlay(alignment: .bottom) {
-            if let key = viewModel.toastMessageKey {
+            // Kleiner Toast unten ("Hinzugefügt", "Schon vorhanden", "Fehler")
+            if let key = viewModel.toastText {
                 Text(LocalizedStringKey(key))
                     .font(.footnote)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(
-                        Capsule().fill(AppColors.Semantic.bgElevated)
-                            .overlay(Capsule().stroke(AppColors.Semantic.borderMuted, lineWidth: 1))
+                        Capsule()
+                            .fill(AppColors.Semantic.bgElevated)
+                            .overlay(
+                                Capsule()
+                                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 1)
+                            )
                     )
                     .padding(.bottom, 24)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .animation(.easeInOut(duration: 0.2), value: viewModel.toastMessageKey)
+                    .animation(.easeInOut(duration: 0.2), value: viewModel.toastText)
                     .accessibilityIdentifier("toast.\(key)")
             }
         }
         .onAppear {
-            // Lokale Library laden (für Fallback)
+            // 1. Lokale gespeicherte Bücher reinziehen (SwiftData)
             viewModel.loadBooks(from: context)
-            // Eingehende Filter anwenden
+
+            // 2. Initiale Filter-/Sucheinstellungen übernehmen
             viewModel.searchQuery = initialSearchText
             viewModel.applyFilter(category: initialCategory)
-            // Falls ein manueller Suchstring vorhanden ist, Suche starten
+
+            // 3. Falls schon ein Suchstring gesetzt war → Suche auslösen
             if !initialSearchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 viewModel.applySearch()
             }
@@ -163,16 +234,24 @@ struct DiscoverAllView: View {
 
     // MARK: - Subviews
 
+    /// Suchfeld oben
     private var searchBar: some View {
         HStack(spacing: AppSpace._8) {
             Image(systemName: "magnifyingglass")
-            TextField(text: $viewModel.searchQuery) {
+
+            TextField(
+                text: searchBinding // <- Binding statt $viewModel.searchQuery
+            ) {
                 Text(LocalizedStringKey("discover.search.placeholder"))
             }
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled(true)
-            .onSubmit { viewModel.applySearch() }
-            .accessibilityLabel(Text(LocalizedStringKey("discover.search.placeholder")))
+            .onSubmit {
+                viewModel.applySearch()
+            }
+            .accessibilityLabel(
+                Text(LocalizedStringKey("discover.search.placeholder"))
+            )
         }
         .font(.subheadline)
         .padding(.horizontal, AppSpace._16)
@@ -189,13 +268,16 @@ struct DiscoverAllView: View {
         .accessibilityIdentifier("discover.all.search")
     }
 
+    /// Horizontale Kategorie-Chips
     private var categoryChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: AppSpace._8) {
                 ForEach(DiscoverCategory.ordered, id: \.id) { cat in
                     let isActive = (viewModel.selectedCategory == cat)
+
                     Button {
                         withAnimation(.easeInOut(duration: 0.25)) {
+                            // Toggle-Logik: erneut tippen = abwählen
                             let newSelection: DiscoverCategory? = isActive ? nil : cat
                             viewModel.applyFilter(category: newSelection)
                         }
@@ -207,9 +289,18 @@ struct DiscoverAllView: View {
                         .font(.footnote)
                         .padding(.horizontal, AppSpace._12)
                         .padding(.vertical, AppSpace._8)
-                        .background(Capsule().fill(AppColors.Semantic.bgElevated))
+                        .background(
+                            Capsule()
+                                .fill(AppColors.Semantic.bgElevated)
+                        )
                         .overlay(
-                            Capsule().stroke(isActive ? AppColors.brandPrimary : AppColors.Semantic.borderMuted, lineWidth: 1)
+                            Capsule()
+                                .stroke(
+                                    isActive
+                                    ? AppColors.brandPrimary
+                                    : AppColors.Semantic.borderMuted,
+                                    lineWidth: 1
+                                )
                         )
                     }
                     .buttonStyle(.plain)
@@ -220,10 +311,12 @@ struct DiscoverAllView: View {
         }
     }
 
-    /// Zeigt Remote-Ergebnisse (Google Books) in einem adaptiven Grid.
-    private func resultsGrid(_ items: [RemoteBook]) -> some View
-    {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: AppSpace._12)], spacing: AppSpace._12) {
+    /// Grid der API-/Remote-Ergebnisse (Google Books)
+    private func resultsGrid(_ items: [RemoteBook]) -> some View {
+        LazyVGrid(
+            columns: [GridItem(.adaptive(minimum: 140), spacing: AppSpace._12)],
+            spacing: AppSpace._12
+        ) {
             ForEach(items, id: \.id) { book in
                 BookCoverCard(
                     title: book.title,
@@ -234,11 +327,9 @@ struct DiscoverAllView: View {
                         #if os(iOS)
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         #endif
-                        do {
-                            try viewModel.addToLibrary(from: book, in: context)
-                        } catch {
-                            print("⛔️ Add failed: \(error)")
-                        }
+
+                        // Speichern in SwiftData über das ViewModel
+                        viewModel.addToLibrary(from: book, in: context)
                     }
                 )
                 .contentShape(Rectangle())
@@ -247,14 +338,16 @@ struct DiscoverAllView: View {
         }
     }
 
+    /// Grid der lokal gespeicherten Bücher (SwiftData Fallback / Library)
     private var grid: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: AppSpace._12)], spacing: AppSpace._12) {
+        LazyVGrid(
+            columns: [GridItem(.adaptive(minimum: 140), spacing: AppSpace._12)],
+            spacing: AppSpace._12
+        ) {
             ForEach(displayedBooks) { book in
                 NavigationLink {
                     DiscoverDetailView(book: book)
                 } label: {
-                    // Falls dein BookCoverCard den BookEntity-Init hat, kannst du ihn direkt verwenden:
-                    // BookCoverCard(book: book)
                     BookCoverCard(
                         title: book.title,
                         author: book.author,
@@ -265,55 +358,48 @@ struct DiscoverAllView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityIdentifier("discover.all.card.\(book.id.uuidString.prefix(6))")
+                .accessibilityIdentifier("discover.all.card.\(book.id)")
             }
         }
         .animation(.easeInOut(duration: 0.25), value: viewModel.selectedCategory)
     }
 
-    // MARK: - Lokale Filterlogik (Fallback)
-    private var filteredBooks: [BookEntity] {
-        let trimmed = viewModel.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
-        let base: [BookEntity]
-        if trimmed.isEmpty {
-            base = allBooks
-        } else {
-            let q = trimmed.lowercased()
-            base = allBooks.filter { b in
-                b.title.lowercased().contains(q) || (b.author?.lowercased().contains(q) ?? false)
+    /// Block, der gezeigt wird, wenn keine gespeicherten Bücher existieren
+    /// (also komplett leere Library + kein aktiver Filter)
+    private var emptyLibraryFallback: some View {
+        VStack(spacing: AppSpace._12) {
+            Text(LocalizedStringKey("discover.empty.title"))
+                .font(.headline)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+
+            Text(LocalizedStringKey("discover.empty.subtitle"))
+                .font(.subheadline)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, AppSpace._16)
+
+            Button {
+                #if os(iOS)
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                #endif
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    viewModel.searchQuery = ""
+                    viewModel.applyFilter(category: nil)
+                }
+            } label: {
+                Label(
+                    LocalizedStringKey("discover.empty.resetFilters"),
+                    systemImage: "arrow.counterclockwise"
+                )
             }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("discover.all.resetFilters")
         }
-        guard let cat = viewModel.selectedCategory else { return base }
-        switch cat {
-        case .fictionRomance:
-            return base.filter { $0.title.localizedCaseInsensitiveContains("novel") || $0.title.localizedCaseInsensitiveContains("story") || $0.title.localizedCaseInsensitiveContains("love") }
-        case .mindfulness, .philosophy:
-            return base.filter { titleIn($0, matchesAnyOf: ["mind", "meditation", "philosophy", "zen"]) }
-        case .selfHelp, .psychology:
-            return base.filter { titleIn($0, matchesAnyOf: ["habit", "better", "change", "think", "psychology"]) }
-        case .creativity, .wellness:
-            return base.filter { titleIn($0, matchesAnyOf: ["creative", "art", "design", "health", "wellness"]) }
-        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, AppSpace._16)
     }
 
-    // Sorted result based on current sort option
-    private var displayedBooks: [BookEntity] {
-        let base = filteredBooks
-        switch sortOption {
-        case .title:
-            return base.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
-        case .author:
-            return base.sorted { ($0.author ?? "").localizedCaseInsensitiveCompare($1.author ?? "") == .orderedAscending }
-        case .date:
-            return base // already reverse-sorted by createdAt via @Query
-        }
-    }
-
-    private func titleIn(_ book: BookEntity, matchesAnyOf parts: [String]) -> Bool {
-        parts.contains { p in book.title.range(of: p, options: [.caseInsensitive, .diacriticInsensitive]) != nil }
-    }
-
-    /// Spezifischer leerer Zustand: aktive Suche / Kategorie liefert nichts
+    /// Kein Treffer für aktive Suche/Kategorie
     private var noResultsForCategory: some View {
         VStack(spacing: AppSpace._16) {
             Image(systemName: "questionmark.book")
@@ -330,51 +416,74 @@ struct DiscoverAllView: View {
         .padding(.horizontal, AppSpace._16)
         .accessibilityIdentifier("discover.empty.category")
     }
+
+    /// Sortier-Menü in der Toolbar
+    private var sortMenu: some View {
+        Menu {
+            Picker(
+                LocalizedStringKey("discover.sort.title"),
+                selection: $sortOption
+            ) {
+                Text(LocalizedStringKey("discover.sort.byTitle")).tag(SortOption.title)
+                Text(LocalizedStringKey("discover.sort.byAuthor")).tag(SortOption.author)
+                Text(LocalizedStringKey("discover.sort.byDate")).tag(SortOption.date)
+            }
+        } label: {
+            Label(
+                LocalizedStringKey("discover.sort.title.short"),
+                systemImage: "arrow.up.arrow.down"
+            )
+        }
+        .accessibilityIdentifier("discover.all.sortMenu")
+    }
+
+    // MARK: - Helpers
+
+    /// Kleiner Helper für Kategoriefilter im Fallback (lokale Bücher)
+    private func titleIn(_ book: BookEntity, matchesAnyOf parts: [String]) -> Bool {
+        parts.contains { p in
+            book.title.range(
+                of: p,
+                options: [.caseInsensitive, .diacriticInsensitive]
+            ) != nil
+        }
+    }
 }
 
 #if DEBUG
-import SwiftUI
+#Preview("DiscoverAll – Empty (Light, DE)") {
+    do {
+        let container = try ModelContainer(for: BookEntity.self)
 
-struct DiscoverAllPreviewHarness: View {
-    private enum SortOption: String, CaseIterable, Identifiable { case title, author, date; var id: String { rawValue } }
-    @State private var searchText: String = ""
-    @State private var sortOption: SortOption = .title
-
-    var body: some View {
-        DiscoverAllView(searchText: searchText, category: nil)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Picker("Sortieren", selection: $sortOption) {
-                            Text("Titel").tag(SortOption.title)
-                            Text("Autor").tag(SortOption.author)
-                            Text("Datum").tag(SortOption.date)
-                        }
-                    } label: {
-                        Label("Sortieren", systemImage: "arrow.up.arrow.down")
-                    }
-                }
-            }
+        return NavigationStack {
+            DiscoverAllView(
+                initialSearchText: "",
+                initialCategory: nil
+            )
+        }
+        .modelContainer(container)
+        .environment(\.locale, .init(identifier: "de"))
+        .preferredColorScheme(.light)
+    } catch {
+        return Text("Preview Error: \(error.localizedDescription)")
     }
 }
 
- #Preview("DiscoverAll – Empty (Light, DE)") {
-     let container = try! ModelContainer(for: BookEntity.self)
-     NavigationStack {
-         DiscoverAllPreviewHarness()
-     }
-     .modelContainer(container)
-     .environment(\.locale, .init(identifier: "de"))
-     .preferredColorScheme(.light)
- }
-
 #Preview("DiscoverAll – Empty (Dark, DE)") {
-    let container = try! ModelContainer(for: BookEntity.self)
-    NavigationStack {
-        DiscoverAllPreviewHarness()
+    do {
+        let container = try ModelContainer(for: BookEntity.self)
+
+        return NavigationStack {
+            DiscoverAllView(
+                initialSearchText: "",
+                initialCategory: nil
+            )
+        }
+        .modelContainer(container)
+        .environment(\.locale, .init(identifier: "de"))
+        .preferredColorScheme(.dark)
+    } catch {
+        return Text("Preview Error: \(error.localizedDescription)")
     }
-    .modelContainer(container)
-    .environment(\.locale, .init(identifier: "de"))
-    .preferredColorScheme(.dark)
 }
 #endif

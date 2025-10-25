@@ -10,26 +10,40 @@ import SwiftData
 
 @Model
 final class BookEntity {
-    @Attribute(.unique) var id: UUID
-    var title: String
-    var author: String?        // ⬅️ Optional, um Dummy-Daten zuzulassen
-    var createdAt: Date
-    var normalizedTitle: String // ⬅️ Für saubere Sortierung & Suche (optional)
 
-    // Beziehung zu Sessions
-    @Relationship(deleteRule: .cascade, inverse: \ReadingSessionEntity.book)
-    var sessions: [ReadingSessionEntity] = []
+    /// Eindeutige ID aus der Quelle (z.B. Google Books Volume ID)
+    @Attribute(.unique)
+    var sourceID: String
+
+    /// Buchtitel (Pflicht)
+    var title: String
+
+    /// Autor oder Autoren (kommagetrennt)
+    var author: String
+
+    /// Thumbnail/Cover-URL als String (optional),
+    /// wird für die Anzeige in der Bibliothek benutzt
+    var thumbnailURL: String?
+
+    /// Quelle der Daten, z.B. "Google Books"
+    var source: String
+
+    /// Wann hat der User das Buch gespeichert
+    var dateAdded: Date
 
     init(
-        id: UUID = UUID(),
+        sourceID: String,
         title: String,
-        author: String? = nil,
-        createdAt: Date = .init()
+        author: String,
+        thumbnailURL: String?,
+        source: String,
+        dateAdded: Date = .now
     ) {
-        self.id = id
+        self.sourceID = sourceID
         self.title = title
         self.author = author
-        self.createdAt = createdAt
-        self.normalizedTitle = title.lowercased()
+        self.thumbnailURL = thumbnailURL
+        self.source = source
+        self.dateAdded = dateAdded
     }
 }

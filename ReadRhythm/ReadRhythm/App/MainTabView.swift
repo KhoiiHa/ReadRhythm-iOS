@@ -18,9 +18,9 @@ struct MainTabView: View {
     @Environment(\.modelContext) private var context
     @EnvironmentObject private var settings: AppSettingsService
 
-    // MARK: - Body
     var body: some View {
         TabView {
+            // Bibliothek
             NavigationStack {
                 LibraryView()
             }
@@ -29,6 +29,7 @@ struct MainTabView: View {
             }
             .accessibilityIdentifier("tab.library")
 
+            // Entdecken
             NavigationStack {
                 DiscoverView()
             }
@@ -37,6 +38,7 @@ struct MainTabView: View {
             }
             .accessibilityIdentifier("tab.discover")
 
+            // Statistiken
             NavigationStack {
                 StatsView()
             }
@@ -45,7 +47,7 @@ struct MainTabView: View {
             }
             .accessibilityIdentifier("tab.stats")
 
-            // MARK: Goals (Phase 4)
+            // Ziele
             NavigationStack {
                 ReadingGoalsView(context: context)
             }
@@ -54,7 +56,7 @@ struct MainTabView: View {
             }
             .accessibilityIdentifier("tab.goals")
 
-            // MARK: Profile (Phase 4)
+            // Profil
             NavigationStack {
                 ProfileView(context: context)
             }
@@ -63,6 +65,7 @@ struct MainTabView: View {
             }
             .accessibilityIdentifier("tab.profile")
 
+            // Einstellungen
             NavigationStack {
                 SettingsView()
             }
@@ -71,16 +74,20 @@ struct MainTabView: View {
             }
             .accessibilityIdentifier("tab.settings")
         }
-        // MARK: - Theme & Global Appearance
+        // Theme / Tint
         .preferredColorScheme(settings.themeMode.colorScheme)
         .tint(AppColors.Semantic.tintPrimary)
         .accessibilityIdentifier("main.tabview")
 
-        // MARK: - Seed Demo Data (DEBUG)
+        // Seed-Daten nur im Debug
         .task {
             #if DEBUG
-            if DataService.shared.hasAnyBooks(in: context) == false {
-                DataService.shared.seedDemoDataIfNeeded(context)
+            // Dependency Injection statt Singleton:
+            // Wir erzeugen hier eine lokale Service-Instanz mit dem aktuellen ModelContext.
+            let service = DataService(context: context)
+
+            if service.fetchAllBooks().isEmpty {
+                service.seedDemoDataIfNeeded()
                 print("🌱 [MainTabView] Demo data seeded for empty store.")
             }
             #endif

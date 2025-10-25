@@ -9,10 +9,10 @@ import Charts
 struct StatsView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = StatsViewModel()
-
+    
     /// UI-Range steuert die Auswahl im Header (wird auf ViewModel.days gemappt).
     @State private var range: StatsRange = .week
-
+    
     var body: some View {
         ScrollView {
             VStack(spacing: AppSpace._16) {
@@ -25,7 +25,7 @@ struct StatsView: View {
                     apply(range: newRange)
                     viewModel.reload(context: modelContext)
                 }
-
+                
                 // Chart oder Empty State
                 if viewModel.daily.allSatisfy({ $0.minutes == 0 }) || viewModel.daily.isEmpty {
                     StatsEmptyState()
@@ -35,57 +35,80 @@ struct StatsView: View {
                         .frame(height: 220)
                         .padding(.horizontal, AppSpace._16)
                 }
-
-                #if DEBUG
+                
+#if DEBUG
                 // Seed-Knopf für schnelle visuelle Prüfung
                 Button(String(localized: "rr.stats.debug.add10")) {
-                    // Finde vorhandenes Buch oder erzeuge ein Debug-Buch
-                    let fetch = FetchDescriptor<BookEntity>()
+
+                    // 1. Versuch: hol ein existierendes Buch aus SwiftData
+                    //    Wir sortieren deterministisch nach Titel, um Compiler-/Lint-Warnungen zu vermeiden.
+                    let fetch = FetchDescriptor<BookEntity>(
+                        sortBy: [SortDescriptor(\.title, order: .forward)]
+                    )
                     let existing = (try? modelContext.fetch(fetch))?.first
+
+                    // 2. Falls kein Buch da ist -> neues Debug-Buch anlegen
                     let book = existing ?? {
-                        let b = BookEntity(title: "Debug Book", author: "")
-                        modelContext.insert(b)
-                        return b
+                        let newBook = BookEntity(
+                            sourceID: "debug-\(UUID().uuidString)", // eindeutige ID
+                            title: "Debug Book",
+                            author: "Debug Author",
+                            thumbnailURL: nil,                      // kein Cover nötig für Seed
+                            source: "userAdded"                     // Herkunft (String)
+                        )
+                        modelContext.insert(newBook)
+                        return newBook
                     }()
 
-                    // Neue Session (10 Minuten) anlegen
-                    let s = ReadingSessionEntity(date: .now, minutes: 10, book: book)
-                    modelContext.insert(s)
+                    // 3. Neue Session (10 Minuten) für dieses Buch
+                    let session = ReadingSessionEntity(
+                        date: .now,
+                        minutes: 10,
+                        book: book
+                    )
+                    modelContext.insert(session)
+
+                    // 4. Speichern (Fehler egal im DEBUG)
                     try? modelContext.save()
 
-                    // Daten neu laden
+                    // 5. UI refresh
                     viewModel.reload(context: modelContext)
                 }
                 .accessibilityIdentifier("rr-stats-debug-add10")
                 .buttonStyle(.bordered)
                 .tint(AppColors.Semantic.tintPrimary)
                 .padding(.horizontal, AppSpace._16)
-                #endif
+#endif
             }
+            .background(AppColors.Semantic.bgPrimary)
+            .tint(AppColors.Semantic.tintPrimary)
+            .onAppear {
+                // Initiales Mapping von UI-Range → ViewModel.days
+                apply(range: range)
+                viewModel.reload(context: modelContext)
+            }
+            .navigationTitle(Text("rr.stats.title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .accessibilityIdentifier("stats.view")
         }
-        .background(AppColors.Semantic.bgPrimary)
-        .tint(AppColors.Semantic.tintPrimary)
-        .onAppear {
-            // Initiales Mapping von UI-Range → ViewModel.days
-            apply(range: range)
-            viewModel.reload(context: modelContext)
-        }
-        .navigationTitle(Text("rr.stats.title"))
-        .navigationBarTitleDisplayMode(.inline)
-        .accessibilityIdentifier("stats.view")
     }
-
+    
     // MARK: - Helpers
-    /// Mappt die UI-Range auf die bestehende days-Logik im ViewModel (7/14/30/∞)
+    
+    /// Mappt die UI-Range auf die bestehende days-Logik im ViewModel (7/30/365/∞)
     private func apply(range: StatsRange) {
         switch range {
-        case .week:  viewModel.days = 7
-        case .month: viewModel.days = 30
-        case .year:  viewModel.days = 365
-        case .all:   viewModel.days = Int.max // oder ein großer Wert, je nach Implementierung
+        case .week:
+            viewModel.days = 7
+        case .month:
+            viewModel.days = 30
+        case .year:
+            viewModel.days = 365
+        case .all:
+            viewModel.days = Int.max // "alles"
         }
     }
-
+    
     /// Konvertiert ViewModel-Daten in Chart-Datenpunkte der StatsChart-Komponente.
     private var chartData: [StatsChart.DataPoint] {
         viewModel.daily.map { .init(date: $0.date, minutes: $0.minutes) }
