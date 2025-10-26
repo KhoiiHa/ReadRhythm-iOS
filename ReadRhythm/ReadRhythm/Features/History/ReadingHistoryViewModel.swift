@@ -13,6 +13,7 @@ struct ReadingHistoryItem: Identifiable {
     let date: Date
     let minutes: Int
     let bookTitle: String
+    let medium: String
 }
 
 @MainActor
@@ -50,7 +51,8 @@ final class ReadingHistoryViewModel: ObservableObject {
                     id: s.id,
                     date: s.date,
                     minutes: s.minutes,
-                    bookTitle: title
+                    bookTitle: title,
+                    medium: s.medium
                 )
             }
 

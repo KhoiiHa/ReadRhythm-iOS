@@ -8,12 +8,15 @@
 import SwiftUI
 import SwiftData
 
+@MainActor
 struct ProfileView: View {
     @Environment(\.modelContext) private var context
-    @ObservedObject private var vm: ProfileViewModel
+    @StateObject private var vm: ProfileViewModel
 
     init(context: ModelContext) {
-        self.vm = ProfileViewModel(context: context)
+        _vm = StateObject(
+            wrappedValue: ProfileViewModel(context: context)
+        )
     }
 
     var body: some View {
@@ -53,7 +56,10 @@ struct ProfileView: View {
                 }
                 .accessibilityIdentifier("Profile.AchievementsLink")
                 NavigationLink {
-                    AudiobookLightView()
+                    AudiobookLightView(
+                        initialText: "",
+                        sessionRepository: LocalSessionRepository(context: context)
+                    )
                 } label: {
                     Label(LocalizedStringKey("audio.nav.title"), systemImage: "waveform")
                         .padding()
@@ -85,7 +91,9 @@ struct ProfileView: View {
             .padding(.top, AppSpace.xl)
         }
         .navigationTitle(Text(LocalizedStringKey("profile.title")))
-        .onAppear { vm.reload() }
+        .task {
+            vm.reload()
+        }
     }
 
     // MARK: - Subviews
@@ -116,11 +124,20 @@ struct ProfileView: View {
 
     private func metricsGrid() -> some View {
         VStack(spacing: AppSpace.md) {
+            // Gesamtminuten im aktuellen Monat (lesen + hören)
             metricRow(
                 title: String(localized: "profile.metric.monthMinutes"),
                 value: "\(vm.monthMinutes) " + String(localized: "goals.metric.minutes"),
                 a11y: "Profile.Metric.MonthMinutes"
             )
+
+            // Aufgeschlüsselt nach Medium
+            metricRow(
+                title: String(localized: "profile.metric.mediumBreakdown"),
+                value: vm.monthMediumBreakdownString(),
+                a11y: "Profile.Metric.MediumBreakdown"
+            )
+
             metricRow(
                 title: String(localized: "profile.metric.monthSessions"),
                 value: "\(vm.monthSessions)",

@@ -61,36 +61,56 @@ struct ReadingHistoryView: View {
 
             VStack(spacing: 8) {
                 ForEach(items) { item in
-                    HStack(spacing: AppSpace.md) {
-                        Image(systemName: "book.fill")
-                            .foregroundStyle(AppColors.brandPrimary)
-                            .frame(width: 22)
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(item.bookTitle)
-                                .font(.subheadline)
-                            Text("\(vm.timeLabel(item.date)) · \(item.minutes) " + String(localized: "goals.metric.minutes"))
-                                .font(.caption)
-                                .foregroundStyle(AppColors.textSecondary)
-                        }
-                        Spacer()
-                    }
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, AppSpace.md)
-                    .background(AppColors.surfacePrimary)
-                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppRadius.l)
-                            .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
-                    )
-                    .shadow(color: AppShadow.card.color,
-                            radius: AppShadow.card.radius,
-                            x: AppShadow.card.x,
-                            y: AppShadow.card.y)
-                    .accessibilityIdentifier("History.Row.\(item.id.uuidString.prefix(6))")
+                    rowView(for: item)
                 }
             }
         }
         .accessibilityElement(children: .contain)
+    }
+
+    private func rowView(for item: ReadingHistoryItem) -> some View {
+        HStack(spacing: AppSpace.md) {
+            // Icon abhängig vom Medium: Lesen 📖 oder Hören 🎧
+            Image(systemName: item.medium == "listening" ? "headphones" : "book.closed.fill")
+                .foregroundStyle(item.medium == "listening" ? AppColors.brandSecondary : AppColors.brandPrimary)
+                .frame(width: 22)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.bookTitle)
+                    .font(.subheadline)
+                    .accessibilityIdentifier("History.Row.Title.\(item.id.uuidString.prefix(6))")
+
+                Text("\(vm.timeLabel(item.date)) · \(item.minutes) " + String(localized: "goals.metric.minutes"))
+                    .font(.caption)
+                    .foregroundStyle(AppColors.textSecondary)
+            }
+
+            Spacer()
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, AppSpace.md)
+        .background(AppColors.surfacePrimary)
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.l)
+                .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+        )
+        .shadow(color: AppShadow.card.color,
+                radius: AppShadow.card.radius,
+                x: AppShadow.card.x,
+                y: AppShadow.card.y)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(historyAccessibilityLabel(for: item))
+        .accessibilityIdentifier("History.Row.\(item.id.uuidString.prefix(6))")
+    }
+
+    private func historyAccessibilityLabel(for item: ReadingHistoryItem) -> String {
+        let mediumText = (item.medium == "listening")
+            ? String(localized: "history.medium.listening")
+            : String(localized: "history.medium.reading")
+
+        let dayText = vm.dayLabel(item.date)
+
+        return "\(item.minutes) Minuten \(mediumText) am \(dayText)"
     }
 }

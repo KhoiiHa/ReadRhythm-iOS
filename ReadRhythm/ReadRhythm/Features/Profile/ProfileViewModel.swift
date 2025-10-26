@@ -17,6 +17,10 @@ final class ProfileViewModel: ObservableObject {
     @Published var bestWeekdayIndex: Int? = nil // 0=So ... 6=Sa
     @Published var bestWeekdayMinutes: Int = 0
 
+    // Minuten getrennt nach Medium (aktueller Monat)
+    @Published var monthReadingMinutes: Int = 0
+    @Published var monthListeningMinutes: Int = 0
+
     @Published var dailyStats: [DailyStatDTO] = []
     @Published var mode: InsightsMode = .combined
 
@@ -66,6 +70,22 @@ final class ProfileViewModel: ObservableObject {
 
         // Fetch last 30 days for Insights Charts
         dailyStats = statsService.fetchDailyStats(context: context, days: 30)
+
+        // Aufteilen in Lesen vs. Hören für den aktuellen Monat.
+        // Wir filtern dailyStats auf die aktuelle Monats-Range und summieren getrennt.
+        monthReadingMinutes = 0
+        monthListeningMinutes = 0
+        for day in dailyStats {
+            // Nur Tage berücksichtigen, die im aktuellen Monat liegen.
+            if day.date >= month.start && day.date < month.end {
+                monthReadingMinutes += day.readingMinutes
+                monthListeningMinutes += day.listeningMinutes
+            }
+        }
+
+        #if DEBUG
+        DebugLogger.log("[Profile] monthReadingMinutes=\(monthReadingMinutes) monthListeningMinutes=\(monthListeningMinutes)")
+        #endif
     }
 
     @MainActor
@@ -107,5 +127,22 @@ final class ProfileViewModel: ObservableObject {
         case .listening: return day.listeningMinutes
         case .combined: return day.readingMinutes + day.listeningMinutes
         }
+    }
+
+    /// Kombinierter Text für "Lesen X · Hören Y"
+    func monthMediumBreakdownString() -> String {
+        // Beispiel: "Lesen 42 min · Hören 18 min"
+        let read = monthReadingMinutes
+        let listen = monthListeningMinutes
+        return String(
+            localized: "profile.breakdown.format",
+            defaultValue: "Lesen \(read) min · Hören \(listen) min",
+            comment: "Breakdown of reading vs listening minutes in the current month"
+        )
+    }
+
+    /// Nur für Screenshots/Case Study: Gesamtminuten dieses Monats (lesen + hören)
+    var monthTotalCombinedMinutes: Int {
+        monthReadingMinutes + monthListeningMinutes
     }
 }

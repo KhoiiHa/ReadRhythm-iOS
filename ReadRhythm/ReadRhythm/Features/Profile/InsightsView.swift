@@ -9,11 +9,14 @@ import SwiftUI
 import SwiftData
 import Charts
 
+@MainActor
 struct InsightsView: View {
-    @ObservedObject private var vm: ProfileViewModel
+    @StateObject private var vm: ProfileViewModel
 
     init(context: ModelContext) {
-        self.vm = ProfileViewModel(context: context)
+        _vm = StateObject(
+            wrappedValue: ProfileViewModel(context: context)
+        )
     }
 
     var body: some View {
@@ -37,9 +40,12 @@ struct InsightsView: View {
             .padding(.top, AppSpace.lg)
             .accessibilityIdentifier("Insights.Screen")
         }
+        .accessibilityIdentifier("Insights.Screen.Scroll")
         .navigationTitle(Text(LocalizedStringKey(vm.titleKey)))
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { vm.reload() }
+        .task {
+            vm.reload()
+        }
     }
 
     private var modePicker: some View {

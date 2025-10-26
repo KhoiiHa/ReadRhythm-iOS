@@ -6,14 +6,23 @@
 //
 
 import SwiftUI
+import SwiftData
 
+@MainActor
 struct AudiobookLightView: View {
+    @Environment(\.modelContext) private var modelContext
     @StateObject private var vm: AudiobookLightViewModel
 
-    init(initialText: String = "") {
-        _vm = StateObject(wrappedValue: AudiobookLightViewModel(
-            initialText: initialText
-        ))
+    init(
+        initialText: String = "",
+        sessionRepository: SessionRepository
+    ) {
+        _vm = StateObject(
+            wrappedValue: AudiobookLightViewModel(
+                initialText: initialText,
+                sessionRepository: sessionRepository
+            )
+        )
     }
 
     var body: some View {
@@ -133,4 +142,57 @@ struct AudiobookLightView: View {
         .frame(maxWidth: .infinity)
     }
 }
+
+#if DEBUG
+struct AudiobookLightView_Previews: PreviewProvider {
+    static var previews: some View {
+
+        // 1. In-Memory SwiftData Container für Preview
+        let container = try! ModelContainer(
+            for: ReadingSessionEntity.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+
+        // 2. Fake Repo, erfüllt SessionRepository-Protokoll
+        struct PreviewSessionRepository: SessionRepository {
+            @discardableResult
+            func saveSession(
+                book: BookEntity?,
+                minutes: Int,
+                date: Date,
+                medium: String
+            ) throws -> ReadingSessionEntity {
+                #if DEBUG
+                DebugLogger.log("🧪 [Preview] saveSession listening \(minutes)min medium=\(medium)")
+                #endif
+                return ReadingSessionEntity(
+                    date: date,
+                    minutes: minutes,
+                    book: book,
+                    medium: medium
+                )
+            }
+
+            @discardableResult
+            func addSession(for book: BookEntity, minutes: Int, date: Date) throws -> ReadingSessionEntity {
+                try saveSession(book: book, minutes: minutes, date: date, medium: "reading")
+            }
+
+            func deleteSession(_ session: ReadingSessionEntity) throws {
+                #if DEBUG
+                DebugLogger.log("🧪 [Preview] deleteSession id=\(session.id)")
+                #endif
+            }
+        }
+
+        return NavigationStack {
+            AudiobookLightView(
+                initialText: "Dies ist ein Testtext für die Audiowiedergabe.",
+                sessionRepository: PreviewSessionRepository()
+            )
+        }
+        .modelContainer(container)
+    }
+}
+#endif
 

@@ -6,6 +6,7 @@ import Charts
 /// Kontext: Die StatsView zeigt aggregierte Leseminuten pro Tag (Timeline) und die Gesamtminuten.
 /// Warum: Visuelles Feedback zum Leseverhalten ist ein MVP-Kernnutzen und Portfolio-Highlight.
 /// Wie: Nutzt modulare Components (Header/Chart/Empty) + bestehendes ViewModel (days/total/daily).
+@MainActor
 struct StatsView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = StatsViewModel()
@@ -82,7 +83,7 @@ struct StatsView: View {
             }
             .background(AppColors.Semantic.bgPrimary)
             .tint(AppColors.Semantic.tintPrimary)
-            .onAppear {
+            .task {
                 // Initiales Mapping von UI-Range → ViewModel.days
                 apply(range: range)
                 viewModel.reload(context: modelContext)

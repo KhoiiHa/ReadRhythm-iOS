@@ -45,12 +45,30 @@ final class StatsViewModel: ObservableObject {
         self.days = days
         reload(context: context)
     }
+    
+    /// Liefert die Anzahl der Tage basierend auf UI-Auswahl (z. B. Woche, Monat, Jahr, Gesamt).
+    /// Verhindert zu große Zeiträume (Performance-Limit für mobile Darstellung).
+    private func safeDays(for requestedDays: Int) -> Int {
+        switch requestedDays {
+        case ..<1:
+            return 1
+        case 1...7:
+            return requestedDays
+        case 8...31:
+            return 30
+        case 32...180:
+            return 90  // maximal 3 Monate
+        case 181...364:
+            return 120 // Jahr → auf 120 Tage limitieren
+        default:
+            return 120 // "Gesamt" → gleiche Obergrenze
+        }
+    }
 
     // MARK: - Load Data
     func reload(context: ModelContext) {
         let service = StatsService.shared
-        // defensive clamp: große Zeiträume begrenzen (außer Int.max für "All")
-        let window = (days == Int.max) ? Int.max : max(1, min(days, 3650))
+        let window = safeDays(for: days)
         
         // Hole aggregierte Tageswerte (letzte X Tage)
         let items = service.minutesPerDay(context: context, days: window)

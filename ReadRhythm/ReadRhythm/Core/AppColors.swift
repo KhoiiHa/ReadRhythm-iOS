@@ -72,6 +72,7 @@ enum AppColors {
     /// Für Views, die mit systemweiten Tokens arbeiten wollen, ohne die Palette zu kennen.
     /// Diese Aliase mappen auf die bestehende semantische Palette oben.
     static var brandPrimary: Color { Brand.primary }
+    static var brandSecondary: Color { Brand.secondary }
 
     static var surfacePrimary: Color { Semantic.bgPrimary }
     static var surfaceSecondary: Color { Semantic.bgSecondary }

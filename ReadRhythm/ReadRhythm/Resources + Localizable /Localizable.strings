@@ -114,6 +114,8 @@
 "profile.metric.streak" = "Aktuelle Serie";
 "profile.metric.bestWeekday" = "Stärkster Wochentag";
 
+"profile.metric.mediumBreakdown" = "Aktivität nach Medium";
+
 // Insights
 "insights.nav.title" = "Insights";
 "insights.title" = "Leser-Insights";
@@ -219,6 +221,9 @@
 "history.empty.title" = "Noch keine Einträge";
 "history.empty.subtitle" = "Sobald du Sessions speicherst, erscheint hier deine Historie.";
 "history.unknownBook" = "Unbekanntes Buch";
+
+"history.medium.reading" = "gelesen";
+"history.medium.listening" = "gehört";
 
 // Focus Mode
 "focus.nav.title" = "Focus Mode";
