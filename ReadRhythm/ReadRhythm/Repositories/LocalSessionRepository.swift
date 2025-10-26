@@ -15,30 +15,69 @@ final class LocalSessionRepository: SessionRepository {
 
     init(context: ModelContext) { self.context = context }
 
+    /// Speichert eine Lese-Session über die neue Phase-9 API.
+    /// Diese Methode erfüllt das `SessionRepository`-Protokoll,
+    /// das vom FocusModeViewModel verwendet wird.
+    ///
+    /// Kontext:
+    ///   FocusMode ruft `saveSession(book:minutes:date:medium:)` auf,
+    ///   nicht mehr direkt SwiftData.
+    ///
+    /// Warum:
+    ///   - MVVM + Repository Pattern
+    ///   - Testbarkeit (Mock in Preview)
+    ///   - Vorbereitung auf "medium" (reading / listening)
+    ///
+    /// Wie:
+    ///   - Erstellt `ReadingSessionEntity`
+    ///   - Fügt sie in den ModelContext ein
+    ///   - Speichert Context
     @discardableResult
-    func addSession(for book: BookEntity, minutes: Int, date: Date) throws -> ReadingSessionEntity {
+    func saveSession(
+        book: BookEntity?,
+        minutes: Int,
+        date: Date,
+        medium: String
+    ) throws -> ReadingSessionEntity {
         precondition(minutes > 0, "Session minutes must be positive")
 
-        // Neue Leseeinheit anlegen und mit dem Buch verknüpfen
-        let session = ReadingSessionEntity(date: date, minutes: minutes, book: book)
+        // ReadingSessionEntity bekommt in Phase 9 / 10 ein optionales `book`
+        // und ein `medium`-Feld. Falls `book` nil ist, speichern wir
+        // trotzdem eine Session (freie Lesezeit).
+        let session = ReadingSessionEntity(
+            date: date,
+            minutes: minutes,
+            book: book,
+            medium: medium
+        )
 
-        // In den Context einfügen
         context.insert(session)
-
-        // ⚠️ kein book.sessions.append(session) mehr – BookEntity hat kein sessions-[...] Feld
 
         do {
             try context.save()
             #if DEBUG
-            print("[LocalSessionRepository] Added Session → \(minutes) min | \(date.formatted()) | Book: \(book.title)")
+            DebugLogger.log("[LocalSessionRepository] saveSession → \(minutes)min | \(medium) | \(date.formatted()) | Book: \(book?.title ?? "nil")")
             #endif
             return session
         } catch {
             #if DEBUG
-            print("[LocalSessionRepository] Save failed: \(error.localizedDescription)")
+            DebugLogger.log("❌ [LocalSessionRepository] saveSession failed: \(error.localizedDescription)")
             #endif
             throw error
         }
+    }
+
+    @available(*, deprecated, message: "Benutze saveSession(book:minutes:date:medium:) statt addSession(for:minutes:date:)")
+    /// SwiftData-Implementierung des SessionRepository.
+    @available(*, deprecated, message: "Benutze saveSession(book:minutes:date:medium:), das auch 'medium' persisted.")
+    @discardableResult
+    func addSession(for book: BookEntity, minutes: Int, date: Date) throws -> ReadingSessionEntity {
+        try saveSession(
+            book: book,
+            minutes: minutes,
+            date: date,
+            medium: "reading"
+        )
     }
     /// Löscht eine ReadingSessionEntity aus SwiftData.
     /// Kontext → Warum → Wie:
@@ -50,11 +89,11 @@ final class LocalSessionRepository: SessionRepository {
         do {
             try context.save()
             #if DEBUG
-            print("[LocalSessionRepository] Deleted session \(session.id)")
+            DebugLogger.log("[LocalSessionRepository] Deleted session \(session.id)")
             #endif
         } catch {
             #if DEBUG
-            print("[LocalSessionRepository] Delete failed: \(error.localizedDescription)")
+            DebugLogger.log("❌ [LocalSessionRepository] Delete failed: \(error.localizedDescription)")
             #endif
             throw error
         }

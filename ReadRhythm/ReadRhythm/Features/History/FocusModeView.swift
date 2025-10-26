@@ -5,13 +5,6 @@
 //  Created by Vu Minh Khoi Ha on 20.10.25.
 //
 
-//
-//  FocusModeView.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 20.10.25.
-//
-
 import SwiftUI
 import SwiftData
 #if os(iOS)
@@ -23,11 +16,16 @@ struct FocusModeView: View {
     @StateObject private var vm: FocusModeViewModel
     @State private var showBookPicker = false
     @State private var hapticsEnabled = true
-    @State private var selectedBookTitle: String? = nil
 
-    init(context: ModelContext) {
-        _vm = StateObject(wrappedValue: FocusModeViewModel(context: context))
+    init(sessionRepository: SessionRepository, initialBook: BookEntity? = nil) {
+        _vm = StateObject(
+            wrappedValue: FocusModeViewModel(sessionRepository: sessionRepository)
+        )
+        _initialBook = initialBook
     }
+
+    // We keep track of the initially provided book so we can assign it on appear
+    private var _initialBook: BookEntity?
 
     var body: some View {
         VStack(spacing: AppSpace.xl) {
@@ -58,10 +56,13 @@ struct FocusModeView: View {
                             .font(.footnote)
                             .foregroundStyle(AppColors.textSecondary)
 
-                        Text(selectedBookTitle ?? String(localized: "focus.picker.choose"))
-                            .font(.callout.weight(.semibold))
-                            .lineLimit(1)
-                            .truncationMode(.tail)
+                        Text(
+                            vm.selectedBook?.title
+                            ?? String(localized: "focus.picker.choose")
+                        )
+                        .font(.callout.weight(.semibold))
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                     }
 
                     Spacer()
@@ -83,7 +84,7 @@ struct FocusModeView: View {
             .accessibilityIdentifier("Focus.BookPicker")
             .sheet(isPresented: $showBookPicker) {
                 BookPickerSheet { book in
-                    selectedBookTitle = book.title
+                    vm.selectedBook = book
                     triggerHaptic(.selection)
                 }
                 .presentationDetents([.medium, .large])
@@ -133,22 +134,37 @@ struct FocusModeView: View {
             // Controls
             HStack(spacing: AppSpace.md) {
 
+                // Start / Resume
                 Button {
                     #if DEBUG
-                    print("[Focus] Start pressed, duration=\(vm.durationMinutes)")
+                    DebugLogger.log("[Focus] Start/Resume pressed, duration=\(vm.durationMinutes)")
                     #endif
-                    vm.start()
+                    if vm.isRunning {
+                        // already running, no-op
+                    } else if vm.remainingSeconds == vm.durationMinutes * 60 {
+                        // fresh start
+                        vm.start()
+                    } else {
+                        // paused; resume
+                        vm.resume()
+                    }
                     triggerHaptic(.success)
                 } label: {
-                    Label(LocalizedStringKey("focus.action.start"), systemImage: "play.circle.fill")
+                    Label(
+                        vm.isRunning
+                        ? LocalizedStringKey("focus.action.running")
+                        : LocalizedStringKey("focus.action.start"),
+                        systemImage: "play.circle.fill"
+                    )
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(vm.isRunning)
-                .accessibilityIdentifier("Focus.Start")
+                .accessibilityIdentifier("Focus.StartResume")
 
+                // Pause
                 Button {
                     #if DEBUG
-                    print("[Focus] Pause pressed")
+                    DebugLogger.log("[Focus] Pause pressed")
                     #endif
                     vm.pause()
                     triggerHaptic(.light)
@@ -159,9 +175,23 @@ struct FocusModeView: View {
                 .disabled(!vm.isRunning)
                 .accessibilityIdentifier("Focus.Pause")
 
+                // Finish & Save
+                Button {
+                    #if DEBUG
+                    DebugLogger.log("[Focus] Finish pressed")
+                    #endif
+                    vm.finishReading()
+                    triggerHaptic(.success)
+                } label: {
+                    Label(LocalizedStringKey("focus.action.finish"), systemImage: "checkmark.circle")
+                }
+                .buttonStyle(.bordered)
+                .accessibilityIdentifier("Focus.Finish")
+
+                // Stop / Reset (destructive, no save)
                 Button(role: .destructive) {
                     #if DEBUG
-                    print("[Focus] Stop pressed")
+                    DebugLogger.log("[Focus] Stop pressed")
                     #endif
                     vm.stop()
                     triggerHaptic(.warning)
@@ -176,6 +206,11 @@ struct FocusModeView: View {
         }
         .padding(.horizontal, AppSpace.lg)
         .navigationTitle(Text(LocalizedStringKey("focus.nav.title")))
+        .onAppear {
+            if vm.selectedBook == nil {
+                vm.selectedBook = _initialBook
+            }
+        }
         .accessibilityIdentifier("Focus.Screen")
     }
 }
@@ -265,23 +300,49 @@ struct FocusModeView_Previews: PreviewProvider {
         // 2. Einen ModelContext ableiten
         let previewContext = ModelContext(container)
 
-        // 3. Dummy-Buch einfügen, damit der Picker was hat
-        //    WICHTIG:
-        //    - `source:` ist jetzt ein String, kein Enum mehr.
-        //    - also einfach "userAdded" (oder "googleBooks")
-        previewContext.insert(
-            BookEntity(
-                sourceID: "demo-id",
-                title: "Atomic Habits",
-                author: "James Clear",
-                thumbnailURL: nil,
-                source: "userAdded"
-            )
+        // 3. Dummy-Buch einfügen
+        let demoBook = BookEntity(
+            sourceID: "demo-id",
+            title: "Atomic Habits",
+            author: "James Clear",
+            thumbnailURL: nil,
+            source: "userAdded"
         )
+        previewContext.insert(demoBook)
 
-        // 4. Die View mit diesem Context zurückgeben
-        return FocusModeView(context: previewContext)
-            .modelContainer(container)
+        // 4. Lokales Mock-Repository für Preview
+        struct PreviewSessionRepository: SessionRepository {
+            @discardableResult
+            func saveSession(book: BookEntity?, minutes: Int, date: Date, medium: String) throws -> ReadingSessionEntity {
+                #if DEBUG
+                DebugLogger.log("🧪 [Preview] saveSession(\(minutes)min, \(medium)) book=\(book?.title ?? "nil")")
+                #endif
+                return ReadingSessionEntity(
+                    date: date,
+                    minutes: minutes,
+                    book: book,
+                    medium: medium
+                )
+            }
+
+            @discardableResult
+            func addSession(for book: BookEntity, minutes: Int, date: Date) throws -> ReadingSessionEntity {
+                try saveSession(book: book, minutes: minutes, date: date, medium: "reading")
+            }
+
+            func deleteSession(_ session: ReadingSessionEntity) throws {
+                #if DEBUG
+                DebugLogger.log("🧪 [Preview] deleteSession id=\(session.id)")
+                #endif
+            }
+        }
+
+        // 5. View mit injiziertem Repository
+        return FocusModeView(
+            sessionRepository: PreviewSessionRepository(),
+            initialBook: demoBook
+        )
+        .modelContainer(container)
     }
 }
 #endif

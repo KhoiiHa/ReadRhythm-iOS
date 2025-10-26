@@ -8,11 +8,12 @@
 import SwiftUI
 import SwiftData
 
+@MainActor
 struct ReadingHistoryView: View {
-    @ObservedObject private var vm: ReadingHistoryViewModel
+    @StateObject private var vm: ReadingHistoryViewModel
 
     init(context: ModelContext) {
-        self.vm = ReadingHistoryViewModel(context: context)
+        _vm = StateObject(wrappedValue: ReadingHistoryViewModel(context: context))
     }
 
     var body: some View {
@@ -30,7 +31,9 @@ struct ReadingHistoryView: View {
             .padding(.top, AppSpace.lg)
         }
         .navigationTitle(Text(LocalizedStringKey("history.title")))
-        .onAppear { vm.reload() }
+        .task {
+            vm.reload()
+        }
         .accessibilityIdentifier("History.Root")
     }
 

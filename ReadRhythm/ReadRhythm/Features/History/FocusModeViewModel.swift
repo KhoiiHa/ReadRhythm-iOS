@@ -8,24 +8,33 @@
 import Foundation
 import SwiftData
 import CoreHaptics
+import SwiftUI
+
 
 @MainActor
 final class FocusModeViewModel: ObservableObject {
-    @Published var durationMinutes: Int = 25
-    @Published var remainingSeconds: Int = 25 * 60
-    @Published var isRunning: Bool = false
-    @Published var selectedBook: BookEntity? = nil // Optional – später bindbar
+    // MARK: - Published UI State
+    @Published var durationMinutes: Int = 25          // user-selected focus length in minutes
+    @Published var remainingSeconds: Int = 25 * 60     // countdown timer state
+    @Published var isRunning: Bool = false             // whether the timer is actively ticking
+    @Published var selectedBook: BookEntity? = nil     // the book this focus session belongs to
 
     private var timer: Timer?
-    private let context: ModelContext
 
-    init(context: ModelContext) {
-        self.context = context
+    // Repository responsible for persisting reading sessions
+    private let sessionRepository: SessionRepository
+
+    // Internal flag to prevent duplicate save on finish()
+    private var didFinishAndSave: Bool = false
+
+    init(sessionRepository: SessionRepository) {
+        self.sessionRepository = sessionRepository
         self.remainingSeconds = durationMinutes * 60
     }
 
     func start() {
         guard !isRunning else { return }
+        didFinishAndSave = false
         remainingSeconds = durationMinutes * 60
         isRunning = true
         scheduleTimer()
@@ -37,10 +46,17 @@ final class FocusModeViewModel: ObservableObject {
         isRunning = false
     }
 
+    func resume() {
+        guard !isRunning else { return }
+        isRunning = true
+        scheduleTimer()
+    }
+
     func stop() {
         timer?.invalidate()
         timer = nil
         isRunning = false
+        didFinishAndSave = false
         remainingSeconds = durationMinutes * 60
     }
 
@@ -67,40 +83,59 @@ final class FocusModeViewModel: ObservableObject {
 
     private func tick() {
         guard remainingSeconds > 0 else {
-            finish()
+            finishReading()
             return
         }
         remainingSeconds -= 1
     }
 
-    private func finish() {
+    func finishReading() {
         timer?.invalidate()
         timer = nil
         isRunning = false
 
-        // Session nur speichern, wenn ein Buch gewählt wurde
+        // prevent double-save if finishReading() is somehow called twice
+        guard didFinishAndSave == false else { return }
+        didFinishAndSave = true
+
+        // calculate minutes actually spent
+        // we track a countdown, so "elapsed" = planned - remaining
+        let elapsedSeconds = max(0, (durationMinutes * 60) - remainingSeconds)
+        let elapsedMinutesRoundedUp = Int(ceil(Double(elapsedSeconds) / 60.0))
+        let minutesToPersist = max(1, elapsedMinutesRoundedUp)
+
+        // only persist if we have a book
         guard let book = selectedBook else {
             #if DEBUG
-            print("[DEBUG] FocusMode: no book selected, skipping auto-save")
+            DebugLogger.log("⏱ FocusMode: no book selected, skipping save")
             #endif
+            resetTimerStateAfterFinish()
             return
         }
 
-        let minutes = max(1, durationMinutes)
-
-        // ⬇️ Reihenfolge: date vor minutes
-        let session = ReadingSessionEntity(date: .now, minutes: minutes, book: book)
-        context.insert(session)
         do {
-            try context.save()
+            try sessionRepository.saveSession(
+                book: book,
+                minutes: minutesToPersist,
+                date: Date(),
+                medium: "reading"
+            )
+
             #if DEBUG
-            print("[DEBUG] FocusMode saved session: \(minutes)min for \(book.title)")
+            DebugLogger.log("✅ FocusMode saved session: \(minutesToPersist)min for \(book.title)")
             #endif
         } catch {
             #if DEBUG
-            print("[DEBUG] FocusMode save error: \(error)")
+            DebugLogger.log("❌ FocusMode save error: \(error)")
             #endif
         }
+
+        resetTimerStateAfterFinish()
+    }
+
+    private func resetTimerStateAfterFinish() {
+        // reset timer UI for next run
+        remainingSeconds = durationMinutes * 60
     }
 
     func formattedRemaining() -> String {

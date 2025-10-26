@@ -6,6 +6,7 @@
 //
 import Foundation
 import SwiftData
+import SwiftUI
 
 @MainActor
 final class ProfileViewModel: ObservableObject {
@@ -35,13 +36,18 @@ final class ProfileViewModel: ObservableObject {
     private let context: ModelContext
     private let statsService: StatsService
 
-    init(context: ModelContext, statsService: StatsService = .shared) {
+    init(context: ModelContext, statsService: StatsService? = nil) {
         self.context = context
-        self.statsService = statsService
+        // Fallback auf den globalen Service erst *im* MainActor-Init,
+        // nicht als Default-Argument. Das verhindert Swift 6 Actor-Warnungen.
+        self.statsService = statsService ?? StatsService.shared
         reload()
     }
 
     func reload() {
+        #if DEBUG
+        DebugLogger.log("[Profile] reload()")
+        #endif
         let cal = Calendar.current
         let month = cal.dateInterval(of: .month, for: .now)!
         monthMinutes = statsService.totalMinutes(from: month.start, to: month.end, in: context)
@@ -62,6 +68,7 @@ final class ProfileViewModel: ObservableObject {
         dailyStats = statsService.fetchDailyStats(context: context, days: 30)
     }
 
+    @MainActor
     static func computeStreak(using service: StatsService, context: ModelContext) -> Int {
         let cal = Calendar.current
         var streak = 0

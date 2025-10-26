@@ -44,12 +44,13 @@ final class ReadingHistoryViewModel: ObservableObject {
 
         do {
             let sessions = try context.fetch(fd)
-            let items: [ReadingHistoryItem] = sessions.map {
-                ReadingHistoryItem(
-                    id: $0.id,
-                    date: $0.date,
-                    minutes: $0.minutes,
-                    bookTitle: $0.book.title   
+            let items: [ReadingHistoryItem] = sessions.map { s in
+                let title = s.book?.title ?? String(localized: "history.unknownBook")
+                return ReadingHistoryItem(
+                    id: s.id,
+                    date: s.date,
+                    minutes: s.minutes,
+                    bookTitle: title
                 )
             }
 
@@ -63,7 +64,7 @@ final class ReadingHistoryViewModel: ObservableObject {
             }
         } catch {
             #if DEBUG
-            print("[DEBUG] History fetch error: \(error)")
+            DebugLogger.log("❌ [History] fetch error: \(error)")
             #endif
             self.sections = []
         }

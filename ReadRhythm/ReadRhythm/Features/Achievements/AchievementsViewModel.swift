@@ -7,6 +7,8 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
+
 
 struct Achievement: Identifiable {
     let id: String
@@ -24,13 +26,18 @@ final class AchievementsViewModel: ObservableObject {
     private let context: ModelContext
     private let stats: StatsService
 
-    init(context: ModelContext, statsService: StatsService = .shared) {
+    init(context: ModelContext, statsService: StatsService? = nil) {
         self.context = context
-        self.stats = statsService
+        // Fallback auf den globalen Service erst im MainActor-Init,
+        // nicht als Default-Argument. Das beruhigt Swift 6.
+        self.stats = statsService ?? StatsService.shared
         reload()
     }
 
     func reload() {
+        #if DEBUG
+        DebugLogger.log("[Achievements] reload")
+        #endif
         let cal = Calendar.current
         let month = cal.dateInterval(of: .month, for: .now)!
         let week  = cal.dateInterval(of: .weekOfYear, for: .now)!
@@ -83,6 +90,7 @@ final class AchievementsViewModel: ObservableObject {
     }
 
     // Vereinfachte Streak-Logik: zähle rückwärts Tage mit >0 Minuten
+    @MainActor
     static func currentStreak(using service: StatsService, context: ModelContext, daysBack: Int) -> Int {
         let cal = Calendar.current
         var streak = 0

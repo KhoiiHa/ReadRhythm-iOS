@@ -14,16 +14,24 @@ final class ReadingSessionEntity {
     var date: Date
     var minutes: Int
 
-    // Beziehung zum Buch
-    @Relationship var book: BookEntity
+    /// Medium der Session: "reading" (Lesen) oder "listening" (Audio)
+    var medium: String
 
-    init(id: UUID = UUID(),
-         date: Date,
-         minutes: Int,
-         book: BookEntity) {
+    /// Zugehöriges Buch (optional)
+    /// Cascade Delete: Wenn ein Buch gelöscht wird, verschwinden seine Sessions.
+    @Relationship(deleteRule: .cascade) var book: BookEntity?
+
+    init(
+        id: UUID = UUID(),
+        date: Date,
+        minutes: Int,
+        book: BookEntity?,
+        medium: String = "reading"
+    ) {
         self.id = id
         self.date = date
         self.minutes = minutes
         self.book = book
+        self.medium = medium
     }
 }

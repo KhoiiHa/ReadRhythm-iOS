@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 @MainActor
 final class ReadingGoalsViewModel: ObservableObject {
@@ -41,7 +42,7 @@ final class ReadingGoalsViewModel: ObservableObject {
         }
         isEditing = true
         #if DEBUG
-        print("[Goals] startEditing – prefill target=\(editTargetMinutes)")
+        DebugLogger.log("[Goals] startEditing – prefill target=\(editTargetMinutes)")
         #endif
     }
 
@@ -56,7 +57,7 @@ final class ReadingGoalsViewModel: ObservableObject {
     func saveGoal(targetMinutes: Int, period: GoalPeriod? = nil) -> Bool {
         guard let goal = activeGoal else {
             #if DEBUG
-            print("[Goals] saveGoal – no active goal to update")
+            DebugLogger.log("[Goals] saveGoal – no active goal to update")
             #endif
             return false
         }
@@ -69,12 +70,12 @@ final class ReadingGoalsViewModel: ObservableObject {
             isEditing = false
             calculateProgress()
             #if DEBUG
-            print("[Goals] saveGoal – saved target=\(newValue), period=\(goal.period)")
+            DebugLogger.log("[Goals] saveGoal – saved target=\(newValue), period=\(goal.period)")
             #endif
             return true
         } catch {
             #if DEBUG
-            print("⚠️ [Goals] saveGoal error: \(error)")
+            DebugLogger.log("⚠️ [Goals] saveGoal error: \(error)")
             #endif
             return false
         }
@@ -90,6 +91,9 @@ final class ReadingGoalsViewModel: ObservableObject {
 
     func calculateProgress() {
         guard let goal = activeGoal else { return }
+        #if DEBUG
+        DebugLogger.log("[Goals] calculateProgress for period=\(goal.period) target=\(goal.targetMinutes)")
+        #endif
         let periodRange = Self.dateRange(for: goal.period)
 
         // Hier: neue Extension-APIs + korrekter context
@@ -100,6 +104,7 @@ final class ReadingGoalsViewModel: ObservableObject {
         self.streakCount = Self.computeStreak(using: statsService, context: context)
     }
 
+    @MainActor
     static func dateRange(for period: GoalPeriod) -> (start: Date, end: Date) {
         let cal = Calendar.current
         let now = Date()
@@ -118,6 +123,7 @@ final class ReadingGoalsViewModel: ObservableObject {
     }
 
     /// Vereinfachte Streak-Logik: zähle rückwärts Tage mit >0 Minuten
+    @MainActor
     static func computeStreak(using service: StatsService, context: ModelContext) -> Int {
         let cal = Calendar.current
         var streak = 0
@@ -132,5 +138,10 @@ final class ReadingGoalsViewModel: ObservableObject {
     func progressPercentageString() -> String {
         let pct = Int((progress * 100).rounded())
         return "\(pct)%"
+    }
+    /// Text for "X / Y min" style progress label in the UI.
+    func progressSummaryString() -> String {
+        guard let goal = activeGoal else { return "\(totalMinutes) min" }
+        return "\(totalMinutes) / \(goal.targetMinutes) min"
     }
 }

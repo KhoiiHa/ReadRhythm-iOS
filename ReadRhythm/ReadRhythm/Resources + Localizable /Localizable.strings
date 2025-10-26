@@ -218,6 +218,7 @@
 "history.yesterday" = "Gestern";
 "history.empty.title" = "Noch keine Einträge";
 "history.empty.subtitle" = "Sobald du Sessions speicherst, erscheint hier deine Historie.";
+"history.unknownBook" = "Unbekanntes Buch";
 
 // Focus Mode
 "focus.nav.title" = "Focus Mode";
@@ -227,6 +228,8 @@
 "focus.action.start" = "Start";
 "focus.action.pause" = "Pause";
 "focus.action.stop" = "Stop";
+"focus.action.finish" = "Fertig";
+"focus.action.running" = "Läuft…";
 
 "focus.picker.title" = "Aktives Buch";
 "focus.picker.choose" = "Buch auswählen";

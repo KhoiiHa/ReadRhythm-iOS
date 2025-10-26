@@ -7,13 +7,28 @@
 import SwiftData
 import Foundation
 
-/// Vertrag für den Zugriff auf ReadingSessions.
-/// Ermöglicht lokale oder zukünftige Remote-Implementierungen.
-/// Repository-Operationen laufen auf dem MainActor, da SwiftData-ModelContext im UI-Thread genutzt wird.
-/// (Hält Aufrufer- und Persistenzthread konsistent. Für Background-Work später separate Repos/Methoden anlegen.)
+
 @MainActor
 protocol SessionRepository {
+
+    /// Neuer, zukünftiger Standardweg (Phase 9)
     @discardableResult
-    func addSession(for book: BookEntity, minutes: Int, date: Date) throws -> ReadingSessionEntity
+    func saveSession(
+        book: BookEntity?,
+        minutes: Int,
+        date: Date,
+        medium: String
+    ) throws -> ReadingSessionEntity
+
+    /// Alte API (für AddSessionView & Kompatibilität)
+    @discardableResult
+    func addSession(
+        for book: BookEntity,
+        minutes: Int,
+        date: Date
+    ) throws -> ReadingSessionEntity
+
+    /// Löscht eine vorhandene Session
     func deleteSession(_ session: ReadingSessionEntity) throws
 }
+

@@ -11,6 +11,7 @@ import Foundation
 import SwiftData
 
 // MARK: - Protocol & DTO for Insights/Charts
+@MainActor
 protocol StatsServiceProtocol {
     /// Returns last `days` items with date + per-day minutes (reading/listening).
     func fetchDailyStats(context: ModelContext, days: Int) -> [DailyStatDTO]
@@ -22,6 +23,7 @@ struct DailyStatDTO: Hashable {
     let listeningMinutes: Int
 }
 
+@MainActor
 final class StatsService {
     static let shared = StatsService()
     private init() {}
@@ -44,7 +46,7 @@ final class StatsService {
             }
         } catch {
             #if DEBUG
-            print("⚠️ Fehler beim Laden der Sessions: \(error)")
+            DebugLogger.log("⚠️ Fehler beim Laden der Sessions: \(error)")
             #endif
             return 0
         }
@@ -79,7 +81,7 @@ final class StatsService {
             }
         } catch {
             #if DEBUG
-            print("⚠️ Fehler beim Berechnen der Minuten pro Tag: \(error)")
+            DebugLogger.log("⚠️ Fehler beim Berechnen der Minuten pro Tag: \(error)")
             #endif
             return []
         }
@@ -96,7 +98,7 @@ final class StatsService {
                 return sessions.reduce(0) { $0 + $1.minutes }
             } catch {
                 #if DEBUG
-                print("⚠️ Fehler beim Summieren der Minuten: \(error)")
+                DebugLogger.log("⚠️ Fehler beim Summieren der Minuten: \(error)")
                 #endif
                 return 0
             }
@@ -120,7 +122,7 @@ final class StatsService {
             return sessions.reduce(0) { $0 + $1.minutes }
         } catch {
             #if DEBUG
-            print("⚠️ Fehler beim Laden der Sessions (range): \(error)")
+            DebugLogger.log("⚠️ Fehler beim Laden der Sessions (range): \(error)")
             #endif
             return 0
         }
@@ -179,7 +181,7 @@ final class StatsService {
             return books.count
         } catch {
             #if DEBUG
-            print("⚠️ Fehler beim Laden der Bücher: \(error)")
+            DebugLogger.log("⚠️ Fehler beim Laden der Bücher: \(error)")
             #endif
             return 0
         }
@@ -197,7 +199,7 @@ final class StatsService {
             return try context.fetch(fd).count
         } catch {
             #if DEBUG
-            print("⚠️ Fehler beim Zählen der Sessions (range): \(error)")
+            DebugLogger.log("⚠️ Fehler beim Zählen der Sessions (range): \(error)")
             #endif
             return 0
         }
@@ -221,7 +223,7 @@ final class StatsService {
             return bucket
         } catch {
             #if DEBUG
-            print("⚠️ Fehler bei minutesByWeekday: \(error)")
+            DebugLogger.log("⚠️ Fehler bei minutesByWeekday: \(error)")
             #endif
             return [:]
         }
@@ -251,25 +253,34 @@ extension StatsService: StatsServiceProtocol {
         do {
             let sessions = try context.fetch(descriptor)
 
-            // Bucket per startOfDay
-            var bucket: [Date: Int] = [:]
+            // Bucket per startOfDay, split by medium
+            var readingBucket: [Date: Int] = [:]
+            var listeningBucket: [Date: Int] = [:]
+
             for s in sessions {
                 let day = cal.startOfDay(for: s.date)
-                bucket[day, default: 0] += s.minutes
+                let minutes = s.minutes
+
+                // medium: "reading" or "listening" (default "reading")
+                switch s.medium {
+                case "listening":
+                    listeningBucket[day, default: 0] += minutes
+                default:
+                    readingBucket[day, default: 0] += minutes
+                }
             }
 
             // Fill gaps oldest -> today
             let d = max(1, days)
             return (0..<d).compactMap { offset in
                 guard let day = cal.date(byAdding: .day, value: -((d - 1) - offset), to: today) else { return nil }
-                let reading = bucket[day, default: 0]
-                // Listening not yet persisted; keep 0 for forward compatibility
-                let listening = 0
+                let reading = readingBucket[day, default: 0]
+                let listening = listeningBucket[day, default: 0]
                 return DailyStatDTO(date: day, readingMinutes: reading, listeningMinutes: listening)
             }
         } catch {
             #if DEBUG
-            print("⚠️ fetchDailyStats error: \(error)")
+            DebugLogger.log("⚠️ fetchDailyStats error: \(error)")
             #endif
             return []
         }

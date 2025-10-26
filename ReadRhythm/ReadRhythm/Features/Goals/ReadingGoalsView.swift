@@ -10,14 +10,23 @@ import SwiftData
 import UIKit
 #endif
 
+@MainActor
 struct ReadingGoalsView: View {
     @StateObject private var viewModel: ReadingGoalsViewModel
     @Environment(\.modelContext) private var context
     @State private var hasReachedGoal: Bool = false
     @State private var celebrate: Bool = false
     // Init mit explizitem Context (aus Environment vom Aufrufer übergeben)
-    init(context: ModelContext, statsService: StatsService = .shared) {
-        _viewModel = StateObject(wrappedValue: ReadingGoalsViewModel(context: context, statsService: statsService))
+    // Wir übergeben StatsService optional und fallen intern auf .shared zurück,
+    // um Swift 6 (@MainActor isolation) zufrieden zu stellen.
+    init(context: ModelContext, statsService: StatsService? = nil) {
+        let service = statsService ?? StatsService.shared
+        _viewModel = StateObject(
+            wrappedValue: ReadingGoalsViewModel(
+                context: context,
+                statsService: service
+            )
+        )
     }
 
     var body: some View {
@@ -25,7 +34,10 @@ struct ReadingGoalsView: View {
             VStack(spacing: AppSpace.lg) {
 
                 NavigationLink {
-                    FocusModeView(context: context)
+                    FocusModeView(
+                        sessionRepository: LocalSessionRepository(context: context),
+                        initialBook: nil
+                    )
                 } label: {
                     Label(LocalizedStringKey("focus.title"), systemImage: "timer")
                         .padding()
