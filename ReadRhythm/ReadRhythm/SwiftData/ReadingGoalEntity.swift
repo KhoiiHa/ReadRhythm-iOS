@@ -1,10 +1,6 @@
-//
-//  ReadingGoalEntity.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 20.10.25.
-//
-
+// Kontext: Diese SwiftData-Entity speichert die persönlichen Leseziele der Nutzer:innen.
+// Warum: Fokus-, Statistik- und Goal-Views brauchen konsistente Zieldefinitionen über Perioden hinweg.
+// Wie: Wir persistieren Perioden, Zielminuten und Fortschrittsdaten inklusive Sessions-Beziehungen.
 import Foundation
 import SwiftData
 

@@ -1,10 +1,6 @@
-//
-//  StatsViewModel.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 15.10.25.
-//
-
+// Kontext: Dieses ViewModel liefert den Statistik-Screen mit aggregierten Lesezahlen und Intervallen.
+// Warum: Die Charts brauchen kuratierte Datenströme statt roher Entities aus SwiftData.
+// Wie: Wir orchestrieren StatsService-Aufrufe, cachen Ergebnisse und beliefern die View mit formatierten Strukturen.
 import SwiftUI
 import SwiftData
 

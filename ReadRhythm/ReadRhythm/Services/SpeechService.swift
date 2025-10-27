@@ -1,11 +1,6 @@
-//
-//  SpeechService.swift
-//  ReadRhythm
-//
-//  Verwaltet Text-to-Speech (TTS) Funktionen für ReadRhythm.
-//  Ziel: Bücher oder Textabschnitte vorlesen (Hörmodus / Accessibility).
-//
-
+// Kontext: Dieser Service hält unsere Text-to-Speech-Pipeline zusammen.
+// Warum: Hörmodus und Accessibility verlassen sich auf konsistente AVSpeechSynthesizer-Steuerung.
+// Wie: Wir bündeln AVFoundation-Konfiguration, Queueing und Lifecycle in einem ObservableObject.
 import Foundation
 import AVFoundation
 

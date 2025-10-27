@@ -1,10 +1,6 @@
-//
-//  FocusModeViewModel.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 20.10.25.
-//
-
+// Kontext: Dieses ViewModel treibt den Fokusmodus an und hält die Session-State-Maschine in Schach.
+// Warum: Ohne diesen Koordinator würden Timer, Buchbindung und Persistenz auseinanderlaufen.
+// Wie: Wir orchestrieren Timer, Status und Saves über das SessionRepository und veröffentlichte Properties.
 import Foundation
 import SwiftData
 import CoreHaptics

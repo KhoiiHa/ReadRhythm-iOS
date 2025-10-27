@@ -1,10 +1,6 @@
-//
-//  LocalSessionRepository.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 17.10.25.
-//
-
+// Kontext: Dieses Repository speichert und lädt ReadingSessions lokal via SwiftData.
+// Warum: Die App braucht eine robuste Persistence-Schicht jenseits der ViewModels.
+// Wie: Wir nutzen ModelContext-Operationen, um Sessions zu persistieren, zu lesen und zu löschen.
 import SwiftData
 import Foundation
 

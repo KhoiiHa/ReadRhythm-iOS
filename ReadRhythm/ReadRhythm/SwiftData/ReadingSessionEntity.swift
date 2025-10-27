@@ -1,10 +1,6 @@
-//
-//  ReadingSessionEntity.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 13.10.25.
-//
-
+// Kontext: Diese SwiftData-Entity repräsentiert einzelne Lese- oder Hörsessions.
+// Warum: Persistente Sitzungen sind die Basis für History, Ziele und Statistiken.
+// Wie: Wir modellieren Attribute inklusive Medium, Dauer und zugeordnetem Buch.
 import Foundation
 import SwiftData
 

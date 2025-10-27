@@ -1,18 +1,6 @@
-//
-//  AppColors .swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 15.10.25.
-//
-
-
-//
-//  AppColors.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 15.10.25.
-//
-
+// Kontext: Diese Farbpalette zentralisiert alle Marken- und UI-Farben der App.
+// Warum: Konsistente Farbnutzung braucht einen einzigen Wahrheitsanker statt Inline-Hexwerte.
+// Wie: Wir mappen Asset-Katalogfarben auf statische SwiftUI-Properties für hell/dunkel.
 import SwiftUI
 
 /// Kontext → Warum → Wie

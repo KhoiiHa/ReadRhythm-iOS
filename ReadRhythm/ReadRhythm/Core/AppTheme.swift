@@ -1,10 +1,6 @@
-//
-//  AppTheme.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 15.10.25.
-//
-
+// Kontext: Dieses Theme-Bundle hält unsere Design-Tokens und Styles konsistent.
+// Warum: Buttons, Karten und Container sollen über das ganze Produkt hinweg gleich ticken.
+// Wie: Wir definieren radien, Abstände und Modifiers als zentrale SwiftUI-Helfer.
 import SwiftUI
 
 /// Kontext → Warum → Wie

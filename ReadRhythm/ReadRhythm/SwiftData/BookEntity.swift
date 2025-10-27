@@ -1,10 +1,6 @@
-//
-//  Book.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 13.10.25.
-//
-
+// Kontext: Diese SwiftData-Entity modelliert ein Buch innerhalb unseres lokalen Katalogs.
+// Warum: Features wie Discover, Focus Mode und History brauchen konsistente Buchdaten.
+// Wie: Wir speichern IDs, Metadaten und Bilder als persistente Eigenschaften für Beziehungen.
 import Foundation
 import SwiftData
 

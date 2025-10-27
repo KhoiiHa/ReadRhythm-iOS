@@ -1,10 +1,6 @@
-//
-//  LocalBookRepository.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 17.10.25.
-//
-
+// Kontext: Dieses Repository verwaltet Bücher im lokalen SwiftData-Store.
+// Warum: Features wie Discover und Add Book brauchen eine zentrale Persistenzschicht.
+// Wie: Wir kapseln CRUD-Operationen über ModelContext und exponieren sie via BookRepository-Protokoll.
 import Foundation
 import SwiftData
 

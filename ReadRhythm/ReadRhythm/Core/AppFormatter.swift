@@ -1,10 +1,6 @@
-//
-//  AppFormatter.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 27.10.25.
-//
-
+// Kontext: Dieser Formatter-Hub liefert lokalisierte Strings und vermeidet Formatter-Suppe im UI.
+// Warum: Wiederverwendbare DateFormatter & Co. sparen Performance und halten Formatlogik zentral.
+// Wie: Wir cachen Formatter als statische Properties und exponieren Utility-Methoden für Views und Services.
 import Foundation
 
 /// Zentraler Formatter-Service für Datum, Zeit und Text-Lokalisierung.
