@@ -19,6 +19,7 @@ final class StatsViewModel: ObservableObject {
     // MARK: - Dependencies
     private let sessionRepository: LocalSessionRepository
     private let statsService: StatsService
+    private let context: ModelContext
 
     // MARK: - Init
     /// ViewModel wird mit Repository- / Service-Abhängigkeiten erzeugt,
@@ -29,6 +30,7 @@ final class StatsViewModel: ObservableObject {
     ) {
         self.sessionRepository = sessionRepository
         self.statsService = statsService
+        self.context = sessionRepository.context
     }
 
     // MARK: - Published Properties
@@ -57,12 +59,6 @@ final class StatsViewModel: ObservableObject {
         daily.contains { $0.minutes > 0 }
     }
 
-    /// Optionales Reload, das gleichzeitig die Tage setzt (MVP-Helper)
-    func reload(context: ModelContext, days: Int) {
-        self.days = days
-        reload(context: context)
-    }
-    
     /// Liefert die Anzahl der Tage basierend auf UI-Auswahl (z. B. Woche, Monat, Jahr, Gesamt).
     /// Verhindert zu große Zeiträume (Performance-Limit für mobile Darstellung).
     private func safeDays(for requestedDays: Int) -> Int {
@@ -83,47 +79,18 @@ final class StatsViewModel: ObservableObject {
     }
 
     // MARK: - Load Data
-    func reload(context: ModelContext) {
-        // Performance-Schutz: clamp der gewünschten Tage
-        let window = safeDays(for: days)
-
-        // 1. Hole aggregierte Tageswerte (letzte X Tage) über den StatsService.
-        //    Aktuell liefert minutesPerDay nur eine kombinierte Summe pro Tag.
-        //    In Phase 12 wird StatsService auf DailyStatDTO (reading/listening getrennt) erweitert.
-        let items = statsService.minutesPerDay(context: context, days: window)
-        daily = items
-
-        // 2. Bisherige Gesamtminuten (kombiniert)
-        let combined = items.reduce(0) { $0 + $1.minutes }
-        totalMinutes = combined
-
-        // 3. Trennung Lesen / Hören (Platzhalter):
-        //    Solange StatsService noch nicht nach medium splittet,
-        //    setzen wir beide auf combined. Nach dem Service-Refactor
-        //    werden diese Werte separat befüllt.
-        totalReadingMinutes = combined
-        totalListeningMinutes = 0
-        combinedTotalMinutes = combined
-
-        // 4. Aktuelle Streak
-        currentStreak = statsService.currentStreak(context: context)
-
-        #if DEBUG
-        DebugLogger.log("[StatsViewModel] reload() – days=\(days), combinedTotalMinutes=\(combined)")
-        #endif
+    /// Optionales Reload, das gleichzeitig die Tage setzt (MVP-Helper)
+    func reload(days: Int) {
+        self.days = days
+        reload()
     }
 
-    /// Aktualisiert all veröffentlichte Werte basierend auf dem aktuellen `days`-Fenster,
-    /// verwendet das Repository und den StatsService. Diese Variante wird nach Debug-Seeds
-    /// aufgerufen, damit die View keinen ModelContext durchreichen muss.
-    private func recomputeFromRepository() {
+    /// Lädt die Statistikwerte basierend auf dem aktuellen `days`-Fenster neu.
+    func reload() {
         // Performance-Schutz: clamp der gewünschten Tage
         let window = safeDays(for: days)
 
         // Hole aggregierte Tageswerte über den StatsService.
-        // Wir geben hier explizit den context des LocalSessionRepository weiter,
-        // damit StatsService weiterhin SwiftData lesen kann.
-        let context = sessionRepository.context
         let items = statsService.minutesPerDay(context: context, days: window)
         daily = items
 
@@ -138,7 +105,7 @@ final class StatsViewModel: ObservableObject {
         currentStreak = statsService.currentStreak(context: context)
 
         #if DEBUG
-        DebugLogger.log("[StatsViewModel] recomputeFromRepository() – days=\(days), combinedTotalMinutes=\(combined)")
+        DebugLogger.log("[StatsViewModel] reload() – days=\(days), combinedTotalMinutes=\(combined)")
         #endif
     }
 
@@ -147,11 +114,11 @@ final class StatsViewModel: ObservableObject {
     /// Wird von der StatsView (nur im DEBUG-UI) aufgerufen, um schnell Testdaten einzuspielen.
     /// Wichtig: Die View selbst spricht NICHT mehr direkt mit SwiftData,
     /// sondern geht über das Repository und lässt das ViewModel sich selbst neu berechnen.
-    func debugAddTenMinutes(repository: LocalSessionRepository) {
+    func debugAddTenMinutes() {
         do {
             // Im MVP behandeln wir das als "reading".
             // Später könnte hier ein Medium-Toggle landen.
-            try repository.debugAddSession(
+            try sessionRepository.debugAddSession(
                 minutes: 10,
                 medium: "reading",
                 date: Date(),
@@ -159,7 +126,7 @@ final class StatsViewModel: ObservableObject {
             )
 
             // Danach sofort neu berechnen, ohne dass die View einen ModelContext durchreichen muss.
-            recomputeFromRepository()
+            reload()
         } catch {
             DebugLogger.log("❌ [StatsViewModel] debugAddTenMinutes() failed: \(error.localizedDescription)")
         }
