@@ -10,17 +10,18 @@ import SwiftData
 
 @MainActor
 struct AudiobookLightView: View {
-    @Environment(\.modelContext) private var modelContext
     @StateObject private var vm: AudiobookLightViewModel
 
     init(
         initialText: String = "",
-        sessionRepository: SessionRepository
+        sessionRepository: SessionRepository,
+        speechService: SpeechService
     ) {
         _vm = StateObject(
             wrappedValue: AudiobookLightViewModel(
                 initialText: initialText,
-                sessionRepository: sessionRepository
+                sessionRepository: sessionRepository,
+                speechService: speechService
             )
         )
     }
@@ -63,7 +64,7 @@ struct AudiobookLightView: View {
                 VStack(spacing: AppSpace.md) {
                     HStack(spacing: AppSpace.md) {
                         Button {
-                            vm.play()
+                            vm.startListeningSession()
                         } label: {
                             Label(LocalizedStringKey("audio.action.play"), systemImage: vm.isPaused ? "play.fill" : "play.circle.fill")
                         }
@@ -71,7 +72,7 @@ struct AudiobookLightView: View {
                         .accessibilityIdentifier("Audio.Play")
 
                         Button {
-                            vm.pause()
+                            vm.pauseListeningSession()
                         } label: {
                             Label(LocalizedStringKey("audio.action.pause"), systemImage: "pause.circle")
                         }
@@ -80,7 +81,7 @@ struct AudiobookLightView: View {
                         .accessibilityIdentifier("Audio.Pause")
 
                         Button(role: .destructive) {
-                            vm.stop()
+                            vm.stopSessionAndSave()
                         } label: {
                             Label(LocalizedStringKey("audio.action.stop"), systemImage: "stop.circle")
                         }
@@ -188,11 +189,11 @@ struct AudiobookLightView_Previews: PreviewProvider {
         return NavigationStack {
             AudiobookLightView(
                 initialText: "Dies ist ein Testtext für die Audiowiedergabe.",
-                sessionRepository: PreviewSessionRepository()
+                sessionRepository: PreviewSessionRepository(),
+                speechService: SpeechService.shared
             )
         }
         .modelContainer(container)
     }
 }
 #endif
-

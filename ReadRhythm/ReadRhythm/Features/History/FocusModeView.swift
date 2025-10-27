@@ -17,15 +17,15 @@ struct FocusModeView: View {
     @State private var showBookPicker = false
     @State private var hapticsEnabled = true
 
+    // We capture the initially provided book for assignment on appear.
+    private let initialBook: BookEntity?
+
     init(sessionRepository: SessionRepository, initialBook: BookEntity? = nil) {
-        _vm = StateObject(
+        self._vm = StateObject(
             wrappedValue: FocusModeViewModel(sessionRepository: sessionRepository)
         )
-        _initialBook = initialBook
+        self.initialBook = initialBook
     }
-
-    // We keep track of the initially provided book so we can assign it on appear
-    private var _initialBook: BookEntity?
 
     var body: some View {
         VStack(spacing: AppSpace.xl) {
@@ -143,10 +143,10 @@ struct FocusModeView: View {
                         // already running, no-op
                     } else if vm.remainingSeconds == vm.durationMinutes * 60 {
                         // fresh start
-                        vm.start()
+                        vm.startSession()
                     } else {
                         // paused; resume
-                        vm.resume()
+                        vm.resumeSession()
                     }
                     triggerHaptic(.success)
                 } label: {
@@ -166,7 +166,7 @@ struct FocusModeView: View {
                     #if DEBUG
                     DebugLogger.log("[Focus] Pause pressed")
                     #endif
-                    vm.pause()
+                    vm.pauseSession()
                     triggerHaptic(.light)
                 } label: {
                     Label(LocalizedStringKey("focus.action.pause"), systemImage: "pause.circle")
@@ -180,7 +180,7 @@ struct FocusModeView: View {
                     #if DEBUG
                     DebugLogger.log("[Focus] Finish pressed")
                     #endif
-                    vm.finishReading()
+                    vm.stopSessionAndSave()
                     triggerHaptic(.success)
                 } label: {
                     Label(LocalizedStringKey("focus.action.finish"), systemImage: "checkmark.circle")
@@ -193,7 +193,7 @@ struct FocusModeView: View {
                     #if DEBUG
                     DebugLogger.log("[Focus] Stop pressed")
                     #endif
-                    vm.stop()
+                    vm.cancelSessionWithoutSave()
                     triggerHaptic(.warning)
                 } label: {
                     Label(LocalizedStringKey("focus.action.stop"), systemImage: "stop.circle")
@@ -208,7 +208,7 @@ struct FocusModeView: View {
         .navigationTitle(Text(LocalizedStringKey("focus.nav.title")))
         .onAppear {
             if vm.selectedBook == nil {
-                vm.selectedBook = _initialBook
+                vm.selectedBook = initialBook
             }
         }
         .accessibilityIdentifier("Focus.Screen")

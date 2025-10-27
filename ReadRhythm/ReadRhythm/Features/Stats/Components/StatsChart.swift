@@ -8,10 +8,11 @@
 import SwiftUI
 import Charts
 
-/// Einfache Swift Charts Darstellung der Lesezeit über einen Zeitraum.
-/// Warum → Wie
-/// - Warum: Visualisiert Fortschritt über Zeit, klar und leicht lesbar.
-/// - Wie: BarChart + dezente Ziel-Linie (RuleMark) und integer Y-Achse.
+/// Kontext → Warum → Wie
+/// Kontext: Zeigt die tägliche Lese-/Hörzeit als Balkendiagramm.
+/// Warum: Nutzer*innen sollen Fortschritt (Minuten pro Tag) und ein persönliches Ziel (goalMinutes) visuell verstehen.
+/// Wie: BarMark + RuleMark. Farben, Spacing, CornerRadius und Linienbreiten kommen aus dem Designsystem
+///      (AppColors, AppChart, AppStroke), keine Magic Numbers im View-Code.
 struct StatsChart: View {
     struct DataPoint: Identifiable {
         let id = UUID()
@@ -31,26 +32,26 @@ struct StatsChart: View {
                     x: .value("Date", point.date, unit: .day),
                     y: .value("Minutes", point.minutes)
                 )
-                .foregroundStyle(AppColors.Semantic.chartBar)
+                .foregroundStyle(AppColors.Chart.barPrimary)
                 .cornerRadius(AppRadius.s)
                 .annotation(position: .top, alignment: .center) {
                     if point.minutes > 0 {
                         Text("\(point.minutes)")
                             .font(.caption2)
-                            .foregroundStyle(AppColors.Semantic.textSecondary)
+                            .foregroundStyle(AppColors.textSecondary)
                     }
                 }
             }
 
             // Ziel-Linie
             RuleMark(y: .value("Goal", goalMinutes))
-                .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
-                .foregroundStyle(AppColors.Semantic.borderMuted)
+                .lineStyle(StrokeStyle(lineWidth: AppStroke.chartGoal, dash: [4]))
+                .foregroundStyle(AppColors.Chart.goalLine)
                 .annotation(position: .topLeading, alignment: .leading) {
                     Text("\(goalMinutes)")
                         .font(.caption2)
-                        .foregroundStyle(AppColors.Semantic.textSecondary)
-                        .padding(.horizontal, 2)
+                        .foregroundStyle(AppColors.textSecondary)
+                        .padding(.horizontal, AppSpace.xs)
                 }
         }
         .chartYAxis {
@@ -69,9 +70,13 @@ struct StatsChart: View {
         }
         .chartYScale(domain: 0...maxY)
         .chartPlotStyle { plot in
-            plot.background(AppColors.Semantic.bgSecondary)
+            plot
+                .background(AppColors.Semantic.bgSecondary)
+                .accessibilityHidden(true) // Deko-Hintergrund ist visuell, nicht in VoiceOver relevant
         }
-        .padding(.horizontal, AppSpace._8)
+        .frame(height: AppChart.height)
+        .padding(.horizontal, AppChart.horizontalPadding)
+        .accessibilityElement(children: .ignore)
         .accessibilityIdentifier("stats.chart")
     }
 
@@ -79,4 +84,3 @@ struct StatsChart: View {
         max(max(data.map { $0.minutes }.max() ?? 30, goalMinutes), 30)
     }
 }
-

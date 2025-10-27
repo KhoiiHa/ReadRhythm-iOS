@@ -225,6 +225,12 @@
 "history.medium.reading" = "gelesen";
 "history.medium.listening" = "gehört";
 
+"history.row.listening" = "%d Minuten gehört am %@";
+"history.row.reading" = "%d Minuten gelesen am %@";
+
+"accessibility.history.listening" = "%d Minuten gehört am %@";
+"accessibility.history.reading" = "%d Minuten gelesen am %@";
+
 // Focus Mode
 "focus.nav.title" = "Focus Mode";
 "focus.title" = "Lese-Fokus";

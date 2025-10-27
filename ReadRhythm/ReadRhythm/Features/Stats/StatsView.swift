@@ -2,6 +2,8 @@ import SwiftUI
 import SwiftData
 import Charts
 
+// MARK: - Dependency Injection for StatsViewModel
+
 /// Kontext → Warum → Wie
 /// Kontext: Die StatsView zeigt aggregierte Leseminuten pro Tag (Timeline) und die Gesamtminuten.
 /// Warum: Visuelles Feedback zum Leseverhalten ist ein MVP-Kernnutzen und Portfolio-Highlight.
@@ -9,10 +11,25 @@ import Charts
 @MainActor
 struct StatsView: View {
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var viewModel = StatsViewModel()
+    @StateObject private var viewModel: StatsViewModel
     
     /// UI-Range steuert die Auswahl im Header (wird auf ViewModel.days gemappt).
     @State private var range: StatsRange = .week
+    // Repository wird hier gehalten, damit auch DEBUG-Seed über Repository läuft
+    private let sessionRepository: LocalSessionRepository
+    
+    init(context: ModelContext) {
+        // Repository kapselt SwiftData-Zugriff und wird durchgereicht
+        let repo = LocalSessionRepository(context: context)
+        self.sessionRepository = repo
+
+        self._viewModel = StateObject(
+            wrappedValue: StatsViewModel(
+                sessionRepository: repo,
+                statsService: .shared
+            )
+        )
+    }
     
     var body: some View {
         ScrollView {
@@ -35,45 +52,14 @@ struct StatsView: View {
                     StatsChart(data: chartData, goalMinutes: 30)
                         .frame(height: 220)
                         .padding(.horizontal, AppSpace._16)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(chartAccessibilitySummary)
                 }
                 
 #if DEBUG
                 // Seed-Knopf für schnelle visuelle Prüfung
                 Button(String(localized: "rr.stats.debug.add10")) {
-
-                    // 1. Versuch: hol ein existierendes Buch aus SwiftData
-                    //    Wir sortieren deterministisch nach Titel, um Compiler-/Lint-Warnungen zu vermeiden.
-                    let fetch = FetchDescriptor<BookEntity>(
-                        sortBy: [SortDescriptor(\.title, order: .forward)]
-                    )
-                    let existing = (try? modelContext.fetch(fetch))?.first
-
-                    // 2. Falls kein Buch da ist -> neues Debug-Buch anlegen
-                    let book = existing ?? {
-                        let newBook = BookEntity(
-                            sourceID: "debug-\(UUID().uuidString)", // eindeutige ID
-                            title: "Debug Book",
-                            author: "Debug Author",
-                            thumbnailURL: nil,                      // kein Cover nötig für Seed
-                            source: "userAdded"                     // Herkunft (String)
-                        )
-                        modelContext.insert(newBook)
-                        return newBook
-                    }()
-
-                    // 3. Neue Session (10 Minuten) für dieses Buch
-                    let session = ReadingSessionEntity(
-                        date: .now,
-                        minutes: 10,
-                        book: book
-                    )
-                    modelContext.insert(session)
-
-                    // 4. Speichern (Fehler egal im DEBUG)
-                    try? modelContext.save()
-
-                    // 5. UI refresh
-                    viewModel.reload(context: modelContext)
+                    viewModel.debugAddTenMinutes(repository: sessionRepository)
                 }
                 .accessibilityIdentifier("rr-stats-debug-add10")
                 .buttonStyle(.bordered)
@@ -113,5 +99,27 @@ struct StatsView: View {
     /// Konvertiert ViewModel-Daten in Chart-Datenpunkte der StatsChart-Komponente.
     private var chartData: [StatsChart.DataPoint] {
         viewModel.daily.map { .init(date: $0.date, minutes: $0.minutes) }
+    }
+
+    /// Liefert eine zusammenfassende Beschreibung für VoiceOver anstelle einzelner Balken.
+    private var chartAccessibilitySummary: String {
+        // Maximalwert finden
+        if let maxEntry = viewModel.daily.max(by: { $0.minutes < $1.minutes }) {
+            let minutes = maxEntry.minutes
+            let dateText = AppFormatter.shortDateFormatter.string(from: maxEntry.date)
+            return String(
+                format: NSLocalizedString(
+                    "stats.chart.accessibility",
+                    comment: "VoiceOver summary for stats chart: maximum minutes and reference date"
+                ),
+                minutes,
+                dateText
+            )
+        } else {
+            return NSLocalizedString(
+                "stats.chart.accessibility.empty",
+                comment: "VoiceOver summary when there's no data in the stats chart"
+            )
+        }
     }
 }

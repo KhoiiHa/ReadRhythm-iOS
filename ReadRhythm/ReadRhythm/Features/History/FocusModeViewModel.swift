@@ -13,6 +13,10 @@ import SwiftUI
 
 @MainActor
 final class FocusModeViewModel: ObservableObject {
+    // MARK: - Session lifecycle flags
+    /// Wurde diese Session bereits persistiert? Dient als Schutz gegen Doppel-Saves.
+    private var hasSavedSession: Bool = false
+
     // MARK: - Published UI State
     @Published var durationMinutes: Int = 25          // user-selected focus length in minutes
     @Published var remainingSeconds: Int = 25 * 60     // countdown timer state
@@ -24,39 +28,40 @@ final class FocusModeViewModel: ObservableObject {
     // Repository responsible for persisting reading sessions
     private let sessionRepository: SessionRepository
 
-    // Internal flag to prevent duplicate save on finish()
-    private var didFinishAndSave: Bool = false
-
     init(sessionRepository: SessionRepository) {
         self.sessionRepository = sessionRepository
         self.remainingSeconds = durationMinutes * 60
     }
 
-    func start() {
-        guard !isRunning else { return }
-        didFinishAndSave = false
+    /// Startet eine neue Fokus-Session. Setzt Timer zurück und beginnt das Countdown-Tracking.
+    func startSession() {
+        guard isRunning == false else { return }
+        hasSavedSession = false
         remainingSeconds = durationMinutes * 60
         isRunning = true
         scheduleTimer()
     }
 
-    func pause() {
+    /// Pausiert die aktuelle Session, ohne sie zu speichern.
+    func pauseSession() {
         timer?.invalidate()
         timer = nil
         isRunning = false
     }
 
-    func resume() {
-        guard !isRunning else { return }
+    /// Führt eine pausierte Session fort.
+    func resumeSession() {
+        guard isRunning == false else { return }
         isRunning = true
         scheduleTimer()
     }
 
-    func stop() {
+    /// Bricht die Session ab, verwirft den Fortschritt (KEIN Save) und setzt UI zurück.
+    func cancelSessionWithoutSave() {
         timer?.invalidate()
         timer = nil
         isRunning = false
-        didFinishAndSave = false
+        hasSavedSession = false
         remainingSeconds = durationMinutes * 60
     }
 
@@ -83,28 +88,29 @@ final class FocusModeViewModel: ObservableObject {
 
     private func tick() {
         guard remainingSeconds > 0 else {
-            finishReading()
+            stopSessionAndSave()
             return
         }
         remainingSeconds -= 1
     }
 
-    func finishReading() {
+    /// Stoppt den Timer, berechnet die gelesene Zeit und persistiert sie (einmalig).
+    /// Diese Funktion wird aufgerufen, wenn der User aktiv "Fertig" drückt
+    /// ODER wenn der Timer natürlich auf 0 läuft.
+    func stopSessionAndSave() {
         timer?.invalidate()
         timer = nil
         isRunning = false
 
-        // prevent double-save if finishReading() is somehow called twice
-        guard didFinishAndSave == false else { return }
-        didFinishAndSave = true
+        // Doppel-Save verhindern
+        guard hasSavedSession == false else { return }
+        hasSavedSession = true
 
-        // calculate minutes actually spent
-        // we track a countdown, so "elapsed" = planned - remaining
+        // berechne tatsächlich gelesene Minuten
         let elapsedSeconds = max(0, (durationMinutes * 60) - remainingSeconds)
         let elapsedMinutesRoundedUp = Int(ceil(Double(elapsedSeconds) / 60.0))
         let minutesToPersist = max(1, elapsedMinutesRoundedUp)
 
-        // only persist if we have a book
         guard let book = selectedBook else {
             #if DEBUG
             DebugLogger.log("⏱ FocusMode: no book selected, skipping save")
@@ -120,7 +126,6 @@ final class FocusModeViewModel: ObservableObject {
                 date: Date(),
                 medium: "reading"
             )
-
             #if DEBUG
             DebugLogger.log("✅ FocusMode saved session: \(minutesToPersist)min for \(book.title)")
             #endif
@@ -142,5 +147,17 @@ final class FocusModeViewModel: ObservableObject {
         let m = remainingSeconds / 60
         let s = remainingSeconds % 60
         return String(format: "%02d:%02d", m, s)
+    }
+
+    deinit {
+        // Timer hart stoppen, kein weiterer Tick nach View-Dismiss
+        timer?.invalidate()
+        timer = nil
+
+        // Wir speichern NICHT automatisch beim deinit. Das verhindert Ghost-Sessions,
+        // z. B. wenn der Nutzer den Screen einfach schließt.
+        #if DEBUG
+        DebugLogger.log("🧹 FocusModeViewModel deinit – timer invalidated, no auto-save")
+        #endif
     }
 }

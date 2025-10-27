@@ -40,7 +40,7 @@ struct MainTabView: View {
 
             // Statistiken
             NavigationStack {
-                StatsView()
+                StatsView(context: context)
             }
             .tabItem {
                 Label(LocalizedStringKey("rr.tab.stats"), systemImage: "chart.bar")

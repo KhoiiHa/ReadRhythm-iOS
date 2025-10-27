@@ -19,11 +19,12 @@ struct ReadingHistoryView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: AppSpace.lg, pinnedViews: []) {
-                ForEach(vm.sections, id: \.date) { section in
-                    sectionView(section.date, items: section.items)
+                let displayData = vm.displaySections()
+                ForEach(displayData, id: \.date) { section in
+                    sectionView(section.date, rows: section.rows)
                 }
 
-                if vm.sections.isEmpty {
+                if displayData.isEmpty {
                     emptyState
                 }
             }
@@ -53,34 +54,33 @@ struct ReadingHistoryView: View {
         .accessibilityIdentifier("History.Empty")
     }
 
-    private func sectionView(_ day: Date, items: [ReadingHistoryItem]) -> some View {
+    private func sectionView(_ day: Date, rows: [HistoryRowDisplayData]) -> some View {
         VStack(alignment: .leading, spacing: AppSpace.md) {
             Text(vm.dayLabel(day))
                 .font(.headline)
                 .padding(.horizontal, AppSpace.xs)
 
             VStack(spacing: 8) {
-                ForEach(items) { item in
-                    rowView(for: item)
+                ForEach(rows) { row in
+                    rowView(for: row)
                 }
             }
         }
         .accessibilityElement(children: .contain)
     }
 
-    private func rowView(for item: ReadingHistoryItem) -> some View {
+    private func rowView(for row: HistoryRowDisplayData) -> some View {
         HStack(spacing: AppSpace.md) {
-            // Icon abhängig vom Medium: Lesen 📖 oder Hören 🎧
-            Image(systemName: item.medium == "listening" ? "headphones" : "book.closed.fill")
-                .foregroundStyle(item.medium == "listening" ? AppColors.brandSecondary : AppColors.brandPrimary)
+            Image(systemName: row.iconSystemName)
+                .foregroundStyle(row.iconSystemName == "headphones" ? AppColors.brandSecondary : AppColors.brandPrimary)
                 .frame(width: 22)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(item.bookTitle)
+                Text(row.subtitleText)
                     .font(.subheadline)
-                    .accessibilityIdentifier("History.Row.Title.\(item.id.uuidString.prefix(6))")
+                    .accessibilityIdentifier("History.Row.Title.\(row.id.uuidString.prefix(6))")
 
-                Text("\(vm.timeLabel(item.date)) · \(item.minutes) " + String(localized: "goals.metric.minutes"))
+                Text("\(row.timeText) · \(row.titleText)")
                     .font(.caption)
                     .foregroundStyle(AppColors.textSecondary)
             }
@@ -99,18 +99,9 @@ struct ReadingHistoryView: View {
                 radius: AppShadow.card.radius,
                 x: AppShadow.card.x,
                 y: AppShadow.card.y)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(historyAccessibilityLabel(for: item))
-        .accessibilityIdentifier("History.Row.\(item.id.uuidString.prefix(6))")
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(row.accessibilityLabel)
+        .accessibilityIdentifier("History.Row.\(row.id.uuidString.prefix(6))")
     }
 
-    private func historyAccessibilityLabel(for item: ReadingHistoryItem) -> String {
-        let mediumText = (item.medium == "listening")
-            ? String(localized: "history.medium.listening")
-            : String(localized: "history.medium.reading")
-
-        let dayText = vm.dayLabel(item.date)
-
-        return "\(item.minutes) Minuten \(mediumText) am \(dayText)"
-    }
 }

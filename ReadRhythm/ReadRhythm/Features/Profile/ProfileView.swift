@@ -58,7 +58,8 @@ struct ProfileView: View {
                 NavigationLink {
                     AudiobookLightView(
                         initialText: "",
-                        sessionRepository: LocalSessionRepository(context: context)
+                        sessionRepository: LocalSessionRepository(context: context),
+                        speechService: SpeechService.shared
                     )
                 } label: {
                     Label(LocalizedStringKey("audio.nav.title"), systemImage: "waveform")

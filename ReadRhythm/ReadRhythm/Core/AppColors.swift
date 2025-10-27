@@ -80,4 +80,22 @@ enum AppColors {
     static var textPrimary: Color { Semantic.textPrimary }
     static var textSecondary: Color { Semantic.textSecondary }
     static var textInverse: Color { Semantic.textInverse }
+    
+    
+    // MARK: - Charts (extended)
+    enum Chart {
+        /// Primäre Farbe für Balken
+        static var barPrimary: Color { Accent.success }
+
+        /// Farbe für das Ziel-Linien-Overlay oder Durchschnitt
+        static var goalLine: Color { Accent.warning }
+
+        /// Farbe für Sekundär- oder Vergleichs-Daten
+        static var secondaryBar: Color { Brand.secondary.opacity(0.6) }
+
+        /// Achsen und Gridlines
+        static var axis: Color { Semantic.chartAxis }
+    }
 }
+
+

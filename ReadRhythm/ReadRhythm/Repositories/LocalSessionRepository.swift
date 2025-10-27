@@ -11,7 +11,7 @@ import Foundation
 /// SwiftData-Implementierung des SessionRepository.
 @MainActor
 final class LocalSessionRepository: SessionRepository {
-    private let context: ModelContext
+    let context: ModelContext
 
     init(context: ModelContext) { self.context = context }
 
@@ -99,3 +99,44 @@ final class LocalSessionRepository: SessionRepository {
         }
     }
 }
+
+// MARK: - Debug helpers / seeding
+#if DEBUG
+extension LocalSessionRepository {
+    /// Fügt eine künstliche Session für Debug/Testzwecke hinzu.
+    /// Wichtig: Diese Funktion wird NUR von Debug-UI (z. B. StatsView) aufgerufen,
+    /// damit die View nie direkt mit SwiftData spricht.
+    /// - Parameters:
+    ///   - minutes: Anzahl der Minuten, die zur Session gezählt werden sollen (>0)
+    ///   - medium: "reading" oder "listening"
+    ///   - date: Datum/Zeit der Session (Default: jetzt)
+    ///   - book: Optionales BookEntity (Default: nil)
+    @discardableResult
+    func debugAddSession(
+        minutes: Int,
+        medium: String,
+        date: Date = Date(),
+        book: BookEntity? = nil
+    ) throws -> ReadingSessionEntity {
+        precondition(minutes > 0, "Session minutes must be positive")
+
+        let debugSession = ReadingSessionEntity(
+            date: date,
+            minutes: minutes,
+            book: book,
+            medium: medium
+        )
+
+        context.insert(debugSession)
+
+        do {
+            try context.save()
+            DebugLogger.log("[LocalSessionRepository] debugAddSession → \(minutes)min | \(medium) | \(date.formatted()) | Book: \(book?.title ?? "nil")")
+            return debugSession
+        } catch {
+            DebugLogger.log("❌ [LocalSessionRepository] debugAddSession failed: \(error.localizedDescription)")
+            throw error
+        }
+    }
+}
+#endif
