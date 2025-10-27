@@ -19,7 +19,8 @@ struct DiscoverView: View {
 
     // MARK: - Environment / ViewModel
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var viewModel = DiscoverViewModel()
+    @StateObject private var viewModel: DiscoverViewModel
+    @State private var repository: (any BookRepository)?
     @State private var didAutoLoad = false
     @State private var showFilterSheet = false
 
@@ -69,7 +70,11 @@ struct DiscoverView: View {
                             titleKey: "discover.section.recommended",
                             showSeeAll: true,
                             seeAllDestination: AnyView(
-                                DiscoverAllView(initialSearchText: viewModel.searchQuery, initialCategory: nil)
+                                DiscoverAllView(
+                                    initialSearchText: viewModel.searchQuery,
+                                    initialCategory: nil,
+                                    repository: repository
+                                )
                             )
                         )
                         let recommended = Array(allBooks.prefix(8))
@@ -81,7 +86,11 @@ struct DiscoverView: View {
                             titleKey: "discover.section.fromLibrary",
                             showSeeAll: allBooks.count > 8,
                             seeAllDestination: AnyView(
-                                DiscoverAllView(initialSearchText: viewModel.searchQuery, initialCategory: nil)
+                                DiscoverAllView(
+                                    initialSearchText: viewModel.searchQuery,
+                                    initialCategory: nil,
+                                    repository: repository
+                                )
                             )
                         )
                         horizontalBooks(libraryVisible)
@@ -92,7 +101,11 @@ struct DiscoverView: View {
                             titleKey: "discover.section.trending",
                             showSeeAll: allBooks.count > 8,
                             seeAllDestination: AnyView(
-                                DiscoverAllView(initialSearchText: viewModel.searchQuery, initialCategory: nil)
+                                DiscoverAllView(
+                                    initialSearchText: viewModel.searchQuery,
+                                    initialCategory: nil,
+                                    repository: repository
+                                )
                             )
                         )
                         horizontalBooks(trendingVisible)
@@ -124,12 +137,14 @@ struct DiscoverView: View {
         .sheet(isPresented: $showFilterSheet) {
             VStack(spacing: AppSpace._16) {
                 HStack {
+                    // TODO: i18n folgt in Phase 11 (Bonus-Feature)
                     Text("Filter")
                         .font(.headline)
                     Spacer()
                     Button {
                         showFilterSheet = false
                     } label: {
+                        // TODO: i18n folgt in Phase 11 (Bonus-Feature)
                         Text("Fertig")
                             .font(.subheadline)
                             .bold()
@@ -143,6 +158,7 @@ struct DiscoverView: View {
                 Divider()
 
                 VStack(alignment: .leading, spacing: AppSpace._12) {
+                    // TODO: i18n folgt in Phase 11 (Bonus-Feature)
                     Text("Aktive Kategorie")
                         .font(.footnote)
                         .foregroundStyle(AppColors.Semantic.textSecondary)
@@ -162,6 +178,7 @@ struct DiscoverView: View {
                                 )
                         )
                     } else {
+                        // TODO: i18n folgt in Phase 11 (Bonus-Feature)
                         Text("Keine Kategorie ausgewählt")
                             .font(.subheadline)
                             .foregroundStyle(AppColors.Semantic.textSecondary)
@@ -200,8 +217,14 @@ struct DiscoverView: View {
             .presentationDragIndicator(.visible)
         }
         .onAppear {
+            if repository == nil {
+                let localRepository = LocalBookRepository(context: modelContext)
+                repository = localRepository
+                viewModel.updateRepository(localRepository)
+            }
+
             // Lokale Library laden (für Fallback & "aus deiner Library")
-            viewModel.loadBooks(from: modelContext)
+            viewModel.loadBooks()
 
             // Erste API-Ladung nur einmal anstoßen.
             if !didAutoLoad {
@@ -293,7 +316,7 @@ struct DiscoverView: View {
                         #if os(iOS)
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         #endif
-                        viewModel.addToLibrary(from: book, in: modelContext)
+                        viewModel.addToLibrary(from: book)
                     }
                 )
                 Divider().opacity(0.1)
@@ -369,3 +392,9 @@ struct DiscoverView: View {
         .accessibilityIdentifier("discover.empty.category")
     }
 }
+    init(repository: (any BookRepository)? = nil) {
+        self._repository = State(initialValue: repository)
+        let initialRepository = repository ?? LocalBookRepository(context: PersistenceController.shared.mainContext)
+        self._viewModel = StateObject(wrappedValue: DiscoverViewModel(repository: initialRepository))
+    }
+

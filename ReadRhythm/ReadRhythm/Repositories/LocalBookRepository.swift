@@ -8,11 +8,20 @@ import SwiftData
 /// Wird z.B. vom Discover-Screen (Speichern aus API)
 /// und vom Add-Book-Flow (manuell hinzufügen) verwendet.
 final class LocalBookRepository: BookRepository {
-    
+
     private let context: ModelContext
 
     init(context: ModelContext) {
         self.context = context
+    }
+
+    func fetchBooks(sortedBy descriptors: [SortDescriptor<BookEntity>]) throws -> [BookEntity] {
+        let effectiveDescriptors = descriptors.isEmpty
+            ? [SortDescriptor(\BookEntity.dateAdded, order: .reverse)]
+            : descriptors
+
+        let descriptor = FetchDescriptor<BookEntity>(sortBy: effectiveDescriptors)
+        return try context.fetch(descriptor)
     }
 
     /// Fügt ein Buch in die lokale Bibliothek ein und speichert.

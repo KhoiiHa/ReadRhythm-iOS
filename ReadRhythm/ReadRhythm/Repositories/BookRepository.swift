@@ -38,6 +38,9 @@ protocol BookRepository {
 
     /// Löscht ein Buch aus der Persistenz.
     func delete(_ book: BookEntity) throws
+
+    /// Lädt Bücher aus der Persistenzschicht, optional sortiert.
+    func fetchBooks(sortedBy descriptors: [SortDescriptor<BookEntity>]) throws -> [BookEntity]
 }
 
 // MARK: - Default Convenience
@@ -57,5 +60,10 @@ extension BookRepository {
             sourceID: nil,
             source: "User" // Fallback-Quelle für manuell hinzugefügte Bücher
         )
+    }
+
+    /// Bequemer Aufruf ohne Sort-Descriptor – nutzt standardmäßig `dateAdded` absteigend.
+    func fetchBooks() throws -> [BookEntity] {
+        try fetchBooks(sortedBy: [SortDescriptor(\BookEntity.dateAdded, order: .reverse)])
     }
 }
