@@ -1,12 +1,6 @@
-//
-//  StatsService.swift
-//  ReadRhythm
-//
-//  Berechnet Lesestatistiken auf Basis gespeicherter Sessions.
-//  Ziel: Anzeige von Fortschritt, gelesenen Seiten und Lesezeit.
-//
-
-
+// Kontext: Dieser Service destilliert ReadingSessions in Kennzahlen für Insights und Charts.
+// Warum: UI-Schichten brauchen vorveredelte Statistikdaten statt jede Aggregation selbst zu rechnen.
+// Wie: Wir ziehen SwiftData-Daten, formen DailyStatDTOs und liefern strukturierte Zeitreihen.
 import Foundation
 import SwiftData
 

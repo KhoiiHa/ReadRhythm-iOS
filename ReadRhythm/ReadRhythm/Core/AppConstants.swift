@@ -1,14 +1,6 @@
-
-//
-//  AppConstants.swift
-//  ReadRhythm
-//
-//  Kontext → Warum → Wie
-//  Kontext: Zentrale UI-Konstanten für Charts & metrische Visualisierungen.
-//  Warum: Entfernt Magic Numbers aus StatsChart & Co. ohne AppSpace/AppRadius doppelt zu definieren.
-//  Wie: Ergänzt das bestehende Designsystem aus AppTheme.swift.
-//
-
+// Kontext: Diese Datei beherbergt UI-Konstanten für Charts und metrische Komponenten.
+// Warum: Wir wollen Magic Numbers aus Views ziehen und Design-Tokens komplementieren.
+// Wie: Wir deklarieren Strokes, Spacing und weitere Werte als zentrale SwiftUI-Statics.
 import SwiftUI
 
 enum AppStroke {

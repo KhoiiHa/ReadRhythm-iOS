@@ -1,10 +1,6 @@
-//
-//  AudiobookLightViewModel.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 20.10.25.
-//
-
+// Kontext: Dieses ViewModel hält die Light-Audiobook-Erfahrung stabil und steuerbar.
+// Warum: Die UI braucht eine Quelle für Playback-Status, Texte und Persistenz der Sessions.
+// Wie: Wir kombinieren AVFoundation-Delegation mit Published-State und SessionRepository-Kleber.
 import Foundation
 import AVFoundation
 import SwiftUI

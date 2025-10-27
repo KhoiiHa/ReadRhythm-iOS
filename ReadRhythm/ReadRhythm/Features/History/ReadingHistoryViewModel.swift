@@ -1,10 +1,6 @@
-//
-//  ReadingHistoryViewModel.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 20.10.25.
-//
-
+// Kontext: Dieses ViewModel kuratiert die Lese- und Hörhistorie für den History-Screen.
+// Warum: Die Liste braucht verständliche Strings, Icons und Sortierung statt roher Session-Entities.
+// Wie: Wir aggregieren Daten aus SwiftData, formatieren sie via AppFormatter und liefern UI-fertige Modelle.
 import Foundation
 import SwiftData
 import SwiftUI
