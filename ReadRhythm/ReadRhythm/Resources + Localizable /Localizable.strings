@@ -50,7 +50,7 @@
 "rr.stats.minutes" = "Minuten";
 "rr.stats.minutes.total" = "Min. gesamt";
 "rr.stats.day" = "Tag";
-"rr.stats.debug.add10" = "+10 Min. (DEBUG)";
+"rr.stats.debug.seed" = "Debug-Minuten einspielen";
 "rr.stats.streak.days" = "Tage in Folge";
 
 // Tabs
