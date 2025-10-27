@@ -21,6 +21,15 @@ final class DiscoverViewModel: ObservableObject {
     // MARK: - Dependencies
 
     private let bookSearchRepository = BookSearchRepository()
+    private var repository: any BookRepository
+
+    init(repository: (any BookRepository) = LocalBookRepository(context: PersistenceController.shared.mainContext)) {
+        self.repository = repository
+    }
+
+    func updateRepository(_ repository: any BookRepository) {
+        self.repository = repository
+    }
 
     private func showToast(_ key: String) {
         toastText = key
@@ -33,13 +42,9 @@ final class DiscoverViewModel: ObservableObject {
 
     /// Holt alle gespeicherten Bücher aus SwiftData.
     /// Sortierung: neueste zuerst.
-    func loadBooks(from context: ModelContext) {
+    func loadBooks() {
         do {
-            let fetched = try context.fetch(
-                FetchDescriptor<BookEntity>(
-                    sortBy: [SortDescriptor(\.dateAdded, order: .reverse)]
-                )
-            )
+            let fetched = try repository.fetchBooks()
             allBooks = fetched
             filteredBooks = fetched
             #if DEBUG
@@ -150,7 +155,7 @@ final class DiscoverViewModel: ObservableObject {
 
     /// Nimmt ein RemoteBook (API-Ergebnis), baut ein BookEntity,
     /// speichert es in SwiftData und aktualisiert lokale Arrays + Toast.
-    func addToLibrary(from remote: RemoteBook, in context: ModelContext) {
+    func addToLibrary(from remote: RemoteBook) {
 
         // Autor normalisieren (API kann "—" schicken oder leere Strings liefern)
         let normalizedAuthor: String = {
@@ -199,29 +204,23 @@ final class DiscoverViewModel: ObservableObject {
             return
         }
 
-        // Neues Model anlegen, inkl. Cover / Quelle / Timestamp
-        let newEntity = BookEntity(
-            sourceID: remote.id,
-            title: remote.title,
-            author: normalizedAuthor,
-            thumbnailURL: remote.thumbnailURL?.absoluteString,
-            source: "Google Books",
-            dateAdded: .now
-        )
-
-        // Persistieren
         do {
-            context.insert(newEntity)
-            try context.save()
+            let saved = try repository.add(
+                title: remote.title,
+                author: normalizedAuthor,
+                thumbnailURL: remote.thumbnailURL?.absoluteString,
+                sourceID: remote.id,
+                source: "Google Books"
+            )
 
             // Sofort UI updaten → wichtig für direkte UI-Reaktion + Toast
-            allBooks.insert(newEntity, at: 0)
+            allBooks.insert(saved, at: 0)
             filteredBooks = allBooks
 
             showToast("toast.added")
 
             #if DEBUG
-            print("✅ [DiscoverVM] saved book -> \(newEntity.title) [sourceID=\(newEntity.sourceID)]")
+            print("✅ [DiscoverVM] saved book -> \(saved.title) [sourceID=\(saved.sourceID)]")
             #endif
         } catch {
             #if DEBUG

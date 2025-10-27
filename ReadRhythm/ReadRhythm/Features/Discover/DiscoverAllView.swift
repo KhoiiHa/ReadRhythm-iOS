@@ -28,7 +28,7 @@ struct DiscoverAllView: View {
     let initialCategory: DiscoverCategory?
 
     // SwiftData-Kontext für Laden/Speichern
-    @Environment(\.modelContext) private var context
+    @Environment(\.modelContext) private var modelContext
 
     // Alle lokal gespeicherten Bücher, via SwiftData-Query
     @Query(sort: [SortDescriptor(\BookEntity.title, order: .forward)])
@@ -37,7 +37,20 @@ struct DiscoverAllView: View {
     // Unser Discover-ViewModel
     // Wichtig: Wir behalten @StateObject, damit dieses ViewModel in dieser View "lebt".
     // Für Bindings zu @Published-Properties verwenden wir unten eigene Binding-Wrapper.
-    @StateObject private var viewModel = DiscoverViewModel()
+    @StateObject private var viewModel: DiscoverViewModel
+    @State private var repository: (any BookRepository)?
+
+    init(
+        initialSearchText: String,
+        initialCategory: DiscoverCategory?,
+        repository: (any BookRepository)? = nil
+    ) {
+        self.initialSearchText = initialSearchText
+        self.initialCategory = initialCategory
+        self._repository = State(initialValue: repository)
+        let initialRepository = repository ?? LocalBookRepository(context: PersistenceController.shared.mainContext)
+        self._viewModel = StateObject(wrappedValue: DiscoverViewModel(repository: initialRepository))
+    }
 
     // Sortierung für das lokale Grid (Fallback-Section)
     private enum SortOption: String, CaseIterable, Identifiable {
@@ -218,8 +231,14 @@ struct DiscoverAllView: View {
             }
         }
         .onAppear {
+            if repository == nil {
+                let localRepository = LocalBookRepository(context: modelContext)
+                repository = localRepository
+                viewModel.updateRepository(localRepository)
+            }
+
             // 1. Lokale gespeicherte Bücher reinziehen (SwiftData)
-            viewModel.loadBooks(from: context)
+            viewModel.loadBooks()
 
             // 2. Initiale Filter-/Sucheinstellungen übernehmen
             viewModel.searchQuery = initialSearchText
@@ -329,7 +348,7 @@ struct DiscoverAllView: View {
                         #endif
 
                         // Speichern in SwiftData über das ViewModel
-                        viewModel.addToLibrary(from: book, in: context)
+                        viewModel.addToLibrary(from: book)
                     }
                 )
                 .contentShape(Rectangle())
@@ -458,7 +477,8 @@ struct DiscoverAllView: View {
         return NavigationStack {
             DiscoverAllView(
                 initialSearchText: "",
-                initialCategory: nil
+                initialCategory: nil,
+                repository: MockBookRepository()
             )
         }
         .modelContainer(container)
@@ -476,7 +496,8 @@ struct DiscoverAllView: View {
         return NavigationStack {
             DiscoverAllView(
                 initialSearchText: "",
-                initialCategory: nil
+                initialCategory: nil,
+                repository: MockBookRepository()
             )
         }
         .modelContainer(container)
