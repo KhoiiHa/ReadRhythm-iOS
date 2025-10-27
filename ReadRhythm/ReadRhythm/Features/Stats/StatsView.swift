@@ -10,18 +10,14 @@ import Charts
 /// Wie: Nutzt modulare Components (Header/Chart/Empty) + bestehendes ViewModel (days/total/daily).
 @MainActor
 struct StatsView: View {
-    @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel: StatsViewModel
-    
+
     /// UI-Range steuert die Auswahl im Header (wird auf ViewModel.days gemappt).
     @State private var range: StatsRange = .week
-    // Repository wird hier gehalten, damit auch DEBUG-Seed über Repository läuft
-    private let sessionRepository: LocalSessionRepository
-    
+
     init(context: ModelContext) {
         // Repository kapselt SwiftData-Zugriff und wird durchgereicht
         let repo = LocalSessionRepository(context: context)
-        self.sessionRepository = repo
 
         self._viewModel = StateObject(
             wrappedValue: StatsViewModel(
@@ -41,9 +37,9 @@ struct StatsView: View {
                     streakDays: viewModel.currentStreak
                 ) { newRange in
                     apply(range: newRange)
-                    viewModel.reload(context: modelContext)
+                    viewModel.reload()
                 }
-                
+
                 // Chart oder Empty State
                 if viewModel.daily.allSatisfy({ $0.minutes == 0 }) || viewModel.daily.isEmpty {
                     StatsEmptyState()
@@ -59,7 +55,7 @@ struct StatsView: View {
 #if DEBUG
                 // Seed-Knopf für schnelle visuelle Prüfung
                 Button(String(localized: "rr.stats.debug.add10")) {
-                    viewModel.debugAddTenMinutes(repository: sessionRepository)
+                    viewModel.debugAddTenMinutes()
                 }
                 .accessibilityIdentifier("rr-stats-debug-add10")
                 .buttonStyle(.bordered)
@@ -72,7 +68,7 @@ struct StatsView: View {
             .task {
                 // Initiales Mapping von UI-Range → ViewModel.days
                 apply(range: range)
-                viewModel.reload(context: modelContext)
+                viewModel.reload()
             }
             .navigationTitle(Text("rr.stats.title"))
             .navigationBarTitleDisplayMode(.inline)
