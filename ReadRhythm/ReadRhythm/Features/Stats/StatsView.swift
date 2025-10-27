@@ -37,7 +37,7 @@ struct StatsView: View {
                     streakDays: viewModel.currentStreak
                 ) { newRange in
                     apply(range: newRange)
-                    viewModel.reload()
+                    viewModel.refreshFromRepositoryContext()
                 }
 
                 // Chart oder Empty State
@@ -54,10 +54,10 @@ struct StatsView: View {
                 
 #if DEBUG
                 // Seed-Knopf für schnelle visuelle Prüfung
-                Button(String(localized: "rr.stats.debug.add10")) {
-                    viewModel.debugAddTenMinutes()
+                Button(String(localized: "rr.stats.debug.seed")) {
+                    viewModel.seedDebugMinutes()
                 }
-                .accessibilityIdentifier("rr-stats-debug-add10")
+                .accessibilityIdentifier("rr-stats-debug-seed")
                 .buttonStyle(.bordered)
                 .tint(AppColors.Semantic.tintPrimary)
                 .padding(.horizontal, AppSpace._16)
@@ -68,7 +68,7 @@ struct StatsView: View {
             .task {
                 // Initiales Mapping von UI-Range → ViewModel.days
                 apply(range: range)
-                viewModel.reload()
+                viewModel.refreshFromRepositoryContext()
             }
             .navigationTitle(Text("rr.stats.title"))
             .navigationBarTitleDisplayMode(.inline)

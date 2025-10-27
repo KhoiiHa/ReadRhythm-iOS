@@ -13,7 +13,7 @@ import SwiftData
 ///   Das ViewModel kapselt die Logik, macht sie testbar und sauber getrennt.
 ///   Die View greift dadurch nicht mehr direkt auf SwiftData zu (Repository-Layer bleibt sauber, auch im DEBUG-Modus).
 /// - Wie: Es ruft den StatsService auf, speichert aggregierte Werte (daily, totalMinutes)
-///   und bietet eine reload-Funktion, die beim Start oder nach Änderungen aufgerufen wird.
+///   und bietet eine `refreshFromRepositoryContext`-Funktion, die beim Start oder nach Änderungen aufgerufen wird.
 @MainActor
 final class StatsViewModel: ObservableObject {
     // MARK: - Dependencies
@@ -79,14 +79,14 @@ final class StatsViewModel: ObservableObject {
     }
 
     // MARK: - Load Data
-    /// Optionales Reload, das gleichzeitig die Tage setzt (MVP-Helper)
-    func reload(days: Int) {
+    /// Optionales Refresh, das gleichzeitig die Tage setzt (MVP-Helper)
+    func refreshFromRepositoryContext(days: Int) {
         self.days = days
-        reload()
+        refreshFromRepositoryContext()
     }
 
     /// Lädt die Statistikwerte basierend auf dem aktuellen `days`-Fenster neu.
-    func reload() {
+    func refreshFromRepositoryContext() {
         // Performance-Schutz: clamp der gewünschten Tage
         let window = safeDays(for: days)
 
@@ -105,7 +105,7 @@ final class StatsViewModel: ObservableObject {
         currentStreak = statsService.currentStreak(context: context)
 
         #if DEBUG
-        DebugLogger.log("[StatsViewModel] reload() – days=\(days), combinedTotalMinutes=\(combined)")
+        DebugLogger.log("[StatsViewModel] refreshFromRepositoryContext() – days=\(days), combinedTotalMinutes=\(combined)")
         #endif
     }
 
@@ -114,7 +114,7 @@ final class StatsViewModel: ObservableObject {
     /// Wird von der StatsView (nur im DEBUG-UI) aufgerufen, um schnell Testdaten einzuspielen.
     /// Wichtig: Die View selbst spricht NICHT mehr direkt mit SwiftData,
     /// sondern geht über das Repository und lässt das ViewModel sich selbst neu berechnen.
-    func debugAddTenMinutes() {
+    func seedDebugMinutes() {
         do {
             // Im MVP behandeln wir das als "reading".
             // Später könnte hier ein Medium-Toggle landen.
@@ -126,9 +126,9 @@ final class StatsViewModel: ObservableObject {
             )
 
             // Danach sofort neu berechnen, ohne dass die View einen ModelContext durchreichen muss.
-            reload()
+            refreshFromRepositoryContext()
         } catch {
-            DebugLogger.log("❌ [StatsViewModel] debugAddTenMinutes() failed: \(error.localizedDescription)")
+            DebugLogger.log("❌ [StatsViewModel] seedDebugMinutes() failed: \(error.localizedDescription)")
         }
     }
     #endif
