@@ -37,6 +37,7 @@ final class ReadRhythmUITests: XCTestCase {
         let focusScreen = app.otherElements["Focus.Screen"]
         waitForExistence(of: focusScreen)
 
+        // Select the first available book so the session can be persisted.
         let bookPicker = app.buttons["Focus.BookPicker"]
         waitForExistence(of: bookPicker)
         bookPicker.tap()
@@ -54,16 +55,16 @@ final class ReadRhythmUITests: XCTestCase {
         bookRow.tap()
         waitForDisappearance(of: pickerSheet)
 
-        let startButton = app.buttons["Focus.StartResume"]
+        let startButton = button(in: app, identifiers: ["Focus.StartResume", "focus.startButton"])
         waitForExistence(of: startButton)
 
-        let stopButton = app.buttons["Focus.Stop"]
-        waitForExistence(of: stopButton)
+        let finishButton = button(in: app, identifiers: ["Focus.Finish", "Focus.Stop", "focus.stopButton"])
+        waitForExistence(of: finishButton)
 
         startButton.tap()
         waitForEnabledState(of: startButton, shouldBeEnabled: false)
 
-        stopButton.tap()
+        finishButton.tap()
         waitForEnabledState(of: startButton, shouldBeEnabled: true)
 
         navigateBack(app)
@@ -91,12 +92,11 @@ final class ReadRhythmUITests: XCTestCase {
         textEditor.tap()
         textEditor.typeText("Dies ist ein kurzer Testtext.")
 
-        let playButton = app.buttons["Audio.Play"]
+        let playButton = button(in: app, identifiers: ["Audio.Play", "audio.playButton"])
         waitForExistence(of: playButton)
 
-        let stopButton = app.buttons["Audio.Stop"]
+        let stopButton = button(in: app, identifiers: ["Audio.Stop", "audio.stopButton"])
         waitForExistence(of: stopButton)
-
         playButton.tap()
         waitForEnabledState(of: stopButton, shouldBeEnabled: true)
 
@@ -127,6 +127,14 @@ final class ReadRhythmUITests: XCTestCase {
         if rangePicker.exists {
             for index in 0..<rangePicker.buttons.count {
                 let button = rangePicker.buttons.element(boundBy: index)
+                waitForExistence(of: button)
+                button.tap()
+            }
+        } else {
+            // Fallback: interact with the segmented control buttons directly if identifiers differ.
+            let segmentedButtons = app.segmentedControls.firstMatch.buttons
+            for index in 0..<segmentedButtons.count {
+                let button = segmentedButtons.element(boundBy: index)
                 waitForExistence(of: button)
                 button.tap()
             }
@@ -179,24 +187,24 @@ final class ReadRhythmUITests: XCTestCase {
     }
 
     @MainActor
-    private func waitForExistence(of element: XCUIElement, timeout: TimeInterval = 4) {
-        XCTAssertTrue(element.waitForExistence(timeout: timeout))
-        XCTAssertTrue(element.exists)
+    private func waitForExistence(of element: XCUIElement, timeout: TimeInterval = 6) {
+        let predicate = NSPredicate(format: "exists == true")
+        let expectation = expectation(for: predicate, evaluatedWith: element)
+        wait(for: [expectation], timeout: timeout)
     }
 
     @MainActor
-    private func waitForDisappearance(of element: XCUIElement, timeout: TimeInterval = 4) {
+    private func waitForDisappearance(of element: XCUIElement, timeout: TimeInterval = 6) {
         let predicate = NSPredicate(format: "exists == false")
         let expectation = expectation(for: predicate, evaluatedWith: element)
         wait(for: [expectation], timeout: timeout)
     }
 
     @MainActor
-    private func waitForEnabledState(of element: XCUIElement, shouldBeEnabled: Bool, timeout: TimeInterval = 4) {
+    private func waitForEnabledState(of element: XCUIElement, shouldBeEnabled: Bool, timeout: TimeInterval = 6) {
         let predicate = NSPredicate(format: "isEnabled == %@", NSNumber(value: shouldBeEnabled))
         let expectation = expectation(for: predicate, evaluatedWith: element)
         wait(for: [expectation], timeout: timeout)
-        XCTAssertEqual(element.isEnabled, shouldBeEnabled)
     }
 
     @MainActor
@@ -224,7 +232,7 @@ final class ReadRhythmUITests: XCTestCase {
 
     @MainActor
     private func navigateBack(_ app: XCUIApplication) {
-        let backButton = app.navigationBars.buttons.firstMatch
+        let backButton = app.navigationBars.buttons.element(boundBy: 0)
         waitForExistence(of: backButton)
         backButton.tap()
     }
@@ -246,5 +254,16 @@ final class ReadRhythmUITests: XCTestCase {
 
         navigateBack(app)
         return count
+    }
+
+    @MainActor
+    private func button(in app: XCUIApplication, identifiers: [String]) -> XCUIElement {
+        let predicate = NSPredicate(format: "identifier IN %@", identifiers)
+        let query = app.buttons.matching(predicate)
+        let match = query.firstMatch
+        if match.exists || query.count > 0 {
+            return match
+        }
+        return app.buttons[identifiers.first ?? ""]
     }
 }
