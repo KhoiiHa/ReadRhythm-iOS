@@ -58,14 +58,8 @@ final class LocalSessionRepositoryTests: XCTestCase {
             medium: "reading"
         )
 
-        let descriptor = FetchDescriptor<ReadingSessionEntity>()
-        let countBefore = try context.fetch(descriptor).count
-
         context.insert(duplicate)
-        _ = try? context.save()
-
-        let countAfter = try context.fetch(descriptor).count
-        XCTAssertEqual(countAfter, countBefore)
+        XCTAssertThrowsError(try context.save())
     }
 
     func testDeleteSession_WhenCalled_RemovesEntityFromStore() throws {

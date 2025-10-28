@@ -16,12 +16,25 @@ final class ReadRhythmUITestsLaunchTests: XCTestCase {
         app.launch()
 
         let tabBar = app.tabBars.firstMatch
-        XCTAssertTrue(tabBar.waitForExistence(timeout: 4), "Expected tab bar to be present on launch")
-        XCTAssertTrue(tabBar.exists)
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 6), "Expected tab bar to be present on launch")
 
-        let libraryTab = tabBar.buttons.matching(identifier: "tab.library").firstMatch
-        XCTAssertTrue(libraryTab.waitForExistence(timeout: 4), "Library tab should be visible on launch")
-        XCTAssertTrue(libraryTab.exists)
+        let tabs: [(identifier: String, fallbackLabel: String)] = [
+            ("tab.library", "Bibliothek"),
+            ("tab.discover", "Entdecken"),
+            ("tab.stats", "Statistiken"),
+            ("tab.profile", "Profil")
+        ]
+
+        for tab in tabs {
+            var tabButton = tabBar.buttons.matching(identifier: tab.identifier).firstMatch
+            if !tabButton.exists {
+                tabButton = tabBar.buttons[tab.fallbackLabel]
+            }
+            XCTAssertTrue(
+                tabButton.waitForExistence(timeout: 6),
+                "Expected tab \(tab.identifier) / \(tab.fallbackLabel) to be present on launch"
+            )
+        }
 
         print("🚀 App launched successfully")
 

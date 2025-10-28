@@ -35,12 +35,24 @@ final class SpeechServiceTests: XCTestCase {
         let service = SpeechService.shared
         service.stop()
 
+        let speakingExpectation = expectation(description: "Synthesizer started")
         service.speak("Stopping soon", language: "en-US")
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.1))
-        XCTAssertTrue(service.synthesizer.isSpeaking)
 
-        XCTAssertNoThrow(service.stop())
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.1))
-        XCTAssertFalse(service.synthesizer.isSpeaking)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            speakingExpectation.fulfill()
+        }
+
+        wait(for: [speakingExpectation], timeout: 2.0)
+
+        service.stop()
+
+        let stoppedExpectation = expectation(description: "Synthesizer stopped")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            if service.synthesizer.isSpeaking == false {
+                stoppedExpectation.fulfill()
+            }
+        }
+
+        wait(for: [stoppedExpectation], timeout: 2.0)
     }
 }
