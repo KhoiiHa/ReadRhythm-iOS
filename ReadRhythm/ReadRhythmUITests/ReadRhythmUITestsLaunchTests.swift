@@ -1,10 +1,3 @@
-//
-//  ReadRhythmUITestsLaunchTests.swift
-//  ReadRhythmUITests
-//
-//  Created by Vu Minh Khoi Ha on 15.09.25.
-//
-
 import XCTest
 
 final class ReadRhythmUITestsLaunchTests: XCTestCase {
@@ -22,8 +15,15 @@ final class ReadRhythmUITestsLaunchTests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        // Insert steps here to perform after app launch but before taking a screenshot,
-        // such as logging into a test account or navigating somewhere in the app
+        let tabBar = app.tabBars.firstMatch
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 4), "Expected tab bar to be present on launch")
+        XCTAssertTrue(tabBar.exists)
+
+        let libraryTab = tabBar.buttons.matching(identifier: "tab.library").firstMatch
+        XCTAssertTrue(libraryTab.waitForExistence(timeout: 4), "Library tab should be visible on launch")
+        XCTAssertTrue(libraryTab.exists)
+
+        print("🚀 App launched successfully")
 
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = "Launch Screen"
