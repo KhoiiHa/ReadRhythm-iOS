@@ -1,10 +1,3 @@
-//
-//  ReadRhythmUITests.swift
-//  ReadRhythmUITests
-//
-//  Created by Vu Minh Khoi Ha on 15.09.25.
-//
-
 import XCTest
 
 final class ReadRhythmUITests: XCTestCase {
