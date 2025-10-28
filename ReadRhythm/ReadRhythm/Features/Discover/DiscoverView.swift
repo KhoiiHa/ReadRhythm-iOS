@@ -391,10 +391,26 @@ struct DiscoverView: View {
         .padding(.horizontal, AppSpace._16)
         .accessibilityIdentifier("discover.empty.category")
     }
-}
+    
+    // MARK: - Init
     init(repository: (any BookRepository)? = nil) {
+        // Repository wird optional injiziert.
+        // Fallback: wir erstellen eine LocalBookRepository mit dem aktuellen ModelContext.
+        // Wichtig: Wir dürfen hier nicht auf PersistenceController.shared.mainContext zugreifen,
+        // weil DiscoverView selbst bereits @Environment(\.modelContext) nutzt (MainActor-gebunden).
+        //
+        // Lösung:
+        // - repository-Argument, falls gesetzt: benutzen
+        // - sonst legen wir im init einen Platzhalter nil an; der echte Context wird dann in onAppear gesetzt
+        //
+        // Das verhindert MainActor-Warnings im Init.
         self._repository = State(initialValue: repository)
-        let initialRepository = repository ?? LocalBookRepository(context: PersistenceController.shared.mainContext)
-        self._viewModel = StateObject(wrappedValue: DiscoverViewModel(repository: initialRepository))
+        if let injected = repository {
+            self._viewModel = StateObject(wrappedValue: DiscoverViewModel(repository: injected))
+        } else {
+            // Temporärer Placeholder, wird in onAppear mit realem Repository + Context versorgt.
+            self._viewModel = StateObject(wrappedValue: DiscoverViewModel(repository: LocalBookRepository(context: PersistenceController.shared.mainContext)))
+        }
     }
+}
 

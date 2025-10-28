@@ -23,7 +23,13 @@ final class DiscoverViewModel: ObservableObject {
     private let bookSearchRepository = BookSearchRepository()
     private var repository: any BookRepository
 
-    init(repository: (any BookRepository) = LocalBookRepository(context: PersistenceController.shared.mainContext)) {
+    /// Initializer
+    /// Kontext: Wir injizieren ein BookRepository (z. B. LocalBookRepository),
+    /// statt hier direkt auf PersistenceController.shared.mainContext zuzugreifen.
+    /// Warum: Der Zugriff auf den SwiftData-ModelContext ist @MainActor-isoliert.
+    /// Wie: DiscoverView kümmert sich darum, beim Erzeugen oder in onAppear
+    ///      ein korrekt angebundenes Repository zu übergeben.
+    init(repository: any BookRepository) {
         self.repository = repository
     }
 

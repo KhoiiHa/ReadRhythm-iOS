@@ -1,22 +1,22 @@
 // Kontext: Diese Farbpalette zentralisiert alle Marken- und UI-Farben der App.
 // Warum: Konsistente Farbnutzung braucht einen einzigen Wahrheitsanker statt Inline-Hexwerte.
-// Wie: Wir mappen Asset-Katalogfarben auf statische SwiftUI-Properties für hell/dunkel.
+// Wie: Wir mappen definierte Markenfarben auf statische SwiftUI-Properties für hell/dunkel.
 import SwiftUI
 
 /// Kontext → Warum → Wie
 /// - Kontext: Zentrale Farb-Tokens der App. Verweisen auf Color Sets im Asset Catalog (Any/Dark).
 /// - Warum: Einheitliche Farbverwendung über alle Features; leichtes Austauschen im Portfolio-Refactor.
-/// - Wie: `Color("token")` lädt Farben aus `Colors.xcassets`. Semantische Farben bauen auf den Basis-Tokens auf.
+/// - Wie: `Color`-Initialisierer liefern definierte Markenwerte; semantische Farben bauen auf den Basis-Tokens auf.
 enum AppColors {
     // MARK: - Brand & Accent (Basis-Tokens)
     enum Brand {
-        static var primary: Color { Color("brand.primary", bundle: .main) }
-        static var secondary: Color { Color("brand.secondary", bundle: .main) }
+        static var primary: Color { Color(red: 127/255, green: 179/255, blue: 174/255) }
+        static var secondary: Color { Color(red: 216/255, green: 200/255, blue: 180/255) }
     }
 
     enum Accent {
-        static var success: Color { Color("accent.success", bundle: .main) }
-        static var warning: Color { Color("accent.warning", bundle: .main) }
+        static var success: Color { Color(red: 122/255, green: 174/255, blue: 140/255) }
+        static var warning: Color { Color(red: 212/255, green: 162/255, blue: 79/255) }
         static var error: Color { Color("accent.error", bundle: .main) }
     }
 
@@ -34,9 +34,9 @@ enum AppColors {
     // MARK: - Semantik (auf Basis der Palette)
     enum Semantic {
         // Backgrounds
-        static var bgPrimary: Color   { Neutral._50 }    // App-Hintergrund
-        static var bgSecondary: Color { Neutral._100 }   // Sektionen
-        static var bgElevated: Color  { Neutral._200 }   // Karten
+        static var bgPrimary: Color   { Neutral._50 }                                   // App-Hintergrund
+        static var bgSecondary: Color { Color(red: 245/255, green: 240/255, blue: 230/255) } // Sektionen
+        static var bgElevated: Color  { Color(red: 233/255, green: 225/255, blue: 214/255) } // Karten
 
         // Text
         static var textPrimary: Color   { Neutral._900 }
@@ -68,8 +68,8 @@ enum AppColors {
     static var textPrimary: Color { Semantic.textPrimary }
     static var textSecondary: Color { Semantic.textSecondary }
     static var textInverse: Color { Semantic.textInverse }
-    
-    
+
+
     // MARK: - Charts (extended)
     enum Chart {
         /// Primäre Farbe für Balken
@@ -85,5 +85,3 @@ enum AppColors {
         static var axis: Color { Semantic.chartAxis }
     }
 }
-
-
