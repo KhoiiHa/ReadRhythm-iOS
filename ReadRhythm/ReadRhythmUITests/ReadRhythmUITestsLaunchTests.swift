@@ -22,8 +22,28 @@ final class ReadRhythmUITestsLaunchTests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        // Insert steps here to perform after app launch but before taking a screenshot,
-        // such as logging into a test account or navigating somewhere in the app
+        let tabBar = app.tabBars.firstMatch
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 6), "Expected tab bar to be present on launch")
+
+        let tabs: [(identifier: String, fallbackLabel: String)] = [
+            ("tab.library", "Bibliothek"),
+            ("tab.discover", "Entdecken"),
+            ("tab.stats", "Statistiken"),
+            ("tab.profile", "Profil")
+        ]
+
+        for tab in tabs {
+            var tabButton = tabBar.buttons.matching(identifier: tab.identifier).firstMatch
+            if !tabButton.exists {
+                tabButton = tabBar.buttons[tab.fallbackLabel]
+            }
+            XCTAssertTrue(
+                tabButton.waitForExistence(timeout: 6),
+                "Expected tab \(tab.identifier) / \(tab.fallbackLabel) to be present on launch"
+            )
+        }
+
+        print("🚀 App launched successfully")
 
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = "Launch Screen"
