@@ -32,10 +32,6 @@ struct VolumeInfoDTO: Codable {
     let categories: [String]?
     let description: String?
     let previewLink: String?
-    let infoLink: String?
-    let language: String?
-    let averageRating: Double?
-    let ratingsCount: Int?
     let imageLinks: ImageLinksDTO?
     // Raum für spätere Felder:
     // let industryIdentifiers: [IndustryIdentifierDTO]?
