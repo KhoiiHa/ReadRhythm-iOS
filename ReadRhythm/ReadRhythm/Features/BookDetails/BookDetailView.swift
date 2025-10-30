@@ -71,6 +71,14 @@ struct BookDetailView: View {
                     .multilineTextAlignment(.leading)
                     .accessibilityIdentifier("bookdetail.title")
 
+                if let subtitle = book.subtitle, subtitle.isEmpty == false {
+                    Text(subtitle)
+                        .font(.headline)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .multilineTextAlignment(.leading)
+                        .accessibilityIdentifier("bookdetail.subtitle")
+                }
+
                 Text(authorText)
                     .font(.subheadline)
                     .foregroundStyle(AppColors.Semantic.textSecondary)
@@ -234,6 +242,37 @@ struct BookDetailView: View {
             readingStats = BookReadingStats()
         }
     }
+
+    @MainActor
+    private func loadReadingStats() {
+        let targetID = book.persistentModelID
+        let predicate = #Predicate<ReadingSessionEntity> { session in
+            session.book?.persistentModelID == targetID
+        }
+        let descriptor = FetchDescriptor<ReadingSessionEntity>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\ReadingSessionEntity.date, order: .reverse)]
+        )
+
+        do {
+            let sessions = try modelContext.fetch(descriptor)
+            let total = sessions.reduce(0) { $0 + max(0, $1.minutes) }
+            let last = sessions.first?.date
+            readingStats = BookReadingStats(totalMinutes: total, lastSession: last)
+        } catch {
+            #if DEBUG
+            DebugLogger.log("⚠️ Failed to load reading stats for book detail: \(error.localizedDescription)")
+            #endif
+            readingStats = BookReadingStats()
+        }
+    }
+}
+
+// MARK: - Supporting types
+
+private struct BookReadingStats {
+    var totalMinutes: Int = 0
+    var lastSession: Date? = nil
 }
 
 // MARK: - Supporting types
