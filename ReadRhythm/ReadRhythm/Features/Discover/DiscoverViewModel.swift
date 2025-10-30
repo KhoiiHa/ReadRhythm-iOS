@@ -3,10 +3,6 @@ import Combine
 import SwiftData
 import SwiftUI
 
-#if os(iOS)
-import UIKit
-#endif
-
 @MainActor
 final class DiscoverViewModel: ObservableObject {
 

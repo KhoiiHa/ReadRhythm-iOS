@@ -22,10 +22,6 @@ public struct RemoteBook: Equatable, Hashable, Sendable {
     public let description: String?
     public let thumbnailURL: URL?
     public let previewLink: URL?
-    public let infoLink: URL?
-    public let language: String?
-    public let averageRating: Double?
-    public let ratingsCount: Int?
 }
 
 public extension RemoteBook {
@@ -55,11 +51,7 @@ public extension RemoteBook {
             categories: [],
             description: nil,
             thumbnailURL: thumbnailURL,
-            previewLink: nil,
-            infoLink: nil,
-            language: nil,
-            averageRating: nil,
-            ratingsCount: nil
+            previewLink: nil
         )
     }
 }
@@ -98,10 +90,6 @@ extension VolumeDTO {
             .flatMap { URL(string: $0) }?
             .forcingHTTPS()
 
-        let infoURL = info.infoLink
-            .flatMap { URL(string: $0) }?
-            .forcingHTTPS()
-
         let categories = (info.categories ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
@@ -117,11 +105,7 @@ extension VolumeDTO {
             categories: categories,
             description: info.description?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             thumbnailURL: normalizedURL,
-            previewLink: previewURL,
-            infoLink: infoURL,
-            language: info.language?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
-            averageRating: info.averageRating,
-            ratingsCount: info.ratingsCount
+            previewLink: previewURL
         )
     }
 }
