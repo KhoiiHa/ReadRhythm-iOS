@@ -12,10 +12,8 @@ enum PersistenceController {
     static let shared: ModelContainer = {
         do {
             return try ModelContainer(
-                for: BookEntity.self,
-                    ReadingSessionEntity.self,
-                    DiscoverFeedItem.self,
-                    ReadingGoalEntity.self
+                for: ReadRhythmSchemaV2.self,
+                migrationPlan: ReadRhythmMigrationPlan.self
             )
         } catch {
             fatalError("Failed to create shared ModelContainer: \(error.localizedDescription)")
