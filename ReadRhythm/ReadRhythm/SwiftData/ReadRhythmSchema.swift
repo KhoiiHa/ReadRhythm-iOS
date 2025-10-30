@@ -85,12 +85,12 @@ enum ReadRhythmMigrationPlan: SchemaMigrationPlan {
         [ReadRhythmSchemaV1.self, ReadRhythmSchemaV2.self]
     }
 
-    static var migrationStages: [MigrationStage] {
-        [
-            .lightweight(
-                fromVersion: ReadRhythmSchemaV1.self,
-                toVersion: ReadRhythmSchemaV2.self
-            )
-        ]
+    static let migrateV1toV2 = MigrationStage.lightweight(
+        fromVersion: ReadRhythmSchemaV1.self,
+        toVersion: ReadRhythmSchemaV2.self
+    )
+
+    static var stages: [MigrationStage] {
+        [migrateV1toV2]
     }
 }

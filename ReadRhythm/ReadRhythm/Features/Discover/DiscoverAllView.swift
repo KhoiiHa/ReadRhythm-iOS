@@ -486,46 +486,50 @@ struct DiscoverAllView: View {
 
 #if DEBUG
 #Preview("DiscoverAll – Empty (Light, DE)") {
-    do {
-        let container = try ModelContainer(
-            for: ReadRhythmSchemaV2.self,
-            migrationPlan: ReadRhythmMigrationPlan.self
+    let models: [any PersistentModel.Type] = ReadRhythmSchemaV2.models
+    let schema = Schema(models)
+    let container = try! ModelContainer(
+        for: schema,
+        migrationPlan: ReadRhythmMigrationPlan.self,
+        configurations: ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: true
         )
+    )
 
-        return NavigationStack {
-            DiscoverAllView(
-                initialSearchText: "",
-                initialCategory: nil,
-                repository: MockBookRepository()
-            )
-        }
-        .modelContainer(container)
-        .environment(\.locale, .init(identifier: "de"))
-        .preferredColorScheme(.light)
-    } catch {
-        return Text("Preview Error: \(error.localizedDescription)")
+    NavigationStack {
+        DiscoverAllView(
+            initialSearchText: "",
+            initialCategory: nil,
+            repository: MockBookRepository()
+        )
     }
+    .modelContainer(container)
+    .environment(\.locale, .init(identifier: "de"))
+    .preferredColorScheme(.light)
 }
 
 #Preview("DiscoverAll – Empty (Dark, DE)") {
-    do {
-        let container = try ModelContainer(
-            for: ReadRhythmSchemaV2.self,
-            migrationPlan: ReadRhythmMigrationPlan.self
+    let models: [any PersistentModel.Type] = ReadRhythmSchemaV2.models
+    let schema = Schema(models)
+    let container = try! ModelContainer(
+        for: schema,
+        migrationPlan: ReadRhythmMigrationPlan.self,
+        configurations: ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: true
         )
+    )
 
-        return NavigationStack {
-            DiscoverAllView(
-                initialSearchText: "",
-                initialCategory: nil,
-                repository: MockBookRepository()
-            )
-        }
-        .modelContainer(container)
-        .environment(\.locale, .init(identifier: "de"))
-        .preferredColorScheme(.dark)
-    } catch {
-        return Text("Preview Error: \(error.localizedDescription)")
+    NavigationStack {
+        DiscoverAllView(
+            initialSearchText: "",
+            initialCategory: nil,
+            repository: MockBookRepository()
+        )
     }
+    .modelContainer(container)
+    .environment(\.locale, .init(identifier: "de"))
+    .preferredColorScheme(.dark)
 }
 #endif

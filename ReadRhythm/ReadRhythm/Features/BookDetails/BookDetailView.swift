@@ -23,6 +23,7 @@ struct BookDetailView: View {
     @Environment(\.openURL) private var openURL
 
     @State private var readingStats = BookReadingStats()
+    @State private var readingContent: ReadingContent? = nil
 
     var body: some View {
         ScrollView {
@@ -254,64 +255,12 @@ struct BookDetailView: View {
         return URL(string: "https://books.google.com/books?id=\(encoded)")
     }
 
-    private func infoRow(icon: String, text: Text) -> some View {
-        HStack(spacing: AppSpace._8) {
-            Image(systemName: icon)
-                .foregroundStyle(AppColors.Semantic.textSecondary)
-            text
-                .font(.subheadline)
-                .foregroundStyle(AppColors.Semantic.textSecondary)
-            Spacer(minLength: 0)
-        }
-        .accessibilityElement(children: .combine)
-    }
-
-    @MainActor
-    private func loadReadingStats() {
-        let targetID = book.persistentModelID
-        let predicate = #Predicate<ReadingSessionEntity> { session in
-            session.book?.persistentModelID == targetID
-        }
-        let descriptor = FetchDescriptor<ReadingSessionEntity>(
-            predicate: predicate,
-            sortBy: [SortDescriptor(\ReadingSessionEntity.date, order: .reverse)]
-        )
-
-        do {
-            let sessions = try modelContext.fetch(descriptor)
-            let total = sessions.reduce(0) { $0 + max(0, $1.minutes) }
-            let last = sessions.first?.date
-            readingStats = BookReadingStats(totalMinutes: total, lastSession: last)
-        } catch {
-            #if DEBUG
-            DebugLogger.log("⚠️ Failed to load reading stats for book detail: \(error.localizedDescription)")
-            #endif
-            readingStats = BookReadingStats()
-        }
-    }
-
-    @MainActor
-    private func loadReadingStats() {
-        let targetID = book.persistentModelID
-        let predicate = #Predicate<ReadingSessionEntity> { session in
-            session.book?.persistentModelID == targetID
-        }
-        let descriptor = FetchDescriptor<ReadingSessionEntity>(
-            predicate: predicate,
-            sortBy: [SortDescriptor(\ReadingSessionEntity.date, order: .reverse)]
-        )
-
-        do {
-            let sessions = try modelContext.fetch(descriptor)
-            let total = sessions.reduce(0) { $0 + max(0, $1.minutes) }
-            let last = sessions.first?.date
-            readingStats = BookReadingStats(totalMinutes: total, lastSession: last)
-        } catch {
-            #if DEBUG
-            DebugLogger.log("⚠️ Failed to load reading stats for book detail: \(error.localizedDescription)")
-            #endif
-            readingStats = BookReadingStats()
-        }
+    /// Returns a simple reader progress label based on available content.
+    private func readerProgressLabel(for content: ReadingContent) -> String? {
+        let total = content.pages.count
+        guard total > 0 else { return nil }
+        // Minimal, non-localized fallback label to avoid missing-keys warnings.
+        return "Seiten: \(total)"
     }
 
     private func infoRow(icon: String, text: Text) -> some View {
@@ -349,20 +298,6 @@ struct BookDetailView: View {
             readingStats = BookReadingStats()
         }
     }
-}
-
-// MARK: - Supporting types
-
-private struct BookReadingStats {
-    var totalMinutes: Int = 0
-    var lastSession: Date? = nil
-}
-
-// MARK: - Supporting types
-
-private struct BookReadingStats {
-    var totalMinutes: Int = 0
-    var lastSession: Date? = nil
 }
 
 // MARK: - Supporting types
