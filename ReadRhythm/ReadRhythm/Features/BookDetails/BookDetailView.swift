@@ -5,6 +5,7 @@
 //  Created by Vu Minh Khoi Ha on 19.10.25.
 //
 
+import Foundation
 import SwiftUI
 import SwiftData
 
@@ -18,6 +19,10 @@ struct BookDetailView: View {
     let book: BookEntity
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.openURL) private var openURL
+
+    @State private var readingStats = BookReadingStats()
 
     var body: some View {
         ScrollView {
@@ -41,6 +46,9 @@ struct BookDetailView: View {
                 .accessibilityIdentifier("bookdetail.back")
             }
         }
+        .onAppear {
+            loadReadingStats()
+        }
     }
 
     // MARK: - Header (Cover + Titel + Autor + Quelle)
@@ -62,6 +70,14 @@ struct BookDetailView: View {
                     .foregroundStyle(AppColors.Semantic.textPrimary)
                     .multilineTextAlignment(.leading)
                     .accessibilityIdentifier("bookdetail.title")
+
+                if let subtitle = book.subtitle, subtitle.isEmpty == false {
+                    Text(subtitle)
+                        .font(.headline)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .multilineTextAlignment(.leading)
+                        .accessibilityIdentifier("bookdetail.subtitle")
+                }
 
                 Text(authorText)
                     .font(.subheadline)
@@ -97,37 +113,40 @@ struct BookDetailView: View {
     // MARK: - Meta / Zusatzinfos
     private var metaSection: some View {
         VStack(alignment: .leading, spacing: AppSpace._12) {
-            Text("Details")
+            Text(LocalizedStringKey("detail.source"))
                 .font(.headline)
                 .foregroundStyle(AppColors.Semantic.textPrimary)
-                .accessibilityIdentifier("bookdetail.details.header")
+                .accessibilityHeading(.h2)
 
-            if let addedText = addedDateText {
-                HStack(spacing: AppSpace._8) {
-                    Image(systemName: "calendar")
-                    Text(addedText)
-                }
-                .font(.subheadline)
-                .foregroundStyle(AppColors.Semantic.textSecondary)
-                .accessibilityIdentifier("bookdetail.details.added")
+            infoRow(icon: "globe", text: Text(LocalizedStringKey(sourceLabelKey)))
+                .accessibilityIdentifier("detail.source")
+
+            if let addedText = addedOnText {
+                infoRow(icon: "calendar", text: Text(addedText))
+                    .accessibilityIdentifier("detail.addedOn")
             }
 
-            HStack(spacing: AppSpace._8) {
-                Image(systemName: "globe")
-                Text(sourceText)
+            if let totalMinutesText = totalMinutesText {
+                infoRow(icon: "clock", text: Text(totalMinutesText))
+                    .accessibilityIdentifier("detail.totalMinutes")
             }
-            .font(.subheadline)
-            .foregroundStyle(AppColors.Semantic.textSecondary)
-            .accessibilityIdentifier("bookdetail.details.source")
 
-            if book.thumbnailURL != nil {
-                HStack(spacing: AppSpace._8) {
-                    Image(systemName: "photo")
-                    Text(String(localized: "book.detail.cover.fromWeb"))
+            if let lastSessionText = lastSessionText {
+                infoRow(icon: "clock.arrow.circlepath", text: Text(lastSessionText))
+                    .accessibilityIdentifier("detail.lastSession")
+            }
+
+            if let url = externalInfoURL {
+                Button {
+                    openURL(url)
+                } label: {
+                    Text(LocalizedStringKey("detail.openInGoogleBooks"))
+                        .font(.footnote.weight(.semibold))
+                        .frame(maxWidth: .infinity)
                 }
-                .font(.subheadline)
-                .foregroundStyle(AppColors.Semantic.textSecondary)
-                .accessibilityIdentifier("bookdetail.details.cover")
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.roundedRectangle(radius: AppRadius.s))
+                .accessibilityIdentifier("detail.openInGoogleBooks")
             }
         }
         .padding()
@@ -139,13 +158,14 @@ struct BookDetailView: View {
             RoundedRectangle(cornerRadius: AppRadius.m)
                 .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.5)
         )
+        .accessibilityIdentifier("detail.meta")
     }
 
     // MARK: - Derived helpers
 
     /// Ob das Buch aus der Google Books API stammt.
     private var isRemoteImported: Bool {
-        book.source == "Google Books"
+        book.source.lowercased().contains("google")
     }
 
     /// Lesbare Autorenzeile. Leer? Dann "Unbekannter Autor".
@@ -156,15 +176,86 @@ struct BookDetailView: View {
     }
 
     /// Optional formatierter "hinzugefügt am"-Text.
-    private var addedDateText: String? {
-        let df = DateFormatter()
-        df.dateStyle = .medium
-        df.timeStyle = .none
-        return "Hinzugefügt am \(df.string(from: book.dateAdded))"
+    private var addedOnText: String? {
+        let formatted = AppFormatter.shortDateFormatter.string(from: book.dateAdded)
+        let template = String(localized: "detail.addedOn")
+        return String(format: template, formatted)
     }
 
-    /// Source text or fallback
-    private var sourceText: String {
-        book.source.isEmpty ? String(localized: "book.unknownSource") : book.source
+    private var totalMinutesText: String? {
+        guard readingStats.totalMinutes > 0 else { return nil }
+        let template = String(localized: "detail.totalMinutes")
+        return String(format: template, readingStats.totalMinutes)
     }
+
+    private var lastSessionText: String? {
+        guard let date = readingStats.lastSession else { return nil }
+        let formatted = AppFormatter.shortDateFormatter.string(from: date)
+        let template = String(localized: "detail.lastSession")
+        return String(format: template, formatted)
+    }
+
+    private var sourceLabelKey: String {
+        isRemoteImported ? "detail.source.google" : "detail.source.manual"
+    }
+
+    private var externalInfoURL: URL? {
+        if let infoLink = book.infoLink {
+            return infoLink
+        }
+
+        if let previewLink = book.previewLink {
+            return previewLink
+        }
+
+        guard isRemoteImported,
+              let encoded = book.sourceID.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            return nil
+        }
+
+        return URL(string: "https://books.google.com/books?id=\(encoded)")
+    }
+
+    private func infoRow(icon: String, text: Text) -> some View {
+        HStack(spacing: AppSpace._8) {
+            Image(systemName: icon)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+            text
+                .font(.subheadline)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+            Spacer(minLength: 0)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    @MainActor
+    private func loadReadingStats() {
+        let targetID = book.persistentModelID
+        let predicate = #Predicate<ReadingSessionEntity> { session in
+            session.book?.persistentModelID == targetID
+        }
+        let descriptor = FetchDescriptor<ReadingSessionEntity>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\ReadingSessionEntity.date, order: .reverse)]
+        )
+
+        do {
+            let sessions = try modelContext.fetch(descriptor)
+            let total = sessions.reduce(0) { $0 + max(0, $1.minutes) }
+            let last = sessions.first?.date
+            readingStats = BookReadingStats(totalMinutes: total, lastSession: last)
+        } catch {
+            #if DEBUG
+            DebugLogger.log("⚠️ Failed to load reading stats for book detail: \(error.localizedDescription)")
+            #endif
+            readingStats = BookReadingStats()
+        }
+    }
+}
+
+// MARK: - Supporting types
+
+private struct BookReadingStats {
+    var totalMinutes: Int = 0
+    var lastSession: Date? = nil
 }

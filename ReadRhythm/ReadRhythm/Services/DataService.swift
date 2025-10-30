@@ -65,7 +65,16 @@ final class DataService {
         title: String,
         author: String,
         thumbnailURL: String?,
-        source: String
+        source: String,
+        subtitle: String? = nil,
+        publisher: String? = nil,
+        publishedDate: String? = nil,
+        pageCount: Int? = nil,
+        language: String? = nil,
+        categories: [String] = [],
+        descriptionText: String? = nil,
+        infoLink: URL? = nil,
+        previewLink: URL? = nil
     ) -> BookEntity? {
 
         // Duplikate vermeiden:
@@ -81,7 +90,16 @@ final class DataService {
             author: author,
             thumbnailURL: thumbnailURL,
             source: source,
-            dateAdded: .now
+            dateAdded: .now,
+            subtitle: subtitle,
+            publisher: publisher,
+            publishedDate: publishedDate,
+            pageCount: pageCount,
+            language: language,
+            categories: categories,
+            descriptionText: descriptionText,
+            infoLink: infoLink,
+            previewLink: previewLink
         )
 
         context.insert(newBook)
@@ -143,20 +161,55 @@ final class DataService {
         }
 
         // Kleine statische Beispiele
-        let demoBooks: [(id: String, title: String, author: String, cover: String?, source: String)] = [
-            (
+        struct DemoBookSeed {
+            let id: String
+            let title: String
+            let subtitle: String?
+            let author: String
+            let cover: String?
+            let source: String
+            let publisher: String?
+            let publishedDate: String?
+            let pageCount: Int?
+            let language: String?
+            let categories: [String]
+            let description: String?
+            let infoLink: URL?
+            let previewLink: URL?
+        }
+
+        let demoBooks: [DemoBookSeed] = [
+            DemoBookSeed(
                 id: "demo-atomic-habits",
                 title: "Atomic Habits",
+                subtitle: "An Easy & Proven Way to Build Good Habits & Break Bad Ones",
                 author: "James Clear",
                 cover: nil,
-                source: "Demo"
+                source: "Demo",
+                publisher: "Avery",
+                publishedDate: "2018-10-16",
+                pageCount: 320,
+                language: "en",
+                categories: ["Self-Help", "Productivity"],
+                description: "Praktischer Leitfaden, um kleine Gewohnheiten nachhaltig zu verändern und langfristig bessere Ergebnisse zu erzielen.",
+                infoLink: URL(string: "https://books.google.com/books/about/Atomic_Habits.html?id=demo-atomic-habits"),
+                previewLink: URL(string: "https://books.google.com/books/reader?id=demo-atomic-habits&hl=&printsec=frontcover&output=reader")
             ),
-            (
+            DemoBookSeed(
                 id: "demo-deep-work",
                 title: "Deep Work",
+                subtitle: "Rules for Focused Success in a Distracted World",
                 author: "Cal Newport",
                 cover: nil,
-                source: "Demo"
+                source: "Demo",
+                publisher: "Grand Central Publishing",
+                publishedDate: "2016-01-05",
+                pageCount: 304,
+                language: "en",
+                categories: ["Business & Economics", "Productivity"],
+                description: "Strategien, wie konzentriertes Arbeiten in einer von Ablenkungen dominierten Welt möglich bleibt.",
+                infoLink: URL(string: "https://books.google.com/books/about/Deep_Work.html?id=demo-deep-work"),
+                previewLink: URL(string: "https://books.google.com/books/reader?id=demo-deep-work&hl=&printsec=frontcover&output=reader")
             )
         ]
 
@@ -166,7 +219,16 @@ final class DataService {
                 title: demo.title,
                 author: demo.author,
                 thumbnailURL: demo.cover,
-                source: demo.source
+                source: demo.source,
+                subtitle: demo.subtitle,
+                publisher: demo.publisher,
+                publishedDate: demo.publishedDate,
+                pageCount: demo.pageCount,
+                language: demo.language,
+                categories: demo.categories,
+                descriptionText: demo.description,
+                infoLink: demo.infoLink,
+                previewLink: demo.previewLink
             )
         }
 
