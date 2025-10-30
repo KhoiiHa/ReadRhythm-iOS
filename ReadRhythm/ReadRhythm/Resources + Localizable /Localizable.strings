@@ -181,6 +181,45 @@
 "discover.detail.title" = "Buchdetails";
 "discover.detail.about" = "Über dieses Buch";
 "discover.detail.cta.open" = "In Bibliothek öffnen";
+"discover.detail.publisher" = "Verlag";
+"discover.detail.publishedDate" = "Erscheinungsdatum";
+"discover.detail.pageCount" = "Seiten";
+"discover.detail.pages" = "%d Seiten";
+"discover.detail.categories" = "Kategorien";
+"discover.detail.openGoogleBooks" = "In Google Books öffnen";
+"discover.detail.authors.accessibility" = "Autor:innen: %@";
+"discover.detail.metadata.heading" = "Metadaten";
+"discover.detail.metadata.unknown" = "Keine Angaben";
+"discover.detail.year" = "Erscheinungsjahr";
+"discover.detail.language" = "Sprache";
+"discover.detail.description.more" = "Mehr anzeigen";
+"discover.detail.description.less" = "Weniger anzeigen";
+"discover.detail.rating.count" = "%d Bewertungen";
+"discover.detail.rating.count.one" = "1 Bewertung";
+"discover.detail.rating.accessibility" = "%@ von 5 Sternen basierend auf %d Bewertungen";
+
+// Shared Detail
+"detail.subtitle" = "Untertitel";
+"detail.publisher" = "Verlag";
+"detail.year" = "Erscheinungsjahr";
+"detail.pages" = "Seiten";
+"detail.categories" = "Kategorien";
+"detail.language" = "Sprache";
+"detail.rating" = "Bewertung";
+"detail.rating.accessibility" = "%@ von 5 Sternen, %d Bewertungen";
+"detail.readMore" = "Mehr anzeigen";
+"detail.readLess" = "Weniger anzeigen";
+"detail.openInGoogleBooks" = "In Google Books öffnen";
+"detail.addToLibrary" = "Zur Bibliothek hinzufügen";
+"detail.source" = "Quelle";
+"detail.source.google" = "Google Books";
+"detail.source.manual" = "Manuell hinzugefügt";
+"detail.totalMinutes" = "Gesamtlesezeit: %d Min.";
+"detail.lastSession" = "Letzte Session: %@";
+"detail.addedOn" = "Hinzugefügt am %@";
+
+"cta.addToLibrary" = "Zur Bibliothek hinzufügen";
+"cta.cancel" = "Abbrechen";
 
 
 // Misc

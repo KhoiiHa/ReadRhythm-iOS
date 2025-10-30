@@ -58,9 +58,6 @@ struct BookCoverCard: View {
                 // Add-to-Library Button
                 if let onAddToLibrary = onAddToLibrary {
                     Button(action: {
-                        #if os(iOS)
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        #endif
                         onAddToLibrary()
                     }) {
                         Image(systemName: "plus.circle.fill")

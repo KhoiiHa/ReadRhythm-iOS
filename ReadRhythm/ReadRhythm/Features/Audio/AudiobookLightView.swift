@@ -150,8 +150,9 @@ struct AudiobookLightView_Previews: PreviewProvider {
 
         // 1. In-Memory SwiftData Container für Preview
         let container = try! ModelContainer(
-            for: ReadingSessionEntity.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+            for: ReadRhythmSchemaV2.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true),
+            migrationPlan: ReadRhythmMigrationPlan.self
         )
 
         // 2. Fake Repo, erfüllt SessionRepository-Protokoll
