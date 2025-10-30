@@ -24,11 +24,20 @@ struct VolumeDTO: Codable {
 /// Metadaten eines Buchs (Teilmenge für MVP).
 struct VolumeInfoDTO: Codable {
     let title: String?
+    let subtitle: String?
     let authors: [String]?
+    let publisher: String?
+    let publishedDate: String?
+    let pageCount: Int?
+    let categories: [String]?
+    let description: String?
+    let previewLink: String?
+    let infoLink: String?
+    let language: String?
+    let averageRating: Double?
+    let ratingsCount: Int?
     let imageLinks: ImageLinksDTO?
     // Raum für spätere Felder:
-    // let description: String?
-    // let publishedDate: String?
     // let industryIdentifiers: [IndustryIdentifierDTO]?
 }
 
