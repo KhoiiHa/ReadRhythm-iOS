@@ -165,7 +165,7 @@ final class DiscoverViewModel: ObservableObject {
 
         // Autor normalisieren (API kann "—" schicken oder leere Strings liefern)
         let normalizedAuthor: String = {
-            let trimmed = remote.authors.trimmingCharacters(in: .whitespacesAndNewlines)
+            let trimmed = remote.authorsDisplay.trimmingCharacters(in: .whitespacesAndNewlines)
             if trimmed == "—" || trimmed.isEmpty {
                 return ""
             }

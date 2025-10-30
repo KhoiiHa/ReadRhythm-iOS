@@ -337,21 +337,26 @@ struct DiscoverAllView: View {
             spacing: AppSpace._12
         ) {
             ForEach(items, id: \.id) { book in
-                BookCoverCard(
-                    title: book.title,
-                    author: book.authors,
-                    coverURL: book.thumbnailURL,
-                    coverAssetName: nil,
-                    onAddToLibrary: {
-                        #if os(iOS)
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        #endif
+                NavigationLink {
+                    DiscoverDetailView(detail: DiscoverBookDetail(from: book))
+                } label: {
+                    BookCoverCard(
+                        title: book.title,
+                        author: book.authorsDisplay,
+                        coverURL: book.thumbnailURL,
+                        coverAssetName: nil,
+                        onAddToLibrary: {
+                            #if os(iOS)
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            #endif
 
-                        // Speichern in SwiftData über das ViewModel
-                        viewModel.addToLibrary(from: book)
-                    }
-                )
-                .contentShape(Rectangle())
+                            // Speichern in SwiftData über das ViewModel
+                            viewModel.addToLibrary(from: book)
+                        }
+                    )
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
                 .accessibilityIdentifier("discover.all.result.\(book.id)")
             }
         }
@@ -365,7 +370,7 @@ struct DiscoverAllView: View {
         ) {
             ForEach(displayedBooks) { book in
                 NavigationLink {
-                    DiscoverDetailView(book: book)
+                    BookDetailView(book: book)
                 } label: {
                     BookCoverCard(
                         title: book.title,

@@ -61,7 +61,10 @@ extension DiscoverFeedItem {
         DiscoverFeedItem(
             sourceID: remote.id,
             title: remote.title,
-            author: remote.authors.trimmingCharacters(in: .whitespacesAndNewlines) == "—" ? nil : remote.authors,
+            author: {
+                let display = remote.authorsDisplay
+                return display.trimmingCharacters(in: .whitespacesAndNewlines) == "—" ? nil : display
+            }(),
             thumbnailURL: remote.thumbnailURL?.absoluteString,
             categoryRaw: category?.id ?? "uncategorized",
             fetchedAt: .now

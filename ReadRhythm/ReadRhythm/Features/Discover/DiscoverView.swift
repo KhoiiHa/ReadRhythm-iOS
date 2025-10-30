@@ -307,18 +307,25 @@ struct DiscoverView: View {
     private func resultsList(_ items: [RemoteBook]) -> some View {
         LazyVStack(spacing: AppSpace._12) {
             ForEach(items, id: \.id) { book in
-                BookCoverCard(
-                    title: book.title,
-                    author: book.authors,
-                    coverURL: book.thumbnailURL,
-                    coverAssetName: nil,
-                    onAddToLibrary: {
-                        #if os(iOS)
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        #endif
-                        viewModel.addToLibrary(from: book)
-                    }
-                )
+                NavigationLink {
+                    DiscoverDetailView(detail: DiscoverBookDetail(from: book))
+                } label: {
+                    BookCoverCard(
+                        title: book.title,
+                        author: book.authorsDisplay,
+                        coverURL: book.thumbnailURL,
+                        coverAssetName: nil,
+                        onAddToLibrary: {
+                            #if os(iOS)
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            #endif
+                            viewModel.addToLibrary(from: book)
+                        }
+                    )
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
                 Divider().opacity(0.1)
             }
         }
@@ -330,7 +337,7 @@ struct DiscoverView: View {
             LazyHStack(spacing: AppSpace._12) {
                 ForEach(books) { book in
                     NavigationLink {
-                        DiscoverDetailView(book: book)
+                        BookDetailView(book: book)
                     } label: {
                         BookCoverCard(
                             title: book.title,

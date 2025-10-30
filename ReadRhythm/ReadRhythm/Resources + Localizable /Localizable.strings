@@ -181,6 +181,13 @@
 "discover.detail.title" = "Buchdetails";
 "discover.detail.about" = "Über dieses Buch";
 "discover.detail.cta.open" = "In Bibliothek öffnen";
+"discover.detail.publisher" = "Verlag";
+"discover.detail.publishedDate" = "Erscheinungsdatum";
+"discover.detail.pageCount" = "Seiten";
+"discover.detail.pages" = "%d Seiten";
+"discover.detail.categories" = "Kategorien";
+"discover.detail.openGoogleBooks" = "In Google Books öffnen";
+"discover.detail.authors.accessibility" = "Autor:innen: %@";
 
 
 // Misc
