@@ -10,13 +10,13 @@ import SwiftUI
 enum AppColors {
     // MARK: - Brand & Accent (Basis-Tokens)
     enum Brand {
-        static var primary: Color { Color(red: 127/255, green: 179/255, blue: 174/255) }
-        static var secondary: Color { Color(red: 216/255, green: 200/255, blue: 180/255) }
+        static var primary: Color { Color(red: 98/255, green: 140/255, blue: 133/255) }
+        static var secondary: Color { Color(red: 214/255, green: 193/255, blue: 164/255) }
     }
 
     enum Accent {
-        static var success: Color { Color(red: 122/255, green: 174/255, blue: 140/255) }
-        static var warning: Color { Color(red: 212/255, green: 162/255, blue: 79/255) }
+        static var success: Color { Color(red: 112/255, green: 155/255, blue: 117/255) }
+        static var warning: Color { Color(red: 201/255, green: 155/255, blue: 73/255) }
         static var error: Color { Color("accent.error", bundle: .main) }
     }
 
@@ -34,9 +34,9 @@ enum AppColors {
     // MARK: - Semantik (auf Basis der Palette)
     enum Semantic {
         // Backgrounds
-        static var bgPrimary: Color   { Neutral._50 }                                   // App-Hintergrund
-        static var bgSecondary: Color { Color(red: 245/255, green: 240/255, blue: 230/255) } // Sektionen
-        static var bgElevated: Color  { Color(red: 233/255, green: 225/255, blue: 214/255) } // Karten
+        static var bgPrimary: Color   { Color(red: 248/255, green: 244/255, blue: 235/255) } // App-Hintergrund
+        static var bgSecondary: Color { Color(red: 241/255, green: 236/255, blue: 224/255) } // Sektionen
+        static var bgElevated: Color  { Color(red: 233/255, green: 226/255, blue: 212/255) } // Karten
 
         // Text
         static var textPrimary: Color   { Neutral._900 }
@@ -48,12 +48,12 @@ enum AppColors {
         static var tintSecondary: Color { Brand.secondary }
 
         // Border
-        static var borderMuted: Color  { Neutral._300 }
+        static var borderMuted: Color  { Color(red: 217/255, green: 208/255, blue: 194/255) }
         static var borderStrong: Color { Neutral._700 }
 
         // Charts
         static var chartBar: Color       { Accent.success }
-        static var chartAxis: Color      { Neutral._300 }
+        static var chartAxis: Color      { Color(red: 210/255, green: 201/255, blue: 187/255) }
         static var chartSelection: Color { Accent.warning }
     }
     // MARK: - Aliases (Phase 4 convenience)
@@ -79,7 +79,7 @@ enum AppColors {
         static var goalLine: Color { Accent.warning }
 
         /// Farbe für Sekundär- oder Vergleichs-Daten
-        static var secondaryBar: Color { Brand.secondary.opacity(0.6) }
+        static var secondaryBar: Color { Brand.secondary.opacity(0.55) }
 
         /// Achsen und Gridlines
         static var axis: Color { Semantic.chartAxis }
