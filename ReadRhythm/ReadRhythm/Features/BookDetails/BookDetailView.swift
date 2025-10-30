@@ -28,6 +28,9 @@ struct BookDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpace._16) {
                 headerSection
+                if let content = readingContent {
+                    readerSection(content)
+                }
                 metaSection
             }
             .padding(.horizontal, AppSpace._16)
@@ -109,6 +112,49 @@ struct BookDetailView: View {
 
             Spacer(minLength: 0)
         }
+    }
+
+    // MARK: - Reader
+    private func readerSection(_ content: ReadingContent) -> some View {
+        NavigationLink {
+            ReaderView(
+                bookTitle: content.title ?? book.title,
+                content: content
+            )
+        } label: {
+            VStack(alignment: .leading, spacing: AppSpace._12) {
+                Text(LocalizedStringKey("bookdetail.reader.title"))
+                    .font(.headline)
+                    .foregroundStyle(AppColors.Semantic.textPrimary)
+                    .accessibilityHeading(.h2)
+
+                Text(LocalizedStringKey("bookdetail.reader.open"))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(AppColors.Semantic.tintPrimary)
+                    .accessibilityIdentifier("bookdetail.reader.open")
+
+                if let progressLabel = readerProgressLabel(for: content) {
+                    Text(progressLabel)
+                        .font(.caption)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .accessibilityIdentifier("bookdetail.reader.progress")
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: AppRadius.m)
+                    .fill(AppColors.Semantic.bgElevated)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: AppRadius.m)
+                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.5)
+            )
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("bookdetail.reader.card")
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("bookdetail.reader")
     }
 
     // MARK: - Meta / Zusatzinfos
