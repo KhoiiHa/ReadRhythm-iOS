@@ -13,8 +13,47 @@ import Foundation
 public struct RemoteBook: Equatable, Sendable {
     public let id: String
     public let title: String
-    public let authors: String        // Kommagetrennter String für einfache Anzeige
-    public let thumbnailURL: URL?     // Optional – nicht jedes Buch hat ein Bild
+    public let subtitle: String?
+    public let authors: [String]
+    public let publisher: String?
+    public let publishedDate: String?
+    public let pageCount: Int?
+    public let categories: [String]
+    public let description: String?
+    public let thumbnailURL: URL?
+    public let previewLink: URL?
+}
+
+public extension RemoteBook {
+    /// Vereinheitlichte Anzeige für Autor:innen.
+    var authorsDisplay: String {
+        let trimmed = authors
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        return trimmed.isEmpty ? "—" : trimmed.joined(separator: ", ")
+    }
+
+    /// Convenience-Initializer für Caches, die nur einen Autor:innen-String gespeichert haben.
+    init(id: String, title: String, authorsDisplay: String?, thumbnailURL: URL?) {
+        let authorList = authorsDisplay?
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty } ?? []
+
+        self.init(
+            id: id,
+            title: title,
+            subtitle: nil,
+            authors: authorList,
+            publisher: nil,
+            publishedDate: nil,
+            pageCount: nil,
+            categories: [],
+            description: nil,
+            thumbnailURL: thumbnailURL,
+            previewLink: nil
+        )
+    }
 }
 
 // MARK: - Mapping
@@ -38,22 +77,35 @@ extension VolumeDTO {
         }
 
         // Autorenliste ist optional → wir erlauben "—" als Fallback
-        let authorsJoined = (info.authors ?? [])
+        let authorsList = (info.authors ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
-            .joined(separator: ", ")
-            .nilIfEmpty ?? "—"
 
         // Thumbnail kann an mehreren Stellen stehen; wir upgraden http → https
         let thumb = info.imageLinks?.thumbnail
                  ?? info.imageLinks?.smallThumbnail
         let normalizedURL = thumb.flatMap { URL(string: $0) }?.forcingHTTPS()
 
+        let previewURL = info.previewLink
+            .flatMap { URL(string: $0) }?
+            .forcingHTTPS()
+
+        let categories = (info.categories ?? [])
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
         return RemoteBook(
             id: id,
             title: safeTitle,
-            authors: authorsJoined,
-            thumbnailURL: normalizedURL
+            subtitle: info.subtitle?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
+            authors: authorsList,
+            publisher: info.publisher?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
+            publishedDate: info.publishedDate?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
+            pageCount: info.pageCount,
+            categories: categories,
+            description: info.description?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
+            thumbnailURL: normalizedURL,
+            previewLink: previewURL
         )
     }
 }
