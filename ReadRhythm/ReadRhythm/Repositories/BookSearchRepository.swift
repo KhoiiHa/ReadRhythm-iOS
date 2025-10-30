@@ -95,7 +95,7 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
                 RemoteBook(
                     id: $0.sourceID,
                     title: $0.title,
-                    authors: $0.author ?? "—",
+                    authorsDisplay: $0.author,
                     thumbnailURL: $0.thumbnailURL.flatMap(URL.init)
                 )
             }
@@ -132,89 +132,16 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
 
     // MARK: - Lightweight DTOs for decoding Google Books response (MVP-scope)
 
-    /// Root der Google-Books-Suche
-    private struct SearchResponseDTO: Decodable {
-        let items: [VolumeDTO]?
-    }
-
-    /// Einzelnes Volume aus der Suche
-    private struct VolumeDTO: Decodable {
-        let id: String
-        let volumeInfo: VolumeInfoDTO?
-    }
-
-    /// Metadaten eines Buches
-    private struct VolumeInfoDTO: Decodable {
-        let title: String?
-        let authors: [String]?
-        let imageLinks: ImageLinksDTO?
-    }
-
-    /// Bild-Links; Google liefert manchmal nur http
-    private struct ImageLinksDTO: Decodable {
-        let thumbnail: String?
-        let smallThumbnail: String?
-    }
-
     /// Decodiert das rohe JSON der Google Books API und mappt es in RemoteBook-Modelle.
     /// Bricht NICHT ab, wenn einzelne Volumes unvollständig sind.
     private func mapRemoteBooks(from data: Data) throws -> [RemoteBook] {
-        let decoder = JSONDecoder()
-        let root = try decoder.decode(SearchResponseDTO.self, from: data)
-        let volumes = root.items ?? []
-
-        let mapped: [RemoteBook] = volumes.compactMap { vol in
-            guard let info = vol.volumeInfo else {
-                return nil
-            }
-
-            // Titel ist Pflicht – ohne Titel zeigen wir das Buch nicht
-            guard let rawTitle = info.title?
-                .trimmingCharacters(in: .whitespacesAndNewlines),
-                  !rawTitle.isEmpty else {
-                return nil
-            }
-
-            // Autoren zusammenführen; Fallback "—"
-            let authorsJoined = (info.authors ?? [])
-                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .filter { !$0.isEmpty }
-                .joined(separator: ", ")
-            let safeAuthors = authorsJoined.isEmpty ? "—" : authorsJoined
-
-            // Bild-URL normalisieren und auf https hochstufen
-            let thumb = info.imageLinks?.thumbnail
-                ?? info.imageLinks?.smallThumbnail
-            let normalizedURL = thumb
-                .flatMap { URL(string: $0) }?
-                .forcingHTTPS()
-
-            return RemoteBook(
-                id: vol.id,
-                title: rawTitle,
-                authors: safeAuthors,
-                thumbnailURL: normalizedURL
-            )
-        }
+        let books = try BooksDecoder.decodeSearchList(from: data)
 
         #if DEBUG
-        print("🌐 [BookSearchRepository] API returned \(volumes.count) raw items, mapped \(mapped.count) usable books")
+        print("🌐 [BookSearchRepository] decoded \(books.count) usable books from API response")
         #endif
 
-        return mapped
-    }
-}
-
-
-// MARK: - Helper
-
-/// Hebt http→https an, weil Google-Links manchmal unverschlüsselt kommen.
-fileprivate extension URL {
-    func forcingHTTPS() -> URL {
-        guard scheme?.lowercased() == "http" else { return self }
-        var comps = URLComponents(url: self, resolvingAgainstBaseURL: false)
-        comps?.scheme = "https"
-        return comps?.url ?? self
+        return books
     }
 }
 
