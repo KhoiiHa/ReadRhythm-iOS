@@ -17,16 +17,11 @@ public struct RemoteBook: Equatable, Hashable, Sendable {
     public let authors: [String]
     public let publisher: String?
     public let publishedDate: String?
-    public let publishedYear: String?
     public let pageCount: Int?
     public let categories: [String]
     public let description: String?
     public let thumbnailURL: URL?
     public let previewLink: URL?
-    public let infoLink: URL?
-    public let languageCode: String?
-    public let averageRating: Double?
-    public let ratingsCount: Int?
 }
 
 public extension RemoteBook {
@@ -52,16 +47,11 @@ public extension RemoteBook {
             authors: authorList,
             publisher: nil,
             publishedDate: nil,
-            publishedYear: nil,
             pageCount: nil,
             categories: [],
             description: nil,
             thumbnailURL: thumbnailURL,
-            previewLink: nil,
-            infoLink: nil,
-            languageCode: nil,
-            averageRating: nil,
-            ratingsCount: nil
+            previewLink: nil
         )
     }
 }
@@ -100,17 +90,9 @@ extension VolumeDTO {
             .flatMap { URL(string: $0) }?
             .forcingHTTPS()
 
-        let infoURL = info.infoLink
-            .flatMap { URL(string: $0) }?
-            .forcingHTTPS()
-
         let categories = (info.categories ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
-
-        let publishedDate = info.publishedDate?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .nilIfEmpty
 
         return RemoteBook(
             id: id,
@@ -118,17 +100,12 @@ extension VolumeDTO {
             subtitle: info.subtitle?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             authors: authorsList,
             publisher: info.publisher?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
-            publishedDate: publishedDate,
-            publishedYear: publishedDate.flatMap(Self.extractPublishedYear(from:)),
+            publishedDate: info.publishedDate?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             pageCount: info.pageCount,
             categories: categories,
             description: info.description?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             thumbnailURL: normalizedURL,
-            previewLink: previewURL,
-            infoLink: infoURL,
-            languageCode: info.language?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
-            averageRating: info.averageRating,
-            ratingsCount: info.ratingsCount
+            previewLink: previewURL
         )
     }
 }
