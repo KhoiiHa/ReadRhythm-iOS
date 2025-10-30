@@ -294,9 +294,28 @@
 
 // Toasts
 "toast.added" = "Zur Bibliothek hinzugefügt";
-"toast.duplicate" = "Bereits in deiner Bibliothek";
-"toast.deleted" = "Aus Bibliothek entfernt";
-"toast.error"   = "Aktion fehlgeschlagen";
+ "toast.duplicate" = "Bereits in deiner Bibliothek";
+ "toast.deleted" = "Aus Bibliothek entfernt";
+ "toast.error"   = "Aktion fehlgeschlagen";
+
+// Detail (shared, DE)
+"detail.source" = "Quelle";
+"detail.source.google" = "Google Books";
+"detail.source.manual" = "Manuell";
+"detail.addedOn" = "Hinzugefügt am %@";
+"detail.totalMinutes" = "%d Minuten gesamt";
+"detail.lastSession" = "Letzte Sitzung: %@";
+"detail.openInGoogleBooks" = "In Google Books öffnen";
+"detail.subtitle" = "Untertitel";
+"detail.publisher" = "Verlag";
+"detail.year" = "Jahr";
+"detail.pages" = "Seiten";
+"detail.categories" = "Kategorien";
+"detail.language" = "Sprache";
+"detail.rating" = "Bewertung";
+"detail.readMore" = "Mehr anzeigen";
+"detail.readLess" = "Weniger anzeigen";
+"detail.addToLibrary" = "Zur Bibliothek hinzufügen";
 
 "library.empty.title" = "Deine Bibliothek ist noch leer";
 "library.empty.subtitle" = "Füge dein erstes Buch hinzu – manuell oder direkt aus der Discover-Suche.";

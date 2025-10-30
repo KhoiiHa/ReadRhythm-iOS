@@ -16,3 +16,7 @@
 "detail.totalMinutes" = "Total reading time: %d min";
 "detail.lastSession" = "Last session: %@";
 "detail.addedOn" = "Added on %@";
+
+// Book detail navigation & fallback (EN)
+"book.detail.title" = "Book";
+"book.unknownAuthor" = "Unknown author";
