@@ -110,6 +110,25 @@ extension VolumeDTO {
     }
 }
 
+private extension VolumeDTO {
+    static func extractPublishedYear(from rawValue: String) -> String? {
+        guard !rawValue.isEmpty else { return nil }
+
+        let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        // Google Books liefert Datumsstrings in verschiedenen Formaten ("2021-03-12", "1987").
+        // Wir extrahieren defensiv die ersten vier Ziffern, sofern vorhanden.
+        let digits = trimmed.prefix(4)
+        if digits.count == 4, digits.allSatisfy({ $0.isNumber }) {
+            return String(digits)
+        }
+
+        // Fallback: Wenn kein Jahr extrahierbar ist, geben wir den Rohwert zurück.
+        return trimmed
+    }
+}
+
 extension BooksSearchResponseDTO {
     /// Extrahiert eine Liste von `RemoteBook` aus der Suchantwort (defensiv, stabil).
     /// Ungültige / unvollständige Volumes werden dabei übersprungen.
