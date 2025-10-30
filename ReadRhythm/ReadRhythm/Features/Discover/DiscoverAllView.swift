@@ -229,7 +229,6 @@ struct DiscoverAllView: View {
                     .animation(.easeInOut(duration: 0.3), value: viewModel.toastText)
                     .accessibilityIdentifier("toast.\(key)")
                     .accessibilityElement(children: .combine)
-                    .accessibilityLiveRegion(.assertive)
             }
         }
         .onDisappear {
@@ -343,7 +342,7 @@ struct DiscoverAllView: View {
         ) {
             ForEach(items, id: \.id) { book in
                 NavigationLink {
-                    DiscoverDetailView(detail: DiscoverBookDetail(from: book), viewModel: viewModel)
+                    DiscoverDetailView(detail: DiscoverBookDetail(from: book))
                 } label: {
                     BookCoverCard(
                         title: book.title,
@@ -351,6 +350,11 @@ struct DiscoverAllView: View {
                         coverURL: book.thumbnailURL,
                         coverAssetName: nil,
                         onAddToLibrary: {
+                            #if os(iOS)
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            #endif
+
+                            // Speichern in SwiftData über das ViewModel
                             viewModel.addToLibrary(from: book)
                         }
                     )
