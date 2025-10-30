@@ -133,7 +133,6 @@ struct DiscoverView: View {
                     .animation(.easeInOut(duration: 0.3), value: viewModel.toastText)
                     .accessibilityIdentifier("toast.\(key)")
                     .accessibilityElement(children: .combine)
-                    .accessibilityLiveRegion(.assertive)
             }
         }
         .onDisappear {
@@ -330,6 +329,9 @@ struct DiscoverView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .simultaneousGesture(TapGesture().onEnded {
+                    viewModel.cancelToast()
+                })
 
                 Divider().opacity(0.1)
             }

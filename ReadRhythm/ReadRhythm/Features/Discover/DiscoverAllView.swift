@@ -229,7 +229,6 @@ struct DiscoverAllView: View {
                     .animation(.easeInOut(duration: 0.3), value: viewModel.toastText)
                     .accessibilityIdentifier("toast.\(key)")
                     .accessibilityElement(children: .combine)
-                    .accessibilityLiveRegion(.assertive)
             }
         }
         .onDisappear {

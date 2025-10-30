@@ -55,7 +55,13 @@ final class DiscoverViewModel: ObservableObject {
         }
 
         toastDismissTask = Task { [weak self] in
-            try await Task.sleep(nanoseconds: 2_500_000_000)
+            // Sleep for 2.5s; catch CancellationError so this Task remains non-throwing
+            do {
+                try await Task.sleep(nanoseconds: 2_500_000_000)
+            } catch {
+                // Task was likely cancelled; just exit quietly
+                return
+            }
             guard !Task.isCancelled else { return }
             await MainActor.run {
                 guard let self else { return }
