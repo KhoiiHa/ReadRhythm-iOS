@@ -14,34 +14,34 @@
 
 ## 🌟 Überblick
 
-**ReadRhythm** ist eine iOS-App zum **Lesetracking und Buchverwaltung**,  
-fokussiert auf ruhige, klare User Experience und modernes SwiftUI-Design.  
-Die App ermöglicht es, Bücher hinzuzufügen, Lesesessions zu erfassen,  
-Statistiken zu visualisieren und Themes (Light/Dark/System) flexibel zu steuern.
+**ReadRhythm** ist eine iOS-App zum **Lesetracking und Hörzeit-Tracking**,  
+fokussiert auf eine ruhige, klare User Experience und modernes SwiftUI-Design.  
+Die App kombiniert Lesestatistiken, Hörbuchzeit und Achtsamkeit im digitalen Alltag.  
 
 📱 **Technologien:** SwiftUI · SwiftData · Swift Charts · MVVM  
-🎨 **Design-System:** AppColors · AppSpace · AppRadius · AppShadow  
-🧩 **Architektur:** MVVM + Repository + Service Pattern
+🎨 **Design-System:** AppColors · AppFont · AppSpace · AppRadius · AppShadow  
+🧩 **Architektur:** MVVM + Repository + Service Pattern  
 
 ---
 
 ## 🧭 Zielsetzung
 
-Ziel des Projekts war es, eine App zu entwickeln, die:
-- **Alltagstauglich & ruhig** gestaltet ist (Fokus auf Lesefluss)  
-- **Modular & erweiterbar** bleibt (MVP → Portfolio → Production)  
-- **Visuell stimmig** zwischen Light & Dark Mode funktioniert  
-- Und als **Portfolio-Projekt** den gesamten iOS-Entwicklungsprozess zeigt
+Ziel war es, eine App zu schaffen, die:
+- **Fokus & Ruhe** fördert statt visuellem Overload  
+- **Zustände klar trennt:** Lesen vs. Hören  
+- **Architektonisch erweiterbar** bleibt für Portfolio- & Produktions-Use-Cases  
+- **Visuell konsistent** im Light/Dark Mode ist  
+- Und als **Portfolio-Projekt** technische Reife mit UX-Bewusstsein zeigt  
 
 ---
 
 ## 🏗 Architektur
 
 **App-Layer:** `ReadRhythmApp`, `MainTabView`  
-**Core:** Theme-System & Design Tokens (`AppColors`, `AppSpace`, `AppRadius`, `AppShadow`)  
-**Features:** Library · Discover · Stats · Settings (MVVM)  
+**Core:** Theme-System & Design Tokens (`AppColors`, `AppFont`, `AppSpace`, `AppRadius`, `AppShadow`)  
+**Features:** Library · Discover · Stats · Profile · Settings  
 **Repositories:** `BookRepository`, `SessionRepository`  
-**Services:** `DataService`, `StatsService`, `AppSettingsService`, `SpeechService`, `AppFormatter`
+**Services:** `DataService`, `StatsService`, `AppSettingsService`, `SpeechService`, `AppFormatter`  
 
 ---
 
@@ -53,27 +53,26 @@ Ziel des Projekts war es, eine App zu entwickeln, die:
 - Add-Session mit Haptic Feedback  
 - SwiftData-basierte Persistenz  
 
-### 📊 Stats
-- Lesestatistik per Swift Charts  
-- Ziel-Linie (RuleMark) für tägliche Leseminuten  
-- Integer-Y-Achse, klare BarMarks  
-- Empty-State mit SF-Symbolen & i18n  
-
-### 🌸 Discover
-- API-Integration mit lokalem Fallback (Karussells & Suche)  
-- Dynamische Sections mit Seed-Daten  
-- Reusable Components (`BookCoverCard`, `SectionHeader`)  
-
 ### 🎧 Audiobook Light
 - Text-to-Speech via `AVSpeechSynthesizer`  
 - Echtzeit-Playback-Tracking  
 - Speichert Hördauer automatisch als Session  
 
+### 📊 Stats
+- Lesestatistik per Swift Charts  
+- Ziel-Linie (RuleMark) für tägliche Lese-Minuten  
+- Integer-Y-Achse, klare BarMarks  
+- i18n-kompatible Texte & VoiceOver-Labelling  
+
+### 🧘‍♀️ Focus Mode
+- Timer für Leseeinheiten  
+- Sanfte Haptics & Fade-Animationen  
+- Speichert Sitzungen automatisch als Lesesessions  
+
 ### ⚙️ Settings
 - Theme-Picker (System, Light, Dark)  
 - Persistente Speicherung über `AppSettingsService`  
 - Debug-Reset für Demo-Daten  
-- Live Theme Preview  
 
 ---
 
@@ -81,81 +80,78 @@ Ziel des Projekts war es, eine App zu entwickeln, die:
 
 | Kategorie | Datei | Beschreibung |
 |:--|:--|:--|
-| Farben | `AppColors.swift` | Marken-, Akzent- & Neutralfarben (Light/Dark) |
+| Farben | `AppColors.swift` | Türkis-Sand-Farbwelt mit semantischen Tokens |
+| Typografie | `AppFont.swift` | Strukturierte Hierarchie für Titel, Body, Caption |
 | Abstände | `AppSpace.swift` | Einheitliche Layout-Spacing-Variablen |
 | Radius | `AppRadius.swift` | Corner-Radius-Token |
-| Schatten | `AppShadow.swift` | Weiche UI-Tiefenstufen |
-| Typografie | System Font (SF Pro / Inter) | Lesbar, ruhig, modern |
+| Schatten | `AppShadow.swift` | Weiche UI-Tiefenstufen für Cards & Panels |
+
+> Designziel: „Ruhig, fokussiert, lesbar“ – inspiriert von modernen Reading Apps auf Behance.
 
 ---
 
 ## 🧩 Architektur-Philosophie
 
-- **MVVM:** saubere Trennung von Logik und UI  
-- **Repository-Pattern:** isolierte Datenquellen  
+- **MVVM:** klare Layer-Trennung von Logik & UI  
+- **Repository-Pattern:** abstrahiert Datenzugriff  
 - **Service-Pattern:** aggregiert Berechnungen und Zustände  
-- **SwiftData-Integration:** Entity-basiertes, typensicheres Datenmodell  
-- **Design Tokens:** visuelle Konsistenz & Theme-Anpassung  
+- **SwiftData:** typensicheres Model-Layer mit Entity-Beziehungen  
+- **Design Tokens:** garantieren UI-Konsistenz  
 
 ---
 
 ## 🧪 Teststrategie & Qualitätssicherung
 
-Kontext: Ich betreibe ReadRhythm als Solo-Projekt mit Fokus auf einer belastbaren Codebasis, die Recruiter:innen sofort nachvollziehen können.  
-Warum: Für Portfolio und Produktivität zählt vor allem, dass Persistenz, Auswertungen und Accessibility-konforme Formatter zuverlässig funktionieren.  
-Wie: Die Kernlogik liegt in deterministischen Unit-Tests, die ohne flüchtige Simulator-Zustände laufen und damit stabil CI-fähig sind.
+**Kontext:** Fokus auf stabile, nachvollziehbare Logik-Tests statt UI-Flakiness.  
+**Warum:** CI-taugliche Stabilität durch deterministische Tests der Kernmodule.  
+**Wie:** Unit-Tests für Repositories, Services, Formatter – klar abgegrenzt vom UI-Schema.  
 
-Die Unit-Suite deckt die wesentlichen Domänenbausteine ab:  
-Das Session-Repository wird auf erfolgreiches Speichern, Idempotenz und Löschen geprüft, sodass keine Duplikate oder Leaks entstehen.  
-Der StatsService wird mit gemischten Lese- und Hör-Szenarien gefüttert und berechnet daraus Tages- und Zeitfenster-Minuten, was die Portfolio-relevanten KPIs absichert.  
-Der SpeechService-Test verifiziert den Singleton-Lebenszyklus sowie speak/stop-Übergänge ohne Timing-Flakiness,  
-und AppFormatter garantiert lokalisierte Texte inklusive VoiceOver-Strukturen.
+### Getestete Kernmodule
+- **LocalSessionRepository:** validiert Idempotenz (keine Duplikate, kein Leak)  
+- **StatsService:** aggregiert Lese- & Hörzeit korrekt über Datumsfenster  
+- **SpeechService:** testet Lifecycle und Start/Stop-Übergänge synchron  
+- **AppFormatter:** prüft lokalisierten Text + VoiceOver-Kompatibilität  
 
-Zusätzlich existiert eine UI-Smoke-Schicht, die Tab-Bar, Fokus-Timer, Audiobook-Light-Flow, Stats-Chart und Profilnavigation ansteuert,  
-um die End-to-End-Erfahrung nachzustellen.  
-Diese UI-Szenarien bleiben bewusst außerhalb des Standard-Schemes, weil sie stark von Onboarding-Zuständen, Seed-Daten und Simulator-Tempo abhängen.  
-Sie dienen als dokumentierte Portfolio-Smokes, nicht als Blocking-CI-Checks.
+UI-Smoke-Tests (FocusMode, AudiobookLight, Stats, Profile) sind dokumentiert,  
+aber **nicht Teil des CI-Schemes**, um Stabilität der Kernlogik zu priorisieren.  
 
-Ich entscheide mich damit klar für robuste Logik-Tests plus optionale UI-Skripte:  
-Alles, was businesskritisch ist, läuft deterministisch grün; alles, was visuell demonstriert wird, bleibt als nachvollziehbare Ergänzung im Repo,  
-ohne den stabilen Build zu gefährden.
+> Alles, was produktionsrelevant ist, läuft deterministisch grün –  
+> alles Visuelle bleibt als nachvollziehbarer Showcase im Repo.  
 
 ---
 
 ## 📦 Phase 12 – Code Freeze / Technischer Abschluss
 
-🧩 **Status:** Alle Kern-Tests laufen grün, Architektur stabilisiert, Design-Tokens & Services konsolidiert.  
-🧱 **UI-Smoke-Tests:** Im Repository dokumentiert, aber aus dem Standard-Scheme entfernt (laufen nicht automatisch).  
-🧠 **Nächster Schritt:** Phase 11 – Branding Polish & Case Study Visuals.
+🧩 **Status:** Alle Kern-Tests grün · Architektur stabil · Design-Tokens konsolidiert  
+🧱 **UI-Smokes:** bleiben im Repo, aber außerhalb des CI-Laufs  
+🎨 **Phase 11:** Branding Polish & Case Study Visuals vorbereitet  
 
-Commit-Vermerk (für Git History):  
-> 🧪 QA-Dokumentation: UI-Smokes optional gehalten, Kern-Tests grün  
-> – UI-Smoke-Tests verbleiben im Repo, laufen aber nicht mehr automatisch im Scheme  
-> – Alle produktionsrelevanten Tests (Repository, Stats, Speech, Formatter) sind grün  
-> – Phase 12 ist technisch eingefroren; als Nächstes folgt Phase 11 mit Branding-Polish und Case-Study-Screenshots
+**Commit-Vermerk:**  
+> 🧪 QA: UI-Smokes optional, Kern-Tests grün  
+> – Repositories & Services voll getestet  
+> – SpeechService & Formatter deterministisch stabil  
+> – Phase 12 = Code Freeze → Nächster Schritt: Case Study / Canva Export
 
 ---
 
-## 📊 Screenshots & Visuals *(noch ergänzen)*
+## 📊 Screenshots & Visuals *(folgen in Canva-Phase)*
 
 | Light Mode | Dark Mode |
 |:--|:--|
-| ![Library Light](screenshots/library_light.png) | ![Library Dark](screenshots/library_dark.png) |
+| ![Focus Light](screenshots/focus_light.png) | ![Focus Dark](screenshots/focus_dark.png) |
 | ![Stats Light](screenshots/stats_light.png) | ![Stats Dark](screenshots/stats_dark.png) |
-| ![Settings Light](screenshots/settings_light.png) | ![Settings Dark](screenshots/settings_dark.png) |
-
-> *(Platzhalter – Screenshots aus Xcode oder Simulator kommen noch)*
+| ![Profile Light](screenshots/profile_light.png) | ![Profile Dark](screenshots/profile_dark.png) |
 
 ---
 
 ## 🧠 Learnings
 
-- MVVM-Architektur mit SwiftData verknüpft  
-- Theme-Persistenz via ObservableObject + UserDefaults  
-- Swift Charts + RuleMarks für verständliche Visualisierungen  
-- Haptics + Micro-Interactions = hochwertiges Nutzergefühl  
-- Portfolio-Clean-Code-Struktur: erweiterbar, lesbar, testbar  
-- Strategische Testplanung mit Fokus auf Logik- statt UI-Flows  
+- Saubere MVVM-Architektur mit Repository & Service Layer  
+- SwiftData + Swift Charts im produktionsnahen Setup  
+- Micro-Interactions (Haptics, Fade) gezielt eingesetzt  
+- Designsystem = visuelle Wartbarkeit  
+- Logiktests > visuelle Tests: CI-ready Stabilität  
+- Ruhe im UI = Klarheit im Denken  
 
 ---
 
@@ -163,7 +159,7 @@ Commit-Vermerk (für Git History):
 
 1. Repository klonen  
 2. Öffne `ReadRhythm.xcodeproj` in **Xcode 16+**  
-3. Zielgerät: **iOS 17+** (Device oder Simulator)  
+3. Zielgerät: **iOS 17+**  
 4. Build & Run → Demo-Daten werden automatisch geladen  
 
 ---
@@ -171,8 +167,9 @@ Commit-Vermerk (für Git History):
 ## 💡 Autor
 
 **Vu Minh Khoi Ha**  
-📍 iOS Developer · Portfolio Projekt ReadRhythm  
-📧 Kontakt auf Anfrage
+📍 iOS Developer · Product Strategist · Portfolio-Projekt *ReadRhythm*  
+📧 Kontakt auf Anfrage  
+
 ---
 
 © 2025 Vu Minh Khoi Ha · Projekt: ReadRhythm
