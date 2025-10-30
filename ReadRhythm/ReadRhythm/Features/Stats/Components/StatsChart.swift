@@ -14,8 +14,8 @@ import Charts
 /// Wie: BarMark + RuleMark. Farben, Spacing, CornerRadius und Linienbreiten kommen aus dem Designsystem
 ///      (AppColors, AppChart, AppStroke), keine Magic Numbers im View-Code.
 struct StatsChart: View {
-    struct DataPoint: Identifiable {
-        let id = UUID()
+    struct DataPoint: Identifiable, Equatable, Hashable {
+        var id: Date { date }
         let date: Date
         let minutes: Int
     }
