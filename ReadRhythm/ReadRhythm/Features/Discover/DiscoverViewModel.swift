@@ -1,9 +1,20 @@
 import Foundation
 import Combine
 import SwiftData
+import SwiftUI
+
+#if os(iOS)
+import UIKit
+#endif
 
 @MainActor
 final class DiscoverViewModel: ObservableObject {
+
+    enum AddToLibraryResult {
+        case added
+        case alreadyExists
+        case failure
+    }
 
     // MARK: - Published State für UI
 
@@ -17,6 +28,8 @@ final class DiscoverViewModel: ObservableObject {
     @Published var filteredBooks: [BookEntity] = []    // ggf. gefiltert für UI
 
     @Published var toastText: String? = nil            // "Hinzugefügt", "Schon vorhanden", etc.
+
+    private var toastDismissTask: Task<Void, Never>? = nil
 
     // MARK: - Dependencies
 
@@ -38,10 +51,39 @@ final class DiscoverViewModel: ObservableObject {
     }
 
     private func showToast(_ key: String) {
-        toastText = key
+        toastDismissTask?.cancel()
+        toastDismissTask = nil
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            toastText = key
+        }
+
+        toastDismissTask = Task { [weak self] in
+            try await Task.sleep(nanoseconds: 2_500_000_000)
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                guard let self else { return }
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    self.toastText = nil
+                }
+                self.toastDismissTask = nil
+            }
+        }
+
         #if DEBUG
         print("🍞 [DiscoverVM] toast =", key)
         #endif
+    }
+
+    func cancelToast() {
+        toastDismissTask?.cancel()
+        toastDismissTask = nil
+
+        guard toastText != nil else { return }
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            toastText = nil
+        }
     }
 
     // MARK: - SwiftData / Lokale Bibliothek laden
@@ -161,11 +203,12 @@ final class DiscoverViewModel: ObservableObject {
 
     /// Nimmt ein RemoteBook (API-Ergebnis), baut ein BookEntity,
     /// speichert es in SwiftData und aktualisiert lokale Arrays + Toast.
-    func addToLibrary(from remote: RemoteBook) {
+    @discardableResult
+    func addToLibrary(from remote: RemoteBook) -> AddToLibraryResult {
 
         // Autor normalisieren (API kann "—" schicken oder leere Strings liefern)
         let normalizedAuthor: String = {
-            let trimmed = remote.authors.trimmingCharacters(in: .whitespacesAndNewlines)
+            let trimmed = remote.authorsDisplay.trimmingCharacters(in: .whitespacesAndNewlines)
             if trimmed == "—" || trimmed.isEmpty {
                 return ""
             }
@@ -207,7 +250,7 @@ final class DiscoverViewModel: ObservableObject {
             print("🔁 [DiscoverVM] duplicate -> \(remote.title)")
             #endif
             showToast("toast.duplicate")
-            return
+            return .alreadyExists
         }
 
         do {
@@ -225,9 +268,14 @@ final class DiscoverViewModel: ObservableObject {
 
             showToast("toast.added")
 
+            #if os(iOS)
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            #endif
+
             #if DEBUG
             print("✅ [DiscoverVM] saved book -> \(saved.title) [sourceID=\(saved.sourceID)]")
             #endif
+            return .added
         } catch {
             #if DEBUG
             print("⛔️ [DiscoverVM] save failed:", error)
@@ -236,6 +284,7 @@ final class DiscoverViewModel: ObservableObject {
             }
             #endif
             showToast("toast.error")
+            return .failure
         }
     }
 }

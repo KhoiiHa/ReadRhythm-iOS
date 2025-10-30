@@ -334,8 +334,9 @@ struct FocusModeView_Previews: PreviewProvider {
 
         // 1. In-Memory SwiftData Container für Preview bauen
         let container = try! ModelContainer(
-            for: BookEntity.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+            for: ReadRhythmSchemaV2.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true),
+            migrationPlan: ReadRhythmMigrationPlan.self
         )
 
         // 2. Einen ModelContext ableiten
