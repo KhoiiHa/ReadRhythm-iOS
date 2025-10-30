@@ -6,6 +6,12 @@ import SwiftUI
 @MainActor
 final class DiscoverViewModel: ObservableObject {
 
+    enum AddToLibraryResult {
+        case added
+        case alreadyExists
+        case failure
+    }
+
     // MARK: - Published State für UI
 
     @Published var results: [RemoteBook] = []          // letzte API-Suchergebnisse
@@ -193,7 +199,8 @@ final class DiscoverViewModel: ObservableObject {
 
     /// Nimmt ein RemoteBook (API-Ergebnis), baut ein BookEntity,
     /// speichert es in SwiftData und aktualisiert lokale Arrays + Toast.
-    func addToLibrary(from remote: RemoteBook) {
+    @discardableResult
+    func addToLibrary(from remote: RemoteBook) -> AddToLibraryResult {
 
         // Autor normalisieren (API kann "—" schicken oder leere Strings liefern)
         let normalizedAuthor: String = {
@@ -239,7 +246,7 @@ final class DiscoverViewModel: ObservableObject {
             print("🔁 [DiscoverVM] duplicate -> \(remote.title)")
             #endif
             showToast("toast.duplicate")
-            return
+            return .alreadyExists
         }
 
         do {
@@ -257,9 +264,14 @@ final class DiscoverViewModel: ObservableObject {
 
             showToast("toast.added")
 
+            #if os(iOS)
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            #endif
+
             #if DEBUG
             print("✅ [DiscoverVM] saved book -> \(saved.title) [sourceID=\(saved.sourceID)]")
             #endif
+            return .added
         } catch {
             #if DEBUG
             print("⛔️ [DiscoverVM] save failed:", error)
@@ -268,6 +280,7 @@ final class DiscoverViewModel: ObservableObject {
             }
             #endif
             showToast("toast.error")
+            return .failure
         }
     }
 }

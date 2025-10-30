@@ -10,7 +10,7 @@ import Foundation
 // MARK: - Domain (leichtgewichtig für Discover)
 
 /// Leichtes Domain-Modell für API-Suchergebnisse (ohne Persistenz).
-public struct RemoteBook: Equatable, Sendable {
+public struct RemoteBook: Equatable, Hashable, Sendable {
     public let id: String
     public let title: String
     public let subtitle: String?
