@@ -226,9 +226,14 @@ struct DiscoverAllView: View {
                     )
                     .padding(.bottom, 24)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .animation(.easeInOut(duration: 0.2), value: viewModel.toastText)
+                    .animation(.easeInOut(duration: 0.3), value: viewModel.toastText)
                     .accessibilityIdentifier("toast.\(key)")
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLiveRegion(.assertive)
             }
+        }
+        .onDisappear {
+            viewModel.cancelToast()
         }
         .onAppear {
             if repository == nil {
@@ -337,22 +342,30 @@ struct DiscoverAllView: View {
             spacing: AppSpace._12
         ) {
             ForEach(items, id: \.id) { book in
-                BookCoverCard(
-                    title: book.title,
-                    author: book.authors,
-                    coverURL: book.thumbnailURL,
-                    coverAssetName: nil,
-                    onAddToLibrary: {
-                        #if os(iOS)
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        #endif
+                NavigationLink {
+                    DiscoverDetailView(detail: DiscoverBookDetail(from: book))
+                } label: {
+                    BookCoverCard(
+                        title: book.title,
+                        author: book.authorsDisplay,
+                        coverURL: book.thumbnailURL,
+                        coverAssetName: nil,
+                        onAddToLibrary: {
+                            #if os(iOS)
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            #endif
 
-                        // Speichern in SwiftData über das ViewModel
-                        viewModel.addToLibrary(from: book)
-                    }
-                )
-                .contentShape(Rectangle())
+                            // Speichern in SwiftData über das ViewModel
+                            viewModel.addToLibrary(from: book)
+                        }
+                    )
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
                 .accessibilityIdentifier("discover.all.result.\(book.id)")
+                .simultaneousGesture(TapGesture().onEnded {
+                    viewModel.cancelToast()
+                })
             }
         }
     }
@@ -365,7 +378,7 @@ struct DiscoverAllView: View {
         ) {
             ForEach(displayedBooks) { book in
                 NavigationLink {
-                    DiscoverDetailView(book: book)
+                    BookDetailView(book: book)
                 } label: {
                     BookCoverCard(
                         title: book.title,
@@ -378,6 +391,9 @@ struct DiscoverAllView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("discover.all.card.\(book.id)")
+                .simultaneousGesture(TapGesture().onEnded {
+                    viewModel.cancelToast()
+                })
             }
         }
         .animation(.easeInOut(duration: 0.25), value: viewModel.selectedCategory)

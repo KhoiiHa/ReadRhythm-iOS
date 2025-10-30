@@ -130,9 +130,14 @@ struct DiscoverView: View {
                     )
                     .padding(.bottom, 24)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .animation(.easeInOut(duration: 0.2), value: viewModel.toastText)
+                    .animation(.easeInOut(duration: 0.3), value: viewModel.toastText)
                     .accessibilityIdentifier("toast.\(key)")
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLiveRegion(.assertive)
             }
+        }
+        .onDisappear {
+            viewModel.cancelToast()
         }
         .sheet(isPresented: $showFilterSheet) {
             VStack(spacing: AppSpace._16) {
@@ -307,18 +312,28 @@ struct DiscoverView: View {
     private func resultsList(_ items: [RemoteBook]) -> some View {
         LazyVStack(spacing: AppSpace._12) {
             ForEach(items, id: \.id) { book in
-                BookCoverCard(
-                    title: book.title,
-                    author: book.authors,
-                    coverURL: book.thumbnailURL,
-                    coverAssetName: nil,
-                    onAddToLibrary: {
-                        #if os(iOS)
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        #endif
-                        viewModel.addToLibrary(from: book)
-                    }
-                )
+                NavigationLink {
+                    DiscoverDetailView(detail: DiscoverBookDetail(from: book))
+                } label: {
+                    BookCoverCard(
+                        title: book.title,
+                        author: book.authorsDisplay,
+                        coverURL: book.thumbnailURL,
+                        coverAssetName: nil,
+                        onAddToLibrary: {
+                            #if os(iOS)
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            #endif
+                            viewModel.addToLibrary(from: book)
+                        }
+                    )
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .simultaneousGesture(TapGesture().onEnded {
+                    viewModel.cancelToast()
+                })
+
                 Divider().opacity(0.1)
             }
         }
@@ -330,7 +345,7 @@ struct DiscoverView: View {
             LazyHStack(spacing: AppSpace._12) {
                 ForEach(books) { book in
                     NavigationLink {
-                        DiscoverDetailView(book: book)
+                        BookDetailView(book: book)
                     } label: {
                         BookCoverCard(
                             title: book.title,
@@ -342,6 +357,9 @@ struct DiscoverView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .simultaneousGesture(TapGesture().onEnded {
+                        viewModel.cancelToast()
+                    })
                 }
             }
             .scrollTargetLayout()
