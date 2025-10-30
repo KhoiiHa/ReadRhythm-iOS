@@ -16,6 +16,7 @@ struct FocusModeView: View {
     @StateObject private var vm: FocusModeViewModel
     @State private var showBookPicker = false
     @State private var hapticsEnabled = true
+    @State private var timerAnimationToggle = false
 
     // We capture the initially provided book for assignment on appear.
     private let initialBook: BookEntity?
@@ -33,11 +34,12 @@ struct FocusModeView: View {
             // Header
             VStack(spacing: AppSpace.xs) {
                 Text(LocalizedStringKey("focus.title"))
-                    .font(.title2).bold()
+                    .font(AppFont.title)
+                    .bold()
                     .accessibilityIdentifier("Focus.Title")
 
                 Text(LocalizedStringKey("focus.subtitle"))
-                    .font(.subheadline)
+                    .font(AppFont.body)
                     .foregroundStyle(AppColors.textSecondary)
             }
             .padding(.top, AppSpace.xl)
@@ -51,16 +53,17 @@ struct FocusModeView: View {
                         .imageScale(.medium)
                         .foregroundStyle(AppColors.textSecondary)
 
-                    VStack(alignment: .leading, spacing: 2) {
+                    VStack(alignment: .leading, spacing: AppSpace.xs) {
                         Text(LocalizedStringKey("focus.picker.title"))
-                            .font(.footnote)
+                            .font(AppFont.caption)
                             .foregroundStyle(AppColors.textSecondary)
 
                         Text(
                             vm.selectedBook?.title
                             ?? String(localized: "focus.picker.choose")
                         )
-                        .font(.callout.weight(.semibold))
+                        .font(AppFont.body)
+                        .fontWeight(.semibold)
                         .lineLimit(1)
                         .truncationMode(.tail)
                     }
@@ -68,16 +71,22 @@ struct FocusModeView: View {
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.footnote)
+                        .font(AppFont.caption)
                         .foregroundStyle(AppColors.textSecondary)
                 }
-                .padding()
+                .padding(AppSpace.md)
                 .frame(maxWidth: .infinity)
-                .background(AppColors.surfacePrimary)
+                .background(AppColors.Semantic.bgSecondary)
                 .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: AppRadius.l)
                         .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+                )
+                .shadow(
+                    color: AppShadow.card.color,
+                    radius: AppShadow.card.radius,
+                    x: AppShadow.card.x,
+                    y: AppShadow.card.y
                 )
             }
             .buttonStyle(.plain)
@@ -92,11 +101,11 @@ struct FocusModeView: View {
 
             // Timer Display
             Text(vm.formattedRemaining())
-                .font(.system(size: 56, weight: .semibold, design: .rounded))
+                .font(AppFont.titleLarge)
                 .monospacedDigit()
-                .padding()
+                .padding(AppSpace.lg)
                 .frame(maxWidth: .infinity)
-                .background(AppColors.surfacePrimary)
+                .background(AppColors.Semantic.bgElevated)
                 .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: AppRadius.xl)
@@ -108,12 +117,15 @@ struct FocusModeView: View {
                     x: AppShadow.card.x,
                     y: AppShadow.card.y
                 )
+                .scaleEffect(timerAnimationToggle ? 1.0 : 0.98)
+                .opacity(timerAnimationToggle ? 1.0 : 0.95)
+                .animation(.easeInOut(duration: 0.2), value: timerAnimationToggle)
                 .accessibilityIdentifier("Focus.Timer")
 
             // Duration Slider
             VStack(alignment: .leading, spacing: AppSpace.sm) {
                 Text(LocalizedStringKey("focus.duration"))
-                    .font(.footnote)
+                    .font(AppFont.body)
                     .foregroundStyle(AppColors.textSecondary)
 
                 Slider(
@@ -126,10 +138,23 @@ struct FocusModeView: View {
                 )
 
                 Text("\(vm.durationMinutes) " + String(localized: "goals.metric.minutes"))
-                    .font(.caption)
+                    .font(AppFont.caption)
                     .foregroundStyle(AppColors.textSecondary)
             }
             .padding(.horizontal, AppSpace.lg)
+            .padding(.vertical, AppSpace.md)
+            .background(AppColors.Semantic.bgSecondary)
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: AppRadius.l)
+                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+            )
+            .shadow(
+                color: AppShadow.card.color,
+                radius: AppShadow.card.radius,
+                x: AppShadow.card.x,
+                y: AppShadow.card.y
+            )
 
             // Controls
             HStack(spacing: AppSpace.md) {
@@ -149,6 +174,9 @@ struct FocusModeView: View {
                         vm.resumeSession()
                     }
                     triggerHaptic(.success)
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        timerAnimationToggle.toggle()
+                    }
                 } label: {
                     Label(
                         vm.isRunning
@@ -156,6 +184,8 @@ struct FocusModeView: View {
                         : LocalizedStringKey("focus.action.start"),
                         systemImage: "play.circle.fill"
                     )
+                    .font(AppFont.body)
+                    .fontWeight(.semibold)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(vm.isRunning)
@@ -170,6 +200,7 @@ struct FocusModeView: View {
                     triggerHaptic(.light)
                 } label: {
                     Label(LocalizedStringKey("focus.action.pause"), systemImage: "pause.circle")
+                        .font(AppFont.body)
                 }
                 .buttonStyle(.bordered)
                 .disabled(!vm.isRunning)
@@ -182,8 +213,12 @@ struct FocusModeView: View {
                     #endif
                     vm.stopSessionAndSave()
                     triggerHaptic(.success)
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        timerAnimationToggle.toggle()
+                    }
                 } label: {
                     Label(LocalizedStringKey("focus.action.finish"), systemImage: "checkmark.circle")
+                        .font(AppFont.body)
                 }
                 .buttonStyle(.bordered)
                 .accessibilityIdentifier("Focus.Finish")
@@ -195,8 +230,12 @@ struct FocusModeView: View {
                     #endif
                     vm.cancelSessionWithoutSave()
                     triggerHaptic(.warning)
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        timerAnimationToggle.toggle()
+                    }
                 } label: {
                     Label(LocalizedStringKey("focus.action.stop"), systemImage: "stop.circle")
+                        .font(AppFont.body)
                 }
                 .buttonStyle(.bordered)
                 .accessibilityIdentifier("Focus.Stop")
@@ -205,6 +244,8 @@ struct FocusModeView: View {
             Spacer()
         }
         .padding(.horizontal, AppSpace.lg)
+        .padding(.bottom, AppSpace.xl)
+        .background(AppColors.Semantic.bgPrimary.ignoresSafeArea())
         .navigationTitle(Text(LocalizedStringKey("focus.nav.title")))
         .onAppear {
             if vm.selectedBook == nil {

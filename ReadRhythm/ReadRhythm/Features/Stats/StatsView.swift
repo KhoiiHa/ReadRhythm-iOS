@@ -26,32 +26,12 @@ struct StatsView: View {
             )
         )
     }
-    
+
     var body: some View {
         ScrollView {
-            VStack(spacing: AppSpace._16) {
-                // Header mit Range-Picker und Summary
-                StatsHeader(
-                    selectedRange: $range,
-                    totalMinutes: viewModel.totalMinutes,
-                    streakDays: viewModel.currentStreak
-                ) { newRange in
-                    apply(range: newRange)
-                    viewModel.refreshFromRepositoryContext()
-                }
+            VStack(spacing: AppSpace.lg) {
+                statsCard
 
-                // Chart oder Empty State
-                if viewModel.daily.allSatisfy({ $0.minutes == 0 }) || viewModel.daily.isEmpty {
-                    StatsEmptyState()
-                        .padding(.top, AppSpace._16)
-                } else {
-                    StatsChart(data: chartData, goalMinutes: 30)
-                        .frame(height: 220)
-                        .padding(.horizontal, AppSpace._16)
-                        .accessibilityElement(children: .ignore)
-                        .accessibilityLabel(chartAccessibilitySummary)
-                }
-                
 #if DEBUG
                 // Seed-Knopf für schnelle visuelle Prüfung
                 Button(String(localized: "rr.stats.debug.seed")) {
@@ -60,24 +40,111 @@ struct StatsView: View {
                 .accessibilityIdentifier("rr-stats-debug-seed")
                 .buttonStyle(.bordered)
                 .tint(AppColors.Semantic.tintPrimary)
-                .padding(.horizontal, AppSpace._16)
+                .padding(.top, AppSpace.sm)
 #endif
             }
-            .background(AppColors.Semantic.bgPrimary)
-            .tint(AppColors.Semantic.tintPrimary)
-            .task {
-                // Initiales Mapping von UI-Range → ViewModel.days
-                apply(range: range)
-                viewModel.refreshFromRepositoryContext()
-            }
-            .navigationTitle(Text("rr.stats.title"))
-            .navigationBarTitleDisplayMode(.inline)
-            .accessibilityIdentifier("stats.view")
+            .padding(.horizontal, AppSpace.lg)
+            .padding(.vertical, AppSpace.lg)
         }
+        .background(AppColors.Semantic.bgPrimary.ignoresSafeArea())
+        .tint(AppColors.Semantic.tintPrimary)
+        .task {
+            // Initiales Mapping von UI-Range → ViewModel.days
+            apply(range: range)
+            viewModel.refreshFromRepositoryContext()
+        }
+        .navigationTitle(Text("rr.stats.title"))
+        .navigationBarTitleDisplayMode(.inline)
+        .accessibilityIdentifier("stats.view")
     }
-    
+
+    // MARK: - Card Content
+    private var statsCard: some View {
+        VStack(alignment: .leading, spacing: AppSpace.lg) {
+            headerSection
+
+            if viewModel.daily.allSatisfy({ $0.minutes == 0 }) || viewModel.daily.isEmpty {
+                StatsEmptyState()
+                    .padding(.top, AppSpace.md)
+            } else {
+                StatsChart(data: chartData, goalMinutes: 30)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(chartAccessibilitySummary)
+                    .animation(.easeInOut(duration: 0.2), value: chartData)
+            }
+        }
+        .padding(AppSpace.lg)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColors.Semantic.bgElevated)
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .shadow(
+            color: AppShadow.card.color,
+            radius: AppShadow.card.radius,
+            x: AppShadow.card.x,
+            y: AppShadow.card.y
+        )
+    }
+
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: AppSpace.md) {
+            Text("rr.stats.title")
+                .font(AppFont.title)
+                .foregroundStyle(AppColors.Semantic.textPrimary)
+                .accessibilityIdentifier("stats.header.title")
+
+            Picker("", selection: $range) {
+                ForEach(StatsRange.allCases) { range in
+                    Text(range.titleKey)
+                        .tag(range)
+                }
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: range) { _, newValue in
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    apply(range: newValue)
+                    viewModel.refreshFromRepositoryContext()
+                }
+            }
+            .accessibilityIdentifier("stats.header.rangePicker")
+
+            HStack(spacing: AppSpace.md) {
+                summaryTile(
+                    value: "\(viewModel.totalMinutes)",
+                    labelKey: "rr.stats.minutes.total"
+                )
+
+                summaryTile(
+                    value: "\(viewModel.currentStreak)",
+                    labelKey: "rr.stats.streak.days"
+                )
+
+                Spacer(minLength: 0)
+            }
+        }
+        .accessibilityIdentifier("stats.header")
+    }
+
+    private func summaryTile(value: String, labelKey: LocalizedStringKey) -> some View {
+        VStack(alignment: .leading, spacing: AppSpace.xs) {
+            Text(value)
+                .font(AppFont.title)
+                .foregroundStyle(AppColors.Semantic.textPrimary)
+            Text(labelKey)
+                .font(AppFont.caption)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+        }
+        .padding(AppSpace.md)
+        .background(AppColors.Semantic.bgSecondary)
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.m)
+                .stroke(AppColors.Semantic.borderMuted, lineWidth: AppStroke.cardBorder)
+        )
+        .accessibilityElement(children: .combine)
+    }
+
     // MARK: - Helpers
-    
+
     /// Mappt die UI-Range auf die bestehende days-Logik im ViewModel (7/30/365/∞)
     private func apply(range: StatsRange) {
         switch range {
@@ -91,7 +158,7 @@ struct StatsView: View {
             viewModel.days = Int.max // "alles"
         }
     }
-    
+
     /// Konvertiert ViewModel-Daten in Chart-Datenpunkte der StatsChart-Komponente.
     private var chartData: [StatsChart.DataPoint] {
         viewModel.daily.map { .init(date: $0.date, minutes: $0.minutes) }
