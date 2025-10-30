@@ -487,7 +487,10 @@ struct DiscoverAllView: View {
 #if DEBUG
 #Preview("DiscoverAll – Empty (Light, DE)") {
     do {
-        let container = try ModelContainer(for: BookEntity.self)
+        let container = try ModelContainer(
+            for: ReadRhythmSchemaV2.self,
+            migrationPlan: ReadRhythmMigrationPlan.self
+        )
 
         return NavigationStack {
             DiscoverAllView(
@@ -506,7 +509,10 @@ struct DiscoverAllView: View {
 
 #Preview("DiscoverAll – Empty (Dark, DE)") {
     do {
-        let container = try ModelContainer(for: BookEntity.self)
+        let container = try ModelContainer(
+            for: ReadRhythmSchemaV2.self,
+            migrationPlan: ReadRhythmMigrationPlan.self
+        )
 
         return NavigationStack {
             DiscoverAllView(
