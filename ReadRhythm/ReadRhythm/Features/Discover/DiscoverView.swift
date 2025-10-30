@@ -330,9 +330,6 @@ struct DiscoverView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .simultaneousGesture(TapGesture().onEnded {
-                    viewModel.cancelToast()
-                })
 
                 Divider().opacity(0.1)
             }
