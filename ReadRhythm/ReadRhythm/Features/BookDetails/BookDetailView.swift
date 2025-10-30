@@ -23,8 +23,6 @@ struct BookDetailView: View {
     @Environment(\.openURL) private var openURL
 
     @State private var readingStats = BookReadingStats()
-    @State private var readingContent: ReadingContent?
-    @State private var readerProgress: Int?
 
     var body: some View {
         ScrollView {
@@ -53,7 +51,6 @@ struct BookDetailView: View {
         }
         .onAppear {
             loadReadingStats()
-            loadReaderContent()
         }
     }
 
@@ -83,15 +80,6 @@ struct BookDetailView: View {
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                         .multilineTextAlignment(.leading)
                         .accessibilityIdentifier("bookdetail.subtitle")
-                        .accessibilityLabel(
-                            Text(
-                                String(
-                                    format: "%@: %@",
-                                    String(localized: "detail.subtitle"),
-                                    subtitle
-                                )
-                            )
-                        )
                 }
 
                 Text(authorText)
@@ -195,7 +183,7 @@ struct BookDetailView: View {
                     .accessibilityIdentifier("detail.lastSession")
             }
 
-            if let url = externalInfoURL {
+            if let url = googleBooksURL {
                 Button {
                     openURL(url)
                 } label: {
@@ -258,31 +246,12 @@ struct BookDetailView: View {
         isRemoteImported ? "detail.source.google" : "detail.source.manual"
     }
 
-    private var externalInfoURL: URL? {
-        if let infoLink = book.infoLink {
-            return infoLink
-        }
-
-        if let previewLink = book.previewLink {
-            return previewLink
-        }
-
-        guard isRemoteImported,
-              let encoded = book.sourceID.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+    private var googleBooksURL: URL? {
+        guard isRemoteImported else { return nil }
+        guard let encoded = book.sourceID.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             return nil
         }
-
         return URL(string: "https://books.google.com/books?id=\(encoded)")
-    }
-
-    private func readerProgressLabel(for content: ReadingContent) -> String? {
-        guard let progress = readerProgress,
-              content.pages.isEmpty == false else {
-            return nil
-        }
-
-        let template = String(localized: "bookdetail.reader.progress")
-        return String(format: template, progress + 1, content.pages.count)
     }
 
     private func infoRow(icon: String, text: Text) -> some View {
@@ -321,29 +290,79 @@ struct BookDetailView: View {
         }
     }
 
-    private func loadReaderContent() {
-        guard let content = ReadingContentLoader.shared.content(forBookID: book.sourceID) else {
-            readingContent = nil
-            readerProgress = nil
-            return
+    @MainActor
+    private func loadReadingStats() {
+        let targetID = book.persistentModelID
+        let predicate = #Predicate<ReadingSessionEntity> { session in
+            session.book?.persistentModelID == targetID
         }
+        let descriptor = FetchDescriptor<ReadingSessionEntity>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\ReadingSessionEntity.date, order: .reverse)]
+        )
 
-        readingContent = content
-        updateReaderProgress(with: content)
+        do {
+            let sessions = try modelContext.fetch(descriptor)
+            let total = sessions.reduce(0) { $0 + max(0, $1.minutes) }
+            let last = sessions.first?.date
+            readingStats = BookReadingStats(totalMinutes: total, lastSession: last)
+        } catch {
+            #if DEBUG
+            DebugLogger.log("⚠️ Failed to load reading stats for book detail: \(error.localizedDescription)")
+            #endif
+            readingStats = BookReadingStats()
+        }
     }
 
-    private func updateReaderProgress(with content: ReadingContent) {
-        guard content.pages.isEmpty == false else {
-            readerProgress = nil
-            return
+    private func infoRow(icon: String, text: Text) -> some View {
+        HStack(spacing: AppSpace._8) {
+            Image(systemName: icon)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+            text
+                .font(.subheadline)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
+            Spacer(minLength: 0)
         }
+        .accessibilityElement(children: .combine)
+    }
 
-        if let stored = ReadingProgressRepository.shared.storedPage(for: content.bookID) {
-            readerProgress = min(max(stored, 0), content.pages.count - 1)
-        } else {
-            readerProgress = nil
+    @MainActor
+    private func loadReadingStats() {
+        let targetID = book.persistentModelID
+        let predicate = #Predicate<ReadingSessionEntity> { session in
+            session.book?.persistentModelID == targetID
+        }
+        let descriptor = FetchDescriptor<ReadingSessionEntity>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\ReadingSessionEntity.date, order: .reverse)]
+        )
+
+        do {
+            let sessions = try modelContext.fetch(descriptor)
+            let total = sessions.reduce(0) { $0 + max(0, $1.minutes) }
+            let last = sessions.first?.date
+            readingStats = BookReadingStats(totalMinutes: total, lastSession: last)
+        } catch {
+            #if DEBUG
+            DebugLogger.log("⚠️ Failed to load reading stats for book detail: \(error.localizedDescription)")
+            #endif
+            readingStats = BookReadingStats()
         }
     }
+}
+
+// MARK: - Supporting types
+
+private struct BookReadingStats {
+    var totalMinutes: Int = 0
+    var lastSession: Date? = nil
+}
+
+// MARK: - Supporting types
+
+private struct BookReadingStats {
+    var totalMinutes: Int = 0
+    var lastSession: Date? = nil
 }
 
 // MARK: - Supporting types

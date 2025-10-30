@@ -1,4 +1,3 @@
-// Shared Detail
 "detail.subtitle" = "Subtitle";
 "detail.publisher" = "Publisher";
 "detail.year" = "Year";
@@ -17,8 +16,3 @@
 "detail.totalMinutes" = "Total reading time: %d min";
 "detail.lastSession" = "Last session: %@";
 "detail.addedOn" = "Added on %@";
-"bookdetail.reader.title" = "Reader";
-"bookdetail.reader.open" = "Read book (Preview)";
-"bookdetail.reader.progress" = "Progress: Page %1$d of %2$d";
-"reader.close" = "Close";
-"reader.pageIndicator" = "Page %1$d of %2$d";
