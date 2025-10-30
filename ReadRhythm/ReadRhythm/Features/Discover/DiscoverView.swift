@@ -130,9 +130,14 @@ struct DiscoverView: View {
                     )
                     .padding(.bottom, 24)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .animation(.easeInOut(duration: 0.2), value: viewModel.toastText)
+                    .animation(.easeInOut(duration: 0.3), value: viewModel.toastText)
                     .accessibilityIdentifier("toast.\(key)")
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLiveRegion(.assertive)
             }
+        }
+        .onDisappear {
+            viewModel.cancelToast()
         }
         .sheet(isPresented: $showFilterSheet) {
             VStack(spacing: AppSpace._16) {
@@ -349,6 +354,9 @@ struct DiscoverView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .simultaneousGesture(TapGesture().onEnded {
+                        viewModel.cancelToast()
+                    })
                 }
             }
             .scrollTargetLayout()

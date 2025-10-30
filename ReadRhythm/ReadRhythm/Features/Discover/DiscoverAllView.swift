@@ -226,9 +226,14 @@ struct DiscoverAllView: View {
                     )
                     .padding(.bottom, 24)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .animation(.easeInOut(duration: 0.2), value: viewModel.toastText)
+                    .animation(.easeInOut(duration: 0.3), value: viewModel.toastText)
                     .accessibilityIdentifier("toast.\(key)")
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLiveRegion(.assertive)
             }
+        }
+        .onDisappear {
+            viewModel.cancelToast()
         }
         .onAppear {
             if repository == nil {
@@ -358,6 +363,9 @@ struct DiscoverAllView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("discover.all.result.\(book.id)")
+                .simultaneousGesture(TapGesture().onEnded {
+                    viewModel.cancelToast()
+                })
             }
         }
     }
@@ -383,6 +391,9 @@ struct DiscoverAllView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("discover.all.card.\(book.id)")
+                .simultaneousGesture(TapGesture().onEnded {
+                    viewModel.cancelToast()
+                })
             }
         }
         .animation(.easeInOut(duration: 0.25), value: viewModel.selectedCategory)
