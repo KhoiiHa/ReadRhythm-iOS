@@ -170,3 +170,19 @@ private extension URL {
         return comps?.url ?? self
     }
 }
+
+private extension Array where Element == String {
+    func uniquedPreservingCase() -> [String] {
+        var seen: Set<String> = []
+        var result: [String] = []
+
+        for value in self {
+            let lowered = value.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            if seen.contains(lowered) { continue }
+            seen.insert(lowered)
+            result.append(value)
+        }
+
+        return result
+    }
+}
