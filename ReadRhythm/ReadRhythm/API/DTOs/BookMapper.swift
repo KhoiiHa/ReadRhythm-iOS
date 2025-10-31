@@ -17,16 +17,11 @@ public struct RemoteBook: Equatable, Hashable, Sendable {
     public let authors: [String]
     public let publisher: String?
     public let publishedDate: String?
-    public let publishedYear: String?
     public let pageCount: Int?
     public let categories: [String]
     public let description: String?
     public let thumbnailURL: URL?
     public let previewLink: URL?
-    public let infoLink: URL?
-    public let languageCode: String?
-    public let averageRating: Double?
-    public let ratingsCount: Int?
 }
 
 public extension RemoteBook {
@@ -52,16 +47,11 @@ public extension RemoteBook {
             authors: authorList,
             publisher: nil,
             publishedDate: nil,
-            publishedYear: nil,
             pageCount: nil,
             categories: [],
             description: nil,
             thumbnailURL: thumbnailURL,
-            previewLink: nil,
-            infoLink: nil,
-            languageCode: nil,
-            averageRating: nil,
-            ratingsCount: nil
+            previewLink: nil
         )
     }
 }
@@ -100,34 +90,9 @@ extension VolumeDTO {
             .flatMap { URL(string: $0) }?
             .forcingHTTPS()
 
-        let infoURL = info.infoLink
-            .flatMap { URL(string: $0) }?
-            .forcingHTTPS()
-
         let categories = (info.categories ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
-            .uniquedPreservingCase()
-
-        let publishedDate = info.publishedDate?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .nilIfEmpty
-
-        let languageCode = info.language?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .nilIfEmpty
-            .flatMap { Locale.canonicalIdentifier(from: $0) ?? $0 }
-            .map { $0.replacingOccurrences(of: "_", with: "-") }
-            .map { $0.lowercased() }
-
-        let sanitizedPageCount = info.pageCount.flatMap { $0 > 0 ? $0 : nil }
-
-        let sanitizedAverageRating: Double? = {
-            guard let value = info.averageRating, value.isFinite else { return nil }
-            return min(max(value, 0.0), 5.0)
-        }()
-
-        let sanitizedRatingsCount = info.ratingsCount.flatMap { $0 >= 0 ? $0 : nil }
 
         return RemoteBook(
             id: id,
@@ -135,17 +100,12 @@ extension VolumeDTO {
             subtitle: info.subtitle?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             authors: authorsList,
             publisher: info.publisher?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
-            publishedDate: publishedDate,
-            publishedYear: publishedDate.flatMap(Self.extractPublishedYear(from:)),
-            pageCount: sanitizedPageCount,
+            publishedDate: info.publishedDate?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
+            pageCount: info.pageCount,
             categories: categories,
             description: info.description?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             thumbnailURL: normalizedURL,
-            previewLink: previewURL,
-            infoLink: infoURL,
-            languageCode: languageCode,
-            averageRating: sanitizedAverageRating,
-            ratingsCount: sanitizedRatingsCount
+            previewLink: previewURL
         )
     }
 }
@@ -158,12 +118,10 @@ private extension VolumeDTO {
         guard !trimmed.isEmpty else { return nil }
 
         // Google Books liefert Datumsstrings in verschiedenen Formaten ("2021-03-12", "1987").
-        // Wir suchen nach einer 4-stelligen Jahreszahl irgendwo im String.
-        if let range = trimmed.range(of: #"\b\d{4}\b"#, options: .regularExpression) {
-            let candidate = String(trimmed[range])
-            if candidate.allSatisfy({ $0.isNumber }) {
-                return candidate
-            }
+        // Wir extrahieren defensiv die ersten vier Ziffern, sofern vorhanden.
+        let digits = trimmed.prefix(4)
+        if digits.count == 4, digits.allSatisfy({ $0.isNumber }) {
+            return String(digits)
         }
 
         // Fallback: Wenn kein Jahr extrahierbar ist, geben wir den Rohwert zurück.

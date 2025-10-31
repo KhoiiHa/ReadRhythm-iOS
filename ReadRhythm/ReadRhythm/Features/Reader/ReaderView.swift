@@ -63,7 +63,7 @@ struct ReaderView: View {
                 totalPages: content.pages.count
             )
         }
-        .onChange(of: currentPage) { newValue in
+        .onChange(of: currentPage) { oldValue, newValue in
             progressRepository.update(
                 page: newValue,
                 for: content.bookID,

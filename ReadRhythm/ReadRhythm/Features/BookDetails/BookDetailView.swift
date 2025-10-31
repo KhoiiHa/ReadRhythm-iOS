@@ -23,8 +23,7 @@ struct BookDetailView: View {
     @Environment(\.openURL) private var openURL
 
     @State private var readingStats = BookReadingStats()
-    @State private var readingContent: ReadingContent?
-    @State private var readerProgress: Int?
+    @State private var readingContent: ReadingContent? = nil
 
     var body: some View {
         ScrollView {
@@ -53,7 +52,6 @@ struct BookDetailView: View {
         }
         .onAppear {
             loadReadingStats()
-            loadReaderContent()
         }
     }
 
@@ -83,15 +81,6 @@ struct BookDetailView: View {
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                         .multilineTextAlignment(.leading)
                         .accessibilityIdentifier("bookdetail.subtitle")
-                        .accessibilityLabel(
-                            Text(
-                                String(
-                                    format: "%@: %@",
-                                    String(localized: "detail.subtitle"),
-                                    subtitle
-                                )
-                            )
-                        )
                 }
 
                 Text(authorText)
@@ -195,7 +184,7 @@ struct BookDetailView: View {
                     .accessibilityIdentifier("detail.lastSession")
             }
 
-            if let url = externalInfoURL {
+            if let url = googleBooksURL {
                 Button {
                     openURL(url)
                 } label: {
@@ -258,31 +247,20 @@ struct BookDetailView: View {
         isRemoteImported ? "detail.source.google" : "detail.source.manual"
     }
 
-    private var externalInfoURL: URL? {
-        if let infoLink = book.infoLink {
-            return infoLink
-        }
-
-        if let previewLink = book.previewLink {
-            return previewLink
-        }
-
-        guard isRemoteImported,
-              let encoded = book.sourceID.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+    private var googleBooksURL: URL? {
+        guard isRemoteImported else { return nil }
+        guard let encoded = book.sourceID.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             return nil
         }
-
         return URL(string: "https://books.google.com/books?id=\(encoded)")
     }
 
+    /// Returns a simple reader progress label based on available content.
     private func readerProgressLabel(for content: ReadingContent) -> String? {
-        guard let progress = readerProgress,
-              content.pages.isEmpty == false else {
-            return nil
-        }
-
-        let template = String(localized: "bookdetail.reader.progress")
-        return String(format: template, progress + 1, content.pages.count)
+        let total = content.pages.count
+        guard total > 0 else { return nil }
+        // Minimal, non-localized fallback label to avoid missing-keys warnings.
+        return "Seiten: \(total)"
     }
 
     private func infoRow(icon: String, text: Text) -> some View {
@@ -320,30 +298,13 @@ struct BookDetailView: View {
             readingStats = BookReadingStats()
         }
     }
+}
 
-    private func loadReaderContent() {
-        guard let content = ReadingContentLoader.shared.content(forBookID: book.sourceID) else {
-            readingContent = nil
-            readerProgress = nil
-            return
-        }
+// MARK: - Supporting types
 
-        readingContent = content
-        updateReaderProgress(with: content)
-    }
-
-    private func updateReaderProgress(with content: ReadingContent) {
-        guard content.pages.isEmpty == false else {
-            readerProgress = nil
-            return
-        }
-
-        if let stored = ReadingProgressRepository.shared.storedPage(for: content.bookID) {
-            readerProgress = min(max(stored, 0), content.pages.count - 1)
-        } else {
-            readerProgress = nil
-        }
-    }
+private struct BookReadingStats {
+    var totalMinutes: Int = 0
+    var lastSession: Date? = nil
 }
 
 // MARK: - Supporting types

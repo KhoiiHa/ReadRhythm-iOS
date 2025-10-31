@@ -229,7 +229,6 @@ struct DiscoverAllView: View {
                     .animation(.easeInOut(duration: 0.3), value: viewModel.toastText)
                     .accessibilityIdentifier("toast.\(key)")
                     .accessibilityElement(children: .combine)
-                    .accessibilityLiveRegion(.assertive)
             }
         }
         .onDisappear {
@@ -343,7 +342,7 @@ struct DiscoverAllView: View {
         ) {
             ForEach(items, id: \.id) { book in
                 NavigationLink {
-                    DiscoverDetailView(detail: DiscoverBookDetail(from: book), viewModel: viewModel)
+                    DiscoverDetailView(detail: DiscoverBookDetail(from: book))
                 } label: {
                     BookCoverCard(
                         title: book.title,
@@ -351,6 +350,11 @@ struct DiscoverAllView: View {
                         coverURL: book.thumbnailURL,
                         coverAssetName: nil,
                         onAddToLibrary: {
+                            #if os(iOS)
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            #endif
+
+                            // Speichern in SwiftData über das ViewModel
                             viewModel.addToLibrary(from: book)
                         }
                     )
@@ -482,46 +486,50 @@ struct DiscoverAllView: View {
 
 #if DEBUG
 #Preview("DiscoverAll – Empty (Light, DE)") {
-    do {
-        let container = try ModelContainer(
-            for: ReadRhythmSchemaV2.self,
-            migrationPlan: ReadRhythmMigrationPlan.self
+    let models: [any PersistentModel.Type] = ReadRhythmSchemaV2.models
+    let schema = Schema(models)
+    let container = try! ModelContainer(
+        for: schema,
+        migrationPlan: ReadRhythmMigrationPlan.self,
+        configurations: ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: true
         )
+    )
 
-        return NavigationStack {
-            DiscoverAllView(
-                initialSearchText: "",
-                initialCategory: nil,
-                repository: MockBookRepository()
-            )
-        }
-        .modelContainer(container)
-        .environment(\.locale, .init(identifier: "de"))
-        .preferredColorScheme(.light)
-    } catch {
-        return Text("Preview Error: \(error.localizedDescription)")
+    NavigationStack {
+        DiscoverAllView(
+            initialSearchText: "",
+            initialCategory: nil,
+            repository: MockBookRepository()
+        )
     }
+    .modelContainer(container)
+    .environment(\.locale, .init(identifier: "de"))
+    .preferredColorScheme(.light)
 }
 
 #Preview("DiscoverAll – Empty (Dark, DE)") {
-    do {
-        let container = try ModelContainer(
-            for: ReadRhythmSchemaV2.self,
-            migrationPlan: ReadRhythmMigrationPlan.self
+    let models: [any PersistentModel.Type] = ReadRhythmSchemaV2.models
+    let schema = Schema(models)
+    let container = try! ModelContainer(
+        for: schema,
+        migrationPlan: ReadRhythmMigrationPlan.self,
+        configurations: ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: true
         )
+    )
 
-        return NavigationStack {
-            DiscoverAllView(
-                initialSearchText: "",
-                initialCategory: nil,
-                repository: MockBookRepository()
-            )
-        }
-        .modelContainer(container)
-        .environment(\.locale, .init(identifier: "de"))
-        .preferredColorScheme(.dark)
-    } catch {
-        return Text("Preview Error: \(error.localizedDescription)")
+    NavigationStack {
+        DiscoverAllView(
+            initialSearchText: "",
+            initialCategory: nil,
+            repository: MockBookRepository()
+        )
     }
+    .modelContainer(container)
+    .environment(\.locale, .init(identifier: "de"))
+    .preferredColorScheme(.dark)
 }
 #endif
