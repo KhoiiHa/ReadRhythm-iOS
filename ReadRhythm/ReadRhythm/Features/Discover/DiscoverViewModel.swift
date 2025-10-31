@@ -255,11 +255,24 @@ final class DiscoverViewModel: ObservableObject {
             return .alreadyExists
         }
 
+        #if DEBUG
+        print("[DiscoverVM] addToLibrary -> id=\(remote.id) subtitle=\(remote.subtitle ?? "-") publisher=\(remote.publisher ?? "-") date=\(remote.publishedDate ?? "-") pages=\(remote.pageCount?.description ?? "-") language=\(remote.languageCode ?? "-") cats=\(remote.categories) info=\(remote.infoLink?.absoluteString ?? "-") preview=\(remote.previewLink?.absoluteString ?? "-")")
+        #endif
+
         do {
             let saved = try repository.add(
                 title: remote.title,
                 author: normalizedAuthor,
+                subtitle: remote.subtitle,
+                publisher: remote.publisher,
+                publishedDate: remote.publishedDate,
+                pageCount: remote.pageCount,
+                language: remote.languageCode,
+                categories: remote.categories,
+                descriptionText: remote.description,
                 thumbnailURL: remote.thumbnailURL?.absoluteString,
+                infoLink: remote.infoLink,
+                previewLink: remote.previewLink,
                 sourceID: remote.id,
                 source: "Google Books"
             )

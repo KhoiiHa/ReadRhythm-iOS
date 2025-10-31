@@ -306,3 +306,10 @@ private struct BookReadingStats {
     var totalMinutes: Int = 0
     var lastSession: Date? = nil
 }
+
+// MARK: - Supporting types
+
+private struct BookReadingStats {
+    var totalMinutes: Int = 0
+    var lastSession: Date? = nil
+}
