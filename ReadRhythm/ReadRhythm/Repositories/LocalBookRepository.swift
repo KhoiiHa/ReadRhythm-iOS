@@ -102,14 +102,10 @@ final class LocalBookRepository: BookRepository {
         do {
             try context.save()
             #if DEBUG
-            do {
-                let descriptor = FetchDescriptor<BookEntity>(
-                    predicate: #Predicate { $0.id == entity.id }
-                )
-                let persisted = try context.fetch(descriptor).first ?? entity
+            if let persisted = context.model(for: entity.persistentModelID) as? BookEntity {
                 print("[Save][Book] '\(persisted.title)' pub=\(persisted.publisher ?? "-") year=\(persisted.publishedDate ?? "-") pages=\(persisted.pageCount?.description ?? "-") cats=\(persisted.categories) links=\(persisted.infoLink?.absoluteString ?? "-")")
-            } catch {
-                print("[LocalBookRepository] ✅ Saved book but refetch failed: \(error)")
+            } else {
+                print("[LocalBookRepository] ⚠️ Saved book but could not reload via modelID.")
             }
             #endif
             return entity
@@ -146,7 +142,13 @@ private func trimmedOrNil(_ value: String?) -> String? {
 
 private func sanitizeLanguage(_ value: String?) -> String? {
     guard let trimmed = trimmedOrNil(value) else { return nil }
-    let canonical = Locale.canonicalIdentifier(from: trimmed) ?? trimmed
+    let canonical: String
+    if #available(iOS 16.0, *) {
+        // iOS 16+: canonicalIdentifier(from:) renamed; keep behavior-equivalent normalization
+        canonical = Locale.identifier(fromComponents: [NSLocale.Key.languageCode.rawValue: trimmed])
+    } else {
+        canonical = Locale.canonicalIdentifier(from: trimmed)
+    }
     return canonical.replacingOccurrences(of: "_", with: "-").lowercased()
 }
 

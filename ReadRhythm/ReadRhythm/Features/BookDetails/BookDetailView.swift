@@ -24,6 +24,7 @@ struct BookDetailView: View {
 
     @State private var readingStats = BookReadingStats()
     @State private var readingContent: ReadingContent? = nil
+    @State private var showFullDescription: Bool = false
 
     var body: some View {
         ScrollView {
@@ -184,6 +185,62 @@ struct BookDetailView: View {
                     .accessibilityIdentifier("detail.lastSession")
             }
 
+            // Rich metadata (if available)
+            if let publisher = book.publisher, !publisher.isEmpty {
+                infoRow(icon: "building.2", text: Text("\(String(localized: "detail.publisher")): \(publisher)"))
+                    .accessibilityIdentifier("detail.publisher")
+            }
+
+            if let year = publishedYear {
+                infoRow(icon: "calendar", text: Text("\(String(localized: "detail.year")): \(year)"))
+                    .accessibilityIdentifier("detail.year")
+            }
+
+            if let pages = book.pageCount {
+                infoRow(icon: "book", text: Text("\(String(localized: "detail.pages")): \(pages)"))
+                    .accessibilityIdentifier("detail.pages")
+            }
+
+            if let lang = book.language, !lang.isEmpty {
+                infoRow(icon: "globe", text: Text("\(String(localized: "detail.language")): \(lang)"))
+                    .accessibilityIdentifier("detail.language")
+            }
+
+            if !book.categories.isEmpty {
+                VStack(alignment: .leading, spacing: AppSpace._8) {
+                    Text(LocalizedStringKey("detail.categories"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                    Text(book.categories.joined(separator: ", "))
+                        .font(.subheadline)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .accessibilityIdentifier("detail.categories.values")
+                }
+                .accessibilityIdentifier("detail.categories")
+            }
+
+            if let desc = book.descriptionText, !desc.isEmpty {
+                VStack(alignment: .leading, spacing: AppSpace._8) {
+                    Text(LocalizedStringKey("detail.description"))
+                        .font(.headline)
+                        .foregroundStyle(AppColors.Semantic.textPrimary)
+                        .accessibilityHeading(.h2)
+                    Text(desc)
+                        .font(.subheadline)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .lineLimit(showFullDescription ? nil : 3)
+                        .accessibilityIdentifier("detail.description.text")
+                    Button(showFullDescription ? String(localized: "detail.readLess") : String(localized: "detail.readMore")) {
+                        showFullDescription.toggle()
+                    }
+                    .buttonStyle(.plain)
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(AppColors.Semantic.tintPrimary)
+                    .accessibilityIdentifier("detail.description.toggle")
+                }
+                .accessibilityIdentifier("detail.description")
+            }
+
             if let url = googleBooksURL {
                 Button {
                     openURL(url)
@@ -248,11 +305,22 @@ struct BookDetailView: View {
     }
 
     private var googleBooksURL: URL? {
+        // Prefer stored links when available
+        if let link = book.infoLink { return link }
+        if let preview = book.previewLink { return preview }
+        // Fallback to constructing a Google Books URL from the sourceID when the book came from Google
         guard isRemoteImported else { return nil }
         guard let encoded = book.sourceID.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             return nil
         }
         return URL(string: "https://books.google.com/books?id=\(encoded)")
+    }
+
+    /// Extracts a year string from ISO-like date strings (YYYY, YYYY-MM, YYYY-MM-DD).
+    private var publishedYear: String? {
+        guard let raw = book.publishedDate, !raw.isEmpty else { return nil }
+        let yearPrefix = raw.prefix(4)
+        return yearPrefix.count == 4 ? String(yearPrefix) : nil
     }
 
     /// Returns a simple reader progress label based on available content.
@@ -300,12 +368,6 @@ struct BookDetailView: View {
     }
 }
 
-// MARK: - Supporting types
-
-private struct BookReadingStats {
-    var totalMinutes: Int = 0
-    var lastSession: Date? = nil
-}
 
 // MARK: - Supporting types
 

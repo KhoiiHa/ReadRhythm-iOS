@@ -256,7 +256,7 @@ final class DiscoverViewModel: ObservableObject {
         }
 
         #if DEBUG
-        print("[DiscoverVM] addToLibrary -> id=\(remote.id) subtitle=\(remote.subtitle ?? "-") publisher=\(remote.publisher ?? "-") date=\(remote.publishedDate ?? "-") pages=\(remote.pageCount?.description ?? "-") language=\(remote.languageCode ?? "-") cats=\(remote.categories) info=\(remote.infoLink?.absoluteString ?? "-") preview=\(remote.previewLink?.absoluteString ?? "-")")
+        print("[DiscoverVM] addToLibrary -> id=\(remote.id) subtitle=\(remote.subtitle ?? "-") publisher=\(remote.publisher ?? "-") date=\(remote.publishedDate ?? "-") pages=\(remote.pageCount?.description ?? "-") language=\(remote.language ?? "-") cats=\(remote.categories) info=\((remote.infoLink ?? remote.previewLink)?.absoluteString ?? "-") preview=\(remote.previewLink?.absoluteString ?? "-")")
         #endif
 
         do {
@@ -267,11 +267,11 @@ final class DiscoverViewModel: ObservableObject {
                 publisher: remote.publisher,
                 publishedDate: remote.publishedDate,
                 pageCount: remote.pageCount,
-                language: remote.languageCode,
+                language: remote.language,
                 categories: remote.categories,
                 descriptionText: remote.description,
                 thumbnailURL: remote.thumbnailURL?.absoluteString,
-                infoLink: remote.infoLink,
+                infoLink: (remote.infoLink ?? remote.previewLink),
                 previewLink: remote.previewLink,
                 sourceID: remote.id,
                 source: "Google Books"

@@ -36,7 +36,12 @@ final class MockBookRepository: BookRepository {
             .flatMap { trimmed -> String? in
                 let value = trimmed.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard value.isEmpty == false else { return nil }
-                let canonical = Locale.canonicalIdentifier(from: value) ?? value
+                let canonical: String
+                if #available(iOS 16.0, *) {
+                    canonical = Locale.identifier(fromComponents: [NSLocale.Key.languageCode.rawValue: value])
+                } else {
+                    canonical = Locale.canonicalIdentifier(from: value)
+                }
                 return canonical.replacingOccurrences(of: "_", with: "-").lowercased()
             }
 

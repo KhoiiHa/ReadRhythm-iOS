@@ -306,6 +306,7 @@
 "detail.totalMinutes" = "%d Minuten gesamt";
 "detail.lastSession" = "Letzte Sitzung: %@";
 "detail.openInGoogleBooks" = "In Google Books öffnen";
+"detail.description" = "Über dieses Buch";
 "detail.subtitle" = "Untertitel";
 "detail.publisher" = "Verlag";
 "detail.year" = "Jahr";

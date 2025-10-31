@@ -9,6 +9,7 @@
 "detail.readMore" = "Read more";
 "detail.readLess" = "Show less";
 "detail.openInGoogleBooks" = "Open in Google Books";
+"detail.description" = "About this book";
 "detail.addToLibrary" = "Add to library";
 "detail.source" = "Source";
 "detail.source.google" = "Google Books";

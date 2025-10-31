@@ -18,6 +18,8 @@ public struct RemoteBook: Equatable, Hashable, Sendable {
     public let publisher: String?
     public let publishedDate: String?
     public let pageCount: Int?
+    public let language: String?
+    public let infoLink: URL?
     public let categories: [String]
     public let description: String?
     public let thumbnailURL: URL?
@@ -48,6 +50,8 @@ public extension RemoteBook {
             publisher: nil,
             publishedDate: nil,
             pageCount: nil,
+            language: nil,
+            infoLink: nil,
             categories: [],
             description: nil,
             thumbnailURL: thumbnailURL,
@@ -90,6 +94,11 @@ extension VolumeDTO {
             .flatMap { URL(string: $0) }?
             .forcingHTTPS()
 
+        // Defensive fallback: if the DTO has no explicit infoLink/language fields,
+        // use previewLink as external link and leave language unset.
+        let infoURL = previewURL
+        let language: String? = nil
+
         let categories = (info.categories ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
@@ -102,6 +111,8 @@ extension VolumeDTO {
             publisher: info.publisher?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             publishedDate: info.publishedDate?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             pageCount: info.pageCount,
+            language: language,
+            infoLink: infoURL,
             categories: categories,
             description: info.description?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             thumbnailURL: normalizedURL,

@@ -2,8 +2,21 @@ import SwiftUI
 
 struct DiscoverDetailView: View {
     let detail: DiscoverBookDetail
+    @State private var showFullDescription: Bool = false
 
     private let coverSize = CGSize(width: 180, height: 260)
+
+    // `DiscoverBookDetail` does not expose `infoLink`; prefer previewLink if available.
+    private var externalURL: URL? {
+        return detail.previewLink
+    }
+
+    /// Extract a 4-digit year from `publishedDate` (YYYY, YYYY-MM, YYYY-MM-DD).
+    private var publishedYear: String? {
+        guard let raw = detail.publishedDate, !raw.isEmpty else { return nil }
+        let year = raw.prefix(4)
+        return year.count == 4 ? String(year) : nil
+    }
 
     var body: some View {
         ScrollView {
@@ -13,8 +26,8 @@ struct DiscoverDetailView: View {
                 if let description = detail.description, !description.isEmpty {
                     descriptionSection(description)
                 }
-                if let preview = detail.previewLink {
-                    googleBooksLink(preview)
+                if let url = externalURL {
+                    googleBooksLink(url)
                 }
             }
             .padding(.horizontal, AppSpace._16)
@@ -66,12 +79,11 @@ struct DiscoverDetailView: View {
                 if let publisher = detail.publisher, !publisher.isEmpty {
                     infoRow(systemImage: "building.2", labelKey: "discover.detail.publisher", value: publisher)
                 }
-                if let date = detail.publishedDate, !date.isEmpty {
-                    infoRow(systemImage: "calendar", labelKey: "discover.detail.publishedDate", value: date)
+                if let year = publishedYear {
+                    infoRow(systemImage: "calendar", labelKey: "discover.detail.publishedDate", value: year)
                 }
                 if let pages = detail.pageCount {
-                    let pagesText = String(format: String(localized: String.LocalizationValue("discover.detail.pages")), pages)
-                    infoRow(systemImage: "book", labelKey: "discover.detail.pageCount", value: pagesText)
+                    infoRow(systemImage: "book", labelKey: "discover.detail.pageCount", value: String(pages))
                 }
             }
 
@@ -105,7 +117,14 @@ struct DiscoverDetailView: View {
             Text(text)
                 .font(.body)
                 .foregroundStyle(AppColors.Semantic.textSecondary)
-                .lineLimit(6)
+                .lineLimit(showFullDescription ? nil : 6)
+            Button(showFullDescription ? String(localized: "detail.readLess") : String(localized: "detail.readMore")) {
+                showFullDescription.toggle()
+            }
+            .buttonStyle(.plain)
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(AppColors.Semantic.tintPrimary)
+            .accessibilityIdentifier("discover.detail.description.toggle")
         }
     }
 
