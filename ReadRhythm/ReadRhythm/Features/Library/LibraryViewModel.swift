@@ -83,7 +83,16 @@ final class LibraryViewModel: ObservableObject {
             _ = try repository.add(
                 title: cleanedTitle,
                 author: cleanedAuthor,
+                subtitle: nil,
+                publisher: nil,
+                publishedDate: nil,
+                pageCount: nil,
+                language: nil,
+                categories: [],
+                descriptionText: nil,
                 thumbnailURL: nil,
+                infoLink: nil,
+                previewLink: nil,
                 sourceID: UUID().uuidString,
                 source: "User Added"
             )

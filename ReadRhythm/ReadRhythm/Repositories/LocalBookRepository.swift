@@ -37,7 +37,16 @@ final class LocalBookRepository: BookRepository {
     func add(
         title: String,
         author: String?,
+        subtitle: String?,
+        publisher: String?,
+        publishedDate: String?,
+        pageCount: Int?,
+        language: String?,
+        categories: [String],
+        descriptionText: String?,
         thumbnailURL: String?,
+        infoLink: URL?,
+        previewLink: URL?,
         sourceID: String?,
         source: String
     ) throws -> BookEntity {
@@ -48,6 +57,18 @@ final class LocalBookRepository: BookRepository {
 
         let cleanedAuthor = (author ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let cleanedSubtitle = trimmedOrNil(subtitle)
+        let cleanedPublisher = trimmedOrNil(publisher)
+        let cleanedPublishedDate = trimmedOrNil(publishedDate)
+        let sanitizedPageCount = pageCount.flatMap { $0 > 0 ? $0 : nil }
+        let cleanedLanguage = sanitizeLanguage(language)
+
+        let cleanedCategories = sanitizeCategories(categories)
+
+        let cleanedDescription = trimmedOrNil(descriptionText)
+
+        let cleanedThumbnail = trimmedOrNil(thumbnailURL)
 
         // Wir brauchen IMMER eine sourceID, laut BookEntity.
         // Falls keine kam (z.B. User hat manuell ein Buch angelegt),
@@ -61,9 +82,18 @@ final class LocalBookRepository: BookRepository {
             sourceID: finalSourceID,
             title: cleanedTitle,
             author: cleanedAuthor,
-            thumbnailURL: thumbnailURL,
+            thumbnailURL: cleanedThumbnail,
             source: source,          // z.B. "Google Books" / "User Added"
-            dateAdded: .now
+            dateAdded: .now,
+            subtitle: cleanedSubtitle,
+            publisher: cleanedPublisher,
+            publishedDate: cleanedPublishedDate,
+            pageCount: sanitizedPageCount,
+            language: cleanedLanguage,
+            categories: cleanedCategories,
+            descriptionText: cleanedDescription,
+            infoLink: infoLink,
+            previewLink: previewLink
         )
 
         // 3. Persistieren
@@ -72,7 +102,15 @@ final class LocalBookRepository: BookRepository {
         do {
             try context.save()
             #if DEBUG
-            print("[LocalBookRepository] ✅ Saved book '\(entity.title)' (\(entity.source))")
+            do {
+                let descriptor = FetchDescriptor<BookEntity>(
+                    predicate: #Predicate { $0.id == entity.id }
+                )
+                let persisted = try context.fetch(descriptor).first ?? entity
+                print("[Save][Book] '\(persisted.title)' pub=\(persisted.publisher ?? "-") year=\(persisted.publishedDate ?? "-") pages=\(persisted.pageCount?.description ?? "-") cats=\(persisted.categories) links=\(persisted.infoLink?.absoluteString ?? "-")")
+            } catch {
+                print("[LocalBookRepository] ✅ Saved book but refetch failed: \(error)")
+            }
             #endif
             return entity
         } catch {
@@ -98,4 +136,33 @@ final class LocalBookRepository: BookRepository {
             throw error
         }
     }
+}
+private func trimmedOrNil(_ value: String?) -> String? {
+    guard let raw = value?.trimmingCharacters(in: .whitespacesAndNewlines), raw.isEmpty == false else {
+        return nil
+    }
+    return raw
+}
+
+private func sanitizeLanguage(_ value: String?) -> String? {
+    guard let trimmed = trimmedOrNil(value) else { return nil }
+    let canonical = Locale.canonicalIdentifier(from: trimmed) ?? trimmed
+    return canonical.replacingOccurrences(of: "_", with: "-").lowercased()
+}
+
+private func sanitizeCategories(_ values: [String]) -> [String] {
+    var seen: Set<String> = []
+    var result: [String] = []
+
+    for value in values {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.isEmpty == false else { continue }
+
+        let normalized = trimmed.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+        if seen.contains(normalized) { continue }
+        seen.insert(normalized)
+        result.append(trimmed)
+    }
+
+    return result
 }

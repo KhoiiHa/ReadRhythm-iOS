@@ -24,14 +24,25 @@ protocol BookRepository {
     /// - Parameters:
     ///   - title: Anzeigename des Buches (Pflicht)
     ///   - author: Autor oder Autor:innen-Liste (optional)
+    ///   - subtitle/publisher/publishedDate/pageCount/language/categories/descriptionText: optionale, reichhaltige Metadaten
     ///   - thumbnailURL: (optional) Remote-Cover-URL (z. B. Google Books Thumbnail)
+    ///   - infoLink/previewLink: optionale externe URLs
     ///   - sourceID: (optional) Eine externe ID (z. B. Google Books Volume ID)
     ///   - source: Kennzeichnung der Quelle (z. B. "Google Books", "User")
     @discardableResult
     func add(
         title: String,
         author: String?,
+        subtitle: String?,
+        publisher: String?,
+        publishedDate: String?,
+        pageCount: Int?,
+        language: String?,
+        categories: [String],
+        descriptionText: String?,
         thumbnailURL: String?,
+        infoLink: URL?,
+        previewLink: URL?,
         sourceID: String?,
         source: String
     ) throws -> BookEntity
@@ -56,7 +67,16 @@ extension BookRepository {
         try add(
             title: title,
             author: author,
+            subtitle: nil,
+            publisher: nil,
+            publishedDate: nil,
+            pageCount: nil,
+            language: nil,
+            categories: [],
+            descriptionText: nil,
             thumbnailURL: nil,
+            infoLink: nil,
+            previewLink: nil,
             sourceID: nil,
             source: "User" // Fallback-Quelle für manuell hinzugefügte Bücher
         )
