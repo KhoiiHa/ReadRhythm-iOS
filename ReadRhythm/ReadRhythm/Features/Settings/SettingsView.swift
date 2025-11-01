@@ -75,7 +75,7 @@ struct SettingsView: View {
         }
         .navigationTitle(Text("rr.tab.settings"))
         .navigationBarTitleDisplayMode(.inline)
-        .background(AppColors.Semantic.bgPrimary)
+        .screenBackground()
         .tint(AppColors.Semantic.tintPrimary)
         .accessibilityIdentifier("settings.view")
     }

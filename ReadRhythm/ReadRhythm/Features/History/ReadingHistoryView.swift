@@ -30,6 +30,7 @@ struct ReadingHistoryView: View {
             }
             .padding(.horizontal, AppSpace.lg)
             .padding(.top, AppSpace.lg)
+            .screenBackground()
         }
         .navigationTitle(Text(LocalizedStringKey("history.title")))
         .task {
@@ -42,12 +43,12 @@ struct ReadingHistoryView: View {
         VStack(spacing: AppSpace.sm) {
             Image(systemName: "clock.badge.questionmark")
                 .font(.system(size: 40))
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
             Text(LocalizedStringKey("history.empty.title"))
                 .font(.headline)
             Text(LocalizedStringKey("history.empty.subtitle"))
                 .font(.subheadline)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, minHeight: 240)
@@ -82,19 +83,15 @@ struct ReadingHistoryView: View {
 
                 Text("\(row.timeText) · \(row.titleText)")
                     .font(.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
             }
 
             Spacer()
         }
         .padding(.vertical, 8)
         .padding(.horizontal, AppSpace.md)
-        .background(AppColors.surfacePrimary)
+        .cardBackground()
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.l)
-                .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
-        )
         .shadow(color: AppShadow.card.color,
                 radius: AppShadow.card.radius,
                 x: AppShadow.card.x,

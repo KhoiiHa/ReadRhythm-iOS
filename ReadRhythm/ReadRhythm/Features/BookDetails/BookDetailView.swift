@@ -38,7 +38,7 @@ struct BookDetailView: View {
             .padding(.horizontal, AppSpace._16)
             .padding(.vertical, AppSpace._16)
         }
-        .background(AppColors.Semantic.bgPrimary)
+        .screenBackground()
         .navigationTitle(Text("book.detail.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -144,14 +144,7 @@ struct BookDetailView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
-            .background(
-                RoundedRectangle(cornerRadius: AppRadius.m)
-                    .fill(AppColors.Semantic.bgElevated)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: AppRadius.m)
-                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.5)
-            )
+            .cardBackground()
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("bookdetail.reader.card")
         }
@@ -255,14 +248,7 @@ struct BookDetailView: View {
             }
         }
         .padding()
-        .background(
-            RoundedRectangle(cornerRadius: AppRadius.m)
-                .fill(AppColors.Semantic.bgElevated)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.m)
-                .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.5)
-        )
+        .cardBackground()
         .accessibilityIdentifier("detail.meta")
     }
 

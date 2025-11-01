@@ -33,7 +33,7 @@ struct DiscoverDetailView: View {
             .padding(.horizontal, AppSpace._16)
             .padding(.vertical, AppSpace._24)
         }
-        .background(AppColors.Semantic.bgPrimary)
+        .screenBackground()
         .navigationTitle(Text(LocalizedStringKey("discover.detail.title")))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("discover.detail")

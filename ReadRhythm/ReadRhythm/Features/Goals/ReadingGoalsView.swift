@@ -42,7 +42,7 @@ struct ReadingGoalsView: View {
                     Label(LocalizedStringKey("focus.title"), systemImage: "timer")
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(AppColors.surfacePrimary)
+                        .cardBackground()
                         .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
                         .overlay(
                             RoundedRectangle(cornerRadius: AppRadius.l)
@@ -101,6 +101,8 @@ struct ReadingGoalsView: View {
                 .accessibilityIdentifier("Goals.ProgressRing")
                 #if DEBUG
                 .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 3)
+                #else
+                .shadow(color: AppColors.Semantic.shadowColor, radius: 6, x: 0, y: 3)
                 #endif
 
                 // MARK: Streak
@@ -139,6 +141,7 @@ struct ReadingGoalsView: View {
             .padding(.bottom, AppSpace.xl)
             .accessibilityIdentifier("Goals.Screen")
         }
+        .screenBackground()
         .navigationTitle(Text(NSLocalizedString("goals.title", comment: "Lesziele")))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -186,7 +189,7 @@ struct ReadingGoalsView: View {
                 .foregroundColor(AppColors.textPrimary)
         }
         .padding(AppSpace.lg)
-        .background(AppColors.surfacePrimary)
+        .cardBackground()
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
         .shadow(color: AppShadow.card.color, radius: AppShadow.card.radius, x: AppShadow.card.x, y: AppShadow.card.y)
         .accessibilityIdentifier("Goals.MetricTile")

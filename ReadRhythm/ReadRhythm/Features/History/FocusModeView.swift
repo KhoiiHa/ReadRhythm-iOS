@@ -76,12 +76,7 @@ struct FocusModeView: View {
                 }
                 .padding(AppSpace.md)
                 .frame(maxWidth: .infinity)
-                .background(AppColors.Semantic.bgSecondary)
-                .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppRadius.l)
-                        .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
-                )
+                .cardBackground()
                 .shadow(
                     color: AppShadow.card.color,
                     radius: AppShadow.card.radius,
@@ -105,12 +100,7 @@ struct FocusModeView: View {
                 .monospacedDigit()
                 .padding(AppSpace.lg)
                 .frame(maxWidth: .infinity)
-                .background(AppColors.Semantic.bgElevated)
-                .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppRadius.xl)
-                        .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
-                )
+                .cardBackground()
                 .shadow(
                     color: AppShadow.card.color,
                     radius: AppShadow.card.radius,
@@ -143,12 +133,7 @@ struct FocusModeView: View {
             }
             .padding(.horizontal, AppSpace.lg)
             .padding(.vertical, AppSpace.md)
-            .background(AppColors.Semantic.bgSecondary)
-            .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: AppRadius.l)
-                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
-            )
+            .cardBackground()
             .shadow(
                 color: AppShadow.card.color,
                 radius: AppShadow.card.radius,
@@ -245,7 +230,7 @@ struct FocusModeView: View {
         }
         .padding(.horizontal, AppSpace.lg)
         .padding(.bottom, AppSpace.xl)
-        .background(AppColors.Semantic.bgPrimary.ignoresSafeArea())
+        .screenBackground()
         .navigationTitle(Text(LocalizedStringKey("focus.nav.title")))
         .onAppear {
             if vm.selectedBook == nil {

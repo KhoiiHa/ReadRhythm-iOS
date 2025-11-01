@@ -37,11 +37,15 @@ struct ReaderView: View {
                         .padding(.vertical, AppSpace._24)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .background(AppColors.Semantic.bgPrimary)
+                .background(
+                    screenBackground()
+                )
                 .tag(index)
             }
         }
-        .background(AppColors.Semantic.bgPrimary)
+        .background(
+            screenBackground()
+        )
         .tabViewStyle(.page(indexDisplayMode: .automatic))
         .indexViewStyle(.page(backgroundDisplayMode: .always))
         .navigationTitle(Text(bookTitle))

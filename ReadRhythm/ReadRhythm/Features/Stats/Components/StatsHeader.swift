@@ -5,14 +5,6 @@
 //  Created by Vu Minh Khoi Ha on 19.10.25.
 //
 
-
-//
-//  StatsHeader.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 19.10.25.
-//
-
 import SwiftUI
 
 /// Kopfbereich für den Stats-Screen: Titel, Range-Picker, kompakte Summary.
@@ -60,7 +52,6 @@ struct StatsHeader: View {
         }
         .padding(.horizontal, AppSpace._16)
         .padding(.vertical, AppSpace._16)
-        .background(AppColors.Semantic.bgPrimary)
         .accessibilityIdentifier("stats.header")
     }
 
@@ -75,14 +66,7 @@ struct StatsHeader: View {
                 .foregroundStyle(AppColors.Semantic.textSecondary)
         }
         .padding(AppSpace._12)
-        .background(
-            RoundedRectangle(cornerRadius: AppRadius.m)
-                .fill(AppColors.Semantic.bgElevated)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.m)
-                .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.5)
-        )
+        .cardBackground()
         .accessibilityElement(children: .combine)
     }
 }
@@ -102,5 +86,3 @@ enum StatsRange: String, CaseIterable, Identifiable {
         }
     }
 }
-
-

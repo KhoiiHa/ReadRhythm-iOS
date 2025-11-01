@@ -29,3 +29,22 @@ enum AppThemeMode: String, CaseIterable, Identifiable {
         }
     }
 }
+
+// MARK: - Bridge to AppAppearance
+extension AppThemeMode {
+    init(_ appearance: AppAppearance) {
+        switch appearance {
+        case .system: self = .system
+        case .light:  self = .light
+        case .dark:   self = .dark
+        }
+    }
+
+    var asAppearance: AppAppearance {
+        switch self {
+        case .system: .system
+        case .light:  .light
+        case .dark:   .dark
+        }
+    }
+}

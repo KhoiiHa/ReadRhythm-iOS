@@ -36,7 +36,7 @@ struct AudiobookLightView: View {
                         .font(.title2).bold()
                     Text(LocalizedStringKey("audio.subtitle"))
                         .font(.subheadline)
-                        .foregroundColor(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, AppSpace.lg)
@@ -45,17 +45,12 @@ struct AudiobookLightView: View {
                 VStack(alignment: .leading, spacing: AppSpace.sm) {
                     Text(LocalizedStringKey("audio.input.label"))
                         .font(.footnote)
-                        .foregroundColor(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
 
                     TextEditor(text: $vm.text)
                         .frame(minHeight: 160)
                         .padding(8)
-                        .background(AppColors.surfacePrimary)
-                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppRadius.l)
-                                .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
-                        )
+                        .cardBackground()
                         .accessibilityIdentifier("Audio.TextEditor")
                 }
                 .padding(.horizontal, AppSpace.lg)
@@ -96,7 +91,7 @@ struct AudiobookLightView: View {
                             .accessibilityIdentifier("Audio.Progress")
                         Text("\(vm.elapsedCharacters)/\(max(vm.totalCharacters,1)) " + NSLocalizedString("audio.progress.chars", comment: "Zeichen"))
                             .font(.caption)
-                            .foregroundColor(AppColors.textSecondary)
+                            .foregroundStyle(AppColors.Semantic.textSecondary)
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -127,6 +122,7 @@ struct AudiobookLightView: View {
                 Spacer(minLength: AppSpace.xl)
             }
             .padding(.top, AppSpace.lg)
+            .screenBackground()
         }
         .navigationTitle(Text(LocalizedStringKey("audio.nav.title")))
     }
@@ -136,7 +132,7 @@ struct AudiobookLightView: View {
         VStack(alignment: .leading, spacing: AppSpace.sm) {
             Text(LocalizedStringKey(title))
                 .font(.footnote)
-                .foregroundColor(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
             Slider(value: value, in: range)
                 .accessibilityIdentifier("Audio.\(title).Slider")
         }

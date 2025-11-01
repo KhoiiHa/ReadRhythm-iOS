@@ -29,7 +29,7 @@ struct ProfileView: View {
             .padding(.horizontal, AppSpace.lg)
             .padding(.vertical, AppSpace.lg)
         }
-        .background(AppColors.Semantic.bgPrimary.ignoresSafeArea())
+        .screenBackground()
         .navigationTitle(Text(LocalizedStringKey("profile.title")))
         .task {
             vm.reload()
@@ -60,7 +60,7 @@ struct ProfileView: View {
         }
         .padding(AppSpace.lg)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColors.Semantic.bgElevated)
+        .cardBackground()
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
         .shadow(
             color: AppShadow.card.color,
@@ -130,7 +130,7 @@ struct ProfileView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(AppSpace.lg)
-                .background(AppColors.Semantic.bgSecondary)
+                .cardBackground()
                 .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
                 .shadow(
                     color: AppShadow.card.color,
@@ -148,7 +148,7 @@ struct ProfileView: View {
                     .font(AppFont.body)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(AppSpace.lg)
-                    .background(AppColors.Semantic.bgSecondary)
+                    .cardBackground()
                     .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
                     .shadow(
                         color: AppShadow.card.color,
@@ -170,7 +170,7 @@ struct ProfileView: View {
                     .font(AppFont.body)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(AppSpace.lg)
-                    .background(AppColors.Semantic.bgSecondary)
+                    .cardBackground()
                     .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
                     .shadow(
                         color: AppShadow.card.color,
@@ -188,7 +188,7 @@ struct ProfileView: View {
                     .font(AppFont.body)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(AppSpace.lg)
-                    .background(AppColors.Semantic.bgSecondary)
+                    .cardBackground()
                     .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
                     .shadow(
                         color: AppShadow.card.color,
@@ -215,7 +215,7 @@ struct ProfileView: View {
         }
         .padding(AppSpace.lg)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColors.Semantic.bgElevated)
+        .cardBackground()
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
         .shadow(
             color: AppShadow.card.color,

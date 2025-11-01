@@ -71,7 +71,7 @@ struct StatsChart: View {
         .chartYScale(domain: 0...maxY)
         .chartPlotStyle { plot in
             plot
-                .background(AppColors.Semantic.bgSecondary)
+                .background(AppColors.Semantic.bgElevated)
                 .accessibilityHidden(true) // Deko-Hintergrund ist visuell, nicht in VoiceOver relevant
         }
         .frame(height: AppChart.height)

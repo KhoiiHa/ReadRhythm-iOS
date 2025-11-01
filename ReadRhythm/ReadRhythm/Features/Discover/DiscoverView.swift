@@ -114,7 +114,7 @@ struct DiscoverView: View {
             }
             .padding(.vertical, AppSpace._16)
         }
-        .background(AppColors.Semantic.bgPrimary)
+        .screenBackground()
         .navigationTitle(Text(LocalizedStringKey("rr.tab.discover")))
         .tint(AppColors.Semantic.tintPrimary)
         .accessibilityIdentifier("discover.view")
@@ -385,7 +385,6 @@ struct DiscoverView: View {
                 .padding(.horizontal, AppSpace._16)
         }
         .frame(maxWidth: .infinity, minHeight: 320)
-        .background(AppColors.Semantic.bgPrimary)
         .accessibilityIdentifier("discover.empty")
     }
     

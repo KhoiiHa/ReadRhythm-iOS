@@ -53,6 +53,13 @@ enum AppShadow {
 
 // MARK: - Reusable Modifiers
 
+struct ScreenBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(AppColors.Semantic.bgPrimary)
+    }
+}
+
 struct CardBackground: ViewModifier {
     func body(content: Content) -> some View {
         content
@@ -97,6 +104,7 @@ struct TagCapsule: ViewModifier {
 }
 
 extension View {
+    func screenBackground() -> some View { modifier(ScreenBackground()) }
     func cardBackground() -> some View { modifier(CardBackground()) }
     func metricTile() -> some View { modifier(MetricTile()) }
     func tagCapsule() -> some View { modifier(TagCapsule()) }

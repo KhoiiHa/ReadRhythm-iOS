@@ -47,7 +47,7 @@ struct AchievementsView: View {
                 .font(.title2).bold()
             Text(String(localized: "achv.subtitle"))
                 .font(.subheadline)
-                .foregroundColor(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
         }
         .padding(.horizontal, AppSpace.lg)
         .accessibilityIdentifier("Achievements.Header")
@@ -57,12 +57,12 @@ struct AchievementsView: View {
 
     @ViewBuilder
     private func badgeCard(for a: Achievement) -> some View {
-        let fg = a.unlocked ? AppColors.textPrimary : AppColors.textSecondary
+        let fg = a.unlocked ? AppColors.Semantic.textPrimary : AppColors.Semantic.textSecondary
         VStack(alignment: .leading, spacing: AppSpace.sm) {
             HStack(spacing: AppSpace.sm) {
                 Image(systemName: a.systemImage)
                     .imageScale(.large)
-                    .foregroundStyle(a.unlocked ? AppColors.brandPrimary : AppColors.textSecondary)
+                    .foregroundStyle(a.unlocked ? AppColors.Brand.primary : AppColors.Semantic.textSecondary)
                     .frame(width: 28)
                 Text(LocalizedStringKey(a.titleKey))
                     .font(.headline)
@@ -77,23 +77,18 @@ struct AchievementsView: View {
             if let hv = a.highlightValue, a.unlocked {
                 Text(hv)
                     .font(.caption)
-                    .foregroundStyle(AppColors.brandPrimary)
+                    .foregroundStyle(AppColors.Brand.primary)
                     .padding(.top, 2)
             }
 
             if !a.unlocked {
                 Text(String(localized: "achv.locked.hint"))
                     .font(.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
             }
         }
         .padding(AppSpace.lg)
-        .background(AppColors.surfacePrimary.opacity(a.unlocked ? 1.0 : 0.9))
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.l)
-                .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
-        )
+        .cardBackground()
         .shadow(color: AppShadow.card.color,
                 radius: AppShadow.card.radius,
                 x: AppShadow.card.x,
@@ -102,4 +97,3 @@ struct AchievementsView: View {
         .accessibilityIdentifier("Achievements.Badge.\(a.id)")
     }
 }
-

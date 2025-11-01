@@ -46,7 +46,7 @@ struct StatsView: View {
             .padding(.horizontal, AppSpace.lg)
             .padding(.vertical, AppSpace.lg)
         }
-        .background(AppColors.Semantic.bgPrimary.ignoresSafeArea())
+        .screenBackground()
         .tint(AppColors.Semantic.tintPrimary)
         .task {
             // Initiales Mapping von UI-Range → ViewModel.days

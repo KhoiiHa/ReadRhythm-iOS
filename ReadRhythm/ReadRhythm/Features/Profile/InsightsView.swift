@@ -41,6 +41,7 @@ struct InsightsView: View {
             .accessibilityIdentifier("Insights.Screen")
         }
         .accessibilityIdentifier("Insights.Screen.Scroll")
+        .screenBackground()
         .navigationTitle(Text(LocalizedStringKey(vm.titleKey)))
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -74,7 +75,7 @@ struct InsightsView: View {
                     if v > 0 {
                         Text("\(v)")
                             .font(.caption2.monospacedDigit())
-                            .foregroundColor(AppColors.textSecondary)
+                            .foregroundStyle(AppColors.Semantic.textSecondary)
                             .accessibilityHidden(true)
                     }
                 }
@@ -118,15 +119,10 @@ struct InsightsView: View {
             }
         }
         .padding()
-        .background(AppColors.surfacePrimary)
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.l)
-                .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
-        )
-        #if DEBUG
-        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
-        #endif
+        .cardBackground()
+#if DEBUG
+        .shadow(color: AppColors.Semantic.shadowColor, radius: 6, x: 0, y: 3)
+#endif
     }
 
     // MARK: - Helpers (local)
@@ -157,7 +153,7 @@ struct InsightsView: View {
                 .accessibilityIdentifier("insights.section.weekday.title")
             Text(String(localized: "insights.section.weekday.subtitle"))
                 .font(.subheadline)
-                .foregroundColor(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Semantic.textSecondary)
                 .accessibilityIdentifier("insights.section.weekday.subtitle")
 
             // Statt Chart: einfache Liste (Phase: Erstellung, kein Polish)
@@ -183,18 +179,13 @@ struct InsightsView: View {
                 }
                 Text(String(localized: "insights.section.weekday.note"))
                     .font(.caption2)
-                    .foregroundColor(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
                     .padding(.top, 4)
                     .accessibilityHidden(true)
                     .accessibilityIdentifier("insights.weekday.note")
             }
             .padding()
-            .background(AppColors.surfacePrimary)
-            .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: AppRadius.l)
-                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
-            )
+            .cardBackground()
         }
         .accessibilityIdentifier("Insights.WeekdayMinutes")
     }
@@ -312,7 +303,7 @@ private struct InsightsPreviewHarness: View {
                             if v > 0 {
                                 Text("\(v)")
                                     .font(.caption2.monospacedDigit())
-                                    .foregroundColor(AppColors.textSecondary)
+                                    .foregroundStyle(AppColors.Semantic.textSecondary)
                                     .accessibilityHidden(true)
                             }
                         }
@@ -363,20 +354,15 @@ private struct InsightsPreviewHarness: View {
                     }
                 }
                 .padding()
-                .background(AppColors.surfacePrimary)
-                .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppRadius.l)
-                        .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
-                )
-                .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
+                .cardBackground()
+                .shadow(color: AppColors.Semantic.shadowColor, radius: 6, x: 0, y: 3)
 
                 // Weekday-Block als visueller Platzhalter (Case-Study)
                 VStack(alignment: .leading, spacing: AppSpace.sm) {
                     Text(String(localized: "insights.section.weekday")).font(.headline)
                         .accessibilityIdentifier("insights.section.weekday.title")
                     Text(String(localized: "insights.section.weekday.subtitle")).font(.subheadline)
-                        .foregroundColor(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
                         .accessibilityIdentifier("insights.section.weekday.subtitle")
                     VStack(spacing: 8) {
                         ForEach(0..<7, id: \.self) { i in
@@ -398,18 +384,13 @@ private struct InsightsPreviewHarness: View {
                         }
                         Text(String(localized: "insights.section.weekday.note"))
                             .font(.caption2)
-                            .foregroundColor(AppColors.textSecondary)
+                            .foregroundStyle(AppColors.Semantic.textSecondary)
                             .padding(.top, 4)
                             .accessibilityHidden(true)
                             .accessibilityIdentifier("insights.weekday.note")
                     }
                     .padding()
-                    .background(AppColors.surfacePrimary)
-                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppRadius.l)
-                            .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
-                    )
+                    .cardBackground()
                 }
                 .accessibilityIdentifier("Insights.WeekdayMinutes")
             }

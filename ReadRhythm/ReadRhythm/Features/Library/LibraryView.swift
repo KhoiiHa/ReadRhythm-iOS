@@ -52,7 +52,7 @@ struct LibraryView: View {
                 .scrollContentBackground(.hidden)
             }
         }
-        .background(AppColors.Semantic.bgPrimary)
+        .screenBackground()
         .navigationTitle(Text("library.title"))
         .toolbar {
             ToolbarItem(placement: .topBarLeading) { EditButton() }
@@ -129,7 +129,7 @@ private struct LibraryEmptyStateView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, AppSpace._16)
-        .background(AppColors.Semantic.bgPrimary)
+        .screenBackground()
         .accessibilityIdentifier("library.emptyState")
     }
 }

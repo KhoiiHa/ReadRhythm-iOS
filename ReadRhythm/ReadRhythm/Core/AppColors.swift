@@ -31,30 +31,38 @@ enum AppColors {
         static var _900: Color { Color("neutral.900", bundle: .main) }
     }
 
-    // MARK: - Semantik (auf Basis der Palette)
+    // MARK: - Semantik (systemdynamisch für Light/Dark)
     enum Semantic {
-        // Backgrounds
-        static var bgPrimary: Color   { Color(red: 248/255, green: 244/255, blue: 235/255) } // App-Hintergrund
-        static var bgSecondary: Color { Color(red: 241/255, green: 236/255, blue: 224/255) } // Sektionen
-        static var bgElevated: Color  { Color(red: 233/255, green: 226/255, blue: 212/255) } // Karten
+        // Backgrounds – folgen automatisch dem System (Light/Dark)
+        static var bgPrimary: Color   { Color(UIColor.systemBackground) }
+        static var bgSecondary: Color { Color(UIColor.secondarySystemBackground) }
+        static var bgElevated: Color  { Color(UIColor.tertiarySystemBackground) }
 
-        // Text
-        static var textPrimary: Color   { Neutral._900 }
-        static var textSecondary: Color { Neutral._700 }
-        static var textInverse: Color   { Neutral._50 }
+        // Text – dynamische Label-Farben für korrekten Kontrast
+        static var textPrimary: Color   { Color(UIColor.label) }
+        static var textSecondary: Color { Color(UIColor.secondaryLabel) }
+        static var textInverse: Color   { Color(UIColor.systemBackground) }
 
-        // Tints
-        static var tintPrimary: Color   { Brand.primary }
+        // Tints – App-Akzent; Brand.primary bleibt als visueller Akzent verfügbar
+        static var tintPrimary: Color   { Color.accentColor }
         static var tintSecondary: Color { Brand.secondary }
 
-        // Border
-        static var borderMuted: Color  { Color(red: 217/255, green: 208/255, blue: 194/255) }
-        static var borderStrong: Color { Neutral._700 }
+        // Border/Separator – systemdynamisch
+        static var borderMuted: Color  { Color(UIColor.separator) }
+        static var borderStrong: Color { Color(UIColor.tertiaryLabel) }
 
-        // Charts
+        // Charts – Achsen an UI-Labels angelehnt, Balken/Selection aus Accent
         static var chartBar: Color       { Accent.success }
-        static var chartAxis: Color      { Color(red: 210/255, green: 201/255, blue: 187/255) }
+        static var chartAxis: Color      { Color(UIColor.tertiaryLabel) }
         static var chartSelection: Color { Accent.warning }
+
+        // Shadows – dezent in Light, stärker in Dark
+        static var shadowColor: Color {
+            Color(UIColor { trait in
+                let alpha: CGFloat = (trait.userInterfaceStyle == .dark) ? 0.35 : 0.10
+                return UIColor.black.withAlphaComponent(alpha)
+            })
+        }
     }
     // MARK: - Aliases (Phase 4 convenience)
     /// Für Views, die mit systemweiten Tokens arbeiten wollen, ohne die Palette zu kennen.
