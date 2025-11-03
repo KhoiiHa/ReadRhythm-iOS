@@ -21,12 +21,12 @@ struct StatsEmptyState: View {
                 .accessibilityHidden(true)
 
             Text("rr.stats.empty.title")
-                .font(.headline)
+                .font(AppFont.headingS())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
                 .accessibilityIdentifier("stats.empty.title")
 
             Text("rr.stats.empty.subtitle")
-                .font(.subheadline)
+                .font(AppFont.bodyStandard())
                 .multilineTextAlignment(.center)
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .padding(.horizontal, AppSpace._16)
@@ -34,9 +34,8 @@ struct StatsEmptyState: View {
         }
         .padding(.vertical, AppSpace._24)
         .frame(maxWidth: .infinity)
-        .background(AppColors.Semantic.bgPrimary)
+        .background(AppColors.Semantic.bgScreen)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("stats.emptyState")
     }
 }
-

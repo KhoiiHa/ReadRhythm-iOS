@@ -57,34 +57,34 @@ struct BookRowView: View {
             )
             .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(book.title)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .font(AppFont.headingS())
+                    .foregroundStyle(AppColors.Semantic.textPrimary)
                     .lineLimit(1)
                     .accessibilityIdentifier("library.row.title.\(book.persistentModelID.hashValue)")
 
                 Text(authorText)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(AppFont.bodyStandard())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
                     .lineLimit(1)
                     .accessibilityIdentifier("library.row.author.\(book.persistentModelID.hashValue)")
 
                 // Badge für echte API-Importe (Google Books)
                 if isRemoteImported {
                     Text("Google Books")
-                        .font(.caption2)
-                        .foregroundStyle(AppColors.Semantic.textSecondary)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
+                        .font(AppFont.caption2())
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
                         .background(
                             Capsule()
-                                .fill(AppColors.Semantic.bgElevated)
+                                .fill(AppColors.Semantic.chipBg)
                                 .overlay(
                                     Capsule()
-                                        .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.5)
+                                        .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                                 )
                         )
+                        .foregroundStyle(AppColors.Semantic.chipFg)
                         .accessibilityIdentifier("library.row.badge.google.\(book.persistentModelID.hashValue)")
                 }
             }
@@ -92,15 +92,8 @@ struct BookRowView: View {
             Spacer()
         }
         .accessibilityLabel(Text("\(book.title), \(authorText)"))
-        .padding(.vertical, 6)
-        .background(
-            RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
-                .fill(
-                    isRemoteImported
-                    ? AppColors.Semantic.bgElevated.opacity(0.3)
-                    : .clear
-                )
-        )
+        .padding(.vertical, 8)
+        .background(Color.clear)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("library.row.\(book.persistentModelID.hashValue)")
     }
@@ -115,10 +108,10 @@ private struct LibraryRowCoverPlaceholder: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
-                .fill(AppColors.Semantic.bgElevated)
+                .fill(AppColors.Semantic.bgCard)
 
             RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
-                .strokeBorder(AppColors.Semantic.borderMuted, lineWidth: 0.5)
+                .strokeBorder(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
 
             Text(initials)
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
@@ -148,10 +141,10 @@ private struct LibraryRowCoverArtwork: View {
                     switch phase {
                     case .empty:
                         RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
-                            .fill(AppColors.Semantic.bgElevated)
+                            .fill(AppColors.Semantic.bgCard)
                             .overlay(
                                 RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
-                                    .strokeBorder(AppColors.Semantic.borderMuted, lineWidth: 0.5)
+                                    .strokeBorder(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                             )
                     case .success(let image):
                         image
@@ -162,7 +155,7 @@ private struct LibraryRowCoverArtwork: View {
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
-                                    .strokeBorder(AppColors.Semantic.borderMuted, lineWidth: 0.5)
+                                    .strokeBorder(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                             )
                     case .failure:
                         LibraryRowCoverPlaceholder(initials: initials)

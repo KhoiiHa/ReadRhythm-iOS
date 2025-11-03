@@ -33,24 +33,35 @@ struct SettingsView: View {
             Section {
                 VStack(alignment: .leading, spacing: AppSpace._12) {
                     Text("settings.preview.section")
-                        .font(.headline)
+                        .font(AppFont.headingS())
                         .foregroundStyle(AppColors.Semantic.textPrimary)
 
                     HStack(spacing: AppSpace._12) {
                         RoundedRectangle(cornerRadius: AppRadius.m)
-                            .fill(AppColors.Semantic.bgPrimary)
+                            .fill(AppColors.Semantic.bgScreen)
                             .frame(width: 60, height: 60)
-                            .overlay(Text("A").font(.title).foregroundStyle(AppColors.Semantic.textPrimary))
+                            .overlay(
+                                Text("A")
+                                    .font(AppFont.headingM())
+                                    .foregroundStyle(AppColors.Semantic.textPrimary)
+                            )
+                            .accessibilityIdentifier("settings.preview.tile.primary")
 
                         RoundedRectangle(cornerRadius: AppRadius.m)
-                            .fill(AppColors.Semantic.bgSecondary)
+                            .fill(AppColors.Semantic.bgCard)
                             .frame(width: 60, height: 60)
-                            .overlay(Text("B").font(.title).foregroundStyle(AppColors.Semantic.textSecondary))
+                            .overlay(
+                                Text("B")
+                                    .font(AppFont.headingM())
+                                    .foregroundStyle(AppColors.Semantic.textSecondary)
+                            )
+                            .accessibilityIdentifier("settings.preview.tile.secondary")
 
                         RoundedRectangle(cornerRadius: AppRadius.m)
                             .fill(AppColors.Semantic.tintPrimary)
                             .frame(width: 60, height: 60)
-                            .overlay(Image(systemName: "star.fill").foregroundStyle(.white))
+                            .overlay(Image(systemName: "star.fill").foregroundStyle(AppColors.Semantic.textInverse))
+                            .accessibilityIdentifier("settings.preview.tile.tint")
                     }
                     .padding(.vertical, AppSpace._4)
                 }
@@ -73,9 +84,10 @@ struct SettingsView: View {
             }
 #endif
         }
+        .scrollContentBackground(.hidden)
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text("rr.tab.settings"))
         .navigationBarTitleDisplayMode(.inline)
-        .screenBackground()
         .tint(AppColors.Semantic.tintPrimary)
         .accessibilityIdentifier("settings.view")
     }

@@ -23,7 +23,7 @@ struct InsightsView: View {
         ScrollView {
             VStack(spacing: AppSpace.lg) {
                 Text(LocalizedStringKey(vm.titleKey))
-                    .font(.title2).bold()
+                    .font(AppFont.headingM())
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityIdentifier("insights.title")
                     .padding(.bottom, 2)
@@ -69,12 +69,13 @@ struct InsightsView: View {
                     x: .value("Date", day.date, unit: .day),
                     y: .value("Minutes", v)
                 )
-                .foregroundStyle(AppColors.brandPrimary)
-                .cornerRadius(3)
+                .foregroundStyle(AppColors.Semantic.chartBar)
+                .cornerRadius(AppChart.barCornerRadius)
                 .annotation(position: .top) {
                     if v > 0 {
                         Text("\(v)")
-                            .font(.caption2.monospacedDigit())
+                            .font(AppFont.caption2())
+                            .monospacedDigit()
                             .foregroundStyle(AppColors.Semantic.textSecondary)
                             .accessibilityHidden(true)
                     }
@@ -86,12 +87,22 @@ struct InsightsView: View {
             .chartXAxis {
                 AxisMarks(values: .stride(by: .day, count: 5)) { _ in
                     AxisGridLine()
+                        .foregroundStyle(AppColors.Semantic.chartAxis.opacity(0.2))
                     AxisTick()
+                        .foregroundStyle(AppColors.Semantic.chartAxis)
                     AxisValueLabel(format: .dateTime.weekday(.abbreviated))
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
                 }
             }
             .chartYAxis {
-                AxisMarks(position: .leading)
+                AxisMarks(position: .leading) {
+                    AxisGridLine()
+                        .foregroundStyle(AppColors.Semantic.chartAxis.opacity(0.35))
+                    AxisTick()
+                        .foregroundStyle(AppColors.Semantic.chartAxis)
+                    AxisValueLabel()
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                }
             }
             .chartYScale(domain: yDomain)
             .animation(.spring(response: 0.45, dampingFraction: 0.85), value: vm.dailyStats)
@@ -103,10 +114,10 @@ struct InsightsView: View {
                     Chart {
                         RuleMark(y: .value("Average", vm.averageMinutes))
                             .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [6,6]))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(AppColors.Semantic.chartSelection)
                             .annotation(position: .topLeading) {
                                 Text(String(format: NSLocalizedString("insights.average.label", comment: "avg label"), Int(vm.averageMinutes.rounded())))
-                                    .font(.caption2)
+                                    .font(AppFont.caption2())
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
                                     .background(.ultraThinMaterial, in: Capsule())
@@ -149,10 +160,10 @@ struct InsightsView: View {
     private func sectionWeekdayMinutes() -> some View {
         VStack(alignment: .leading, spacing: AppSpace.sm) {
             Text(String(localized: "insights.section.weekday"))
-                .font(.headline)
+                .font(AppFont.headingS())
                 .accessibilityIdentifier("insights.section.weekday.title")
             Text(String(localized: "insights.section.weekday.subtitle"))
-                .font(.subheadline)
+                .font(AppFont.bodyStandard())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .accessibilityIdentifier("insights.section.weekday.subtitle")
 
@@ -168,7 +179,7 @@ struct InsightsView: View {
                         let value = (i == vm.bestWeekdayIndex) ? vm.bestWeekdayMinutes : 0
                         Text("\(value)")
                             .monospacedDigit()
-                            .foregroundColor(i == vm.bestWeekdayIndex ? AppColors.brandPrimary : AppColors.textPrimary)
+                            .foregroundStyle(i == vm.bestWeekdayIndex ? AppColors.Semantic.tintPrimary : AppColors.Semantic.textPrimary)
                             .accessibilityIdentifier("insights.weekday.value.\(i)")
                     }
                     .padding(.vertical, 6)
@@ -178,7 +189,7 @@ struct InsightsView: View {
                     .accessibilityIdentifier("insights.weekday.row.\(i)")
                 }
                 Text(String(localized: "insights.section.weekday.note"))
-                    .font(.caption2)
+                    .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
                     .padding(.top, 4)
                     .accessibilityHidden(true)
@@ -276,7 +287,7 @@ private struct InsightsPreviewHarness: View {
         ScrollView {
             VStack(spacing: AppSpace.lg) {
                 Text("insights.title")
-                    .font(.title2).bold()
+                    .font(AppFont.headingM())
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityIdentifier("insights.title")
                     .padding(.bottom, 2)
@@ -297,12 +308,13 @@ private struct InsightsPreviewHarness: View {
                             x: .value("Date", day.date, unit: .day),
                             y: .value("Minutes", v)
                         )
-                        .foregroundStyle(AppColors.brandPrimary)
-                        .cornerRadius(3)
+                        .foregroundStyle(AppColors.Semantic.chartBar)
+                        .cornerRadius(AppChart.barCornerRadius)
                         .annotation(position: .top) {
                             if v > 0 {
                                 Text("\(v)")
-                                    .font(.caption2.monospacedDigit())
+                                    .font(AppFont.caption2())
+                                    .monospacedDigit()
                                     .foregroundStyle(AppColors.Semantic.textSecondary)
                                     .accessibilityHidden(true)
                             }
@@ -313,10 +325,24 @@ private struct InsightsPreviewHarness: View {
                     }
                     .chartXAxis {
                         AxisMarks(values: .stride(by: .day, count: 5)) { _ in
-                            AxisGridLine(); AxisTick(); AxisValueLabel(format: .dateTime.weekday(.abbreviated))
+                            AxisGridLine()
+                                .foregroundStyle(AppColors.Semantic.chartAxis.opacity(0.2))
+                            AxisTick()
+                                .foregroundStyle(AppColors.Semantic.chartAxis)
+                            AxisValueLabel(format: .dateTime.weekday(.abbreviated))
+                                .foregroundStyle(AppColors.Semantic.textSecondary)
                         }
                     }
-                    .chartYAxis { AxisMarks(position: .leading) }
+                    .chartYAxis {
+                        AxisMarks(position: .leading) {
+                            AxisGridLine()
+                                .foregroundStyle(AppColors.Semantic.chartAxis.opacity(0.35))
+                            AxisTick()
+                                .foregroundStyle(AppColors.Semantic.chartAxis)
+                            AxisValueLabel()
+                                .foregroundStyle(AppColors.Semantic.textSecondary)
+                        }
+                    }
                     .chartYScale(domain: yDomain)
                     .frame(height: 260)
                     .accessibilityIdentifier("insights.chart")
@@ -325,10 +351,10 @@ private struct InsightsPreviewHarness: View {
                             Chart {
                                 RuleMark(y: .value("Average", vm.averageMinutes))
                                     .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [6,6]))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(AppColors.Semantic.chartSelection)
                                     .annotation(position: .topLeading) {
                                         Text(String(format: NSLocalizedString("insights.average.label", comment: "avg label"), Int(vm.averageMinutes.rounded())))
-                                            .font(.caption2)
+                                            .font(AppFont.caption2())
                                             .padding(.horizontal, 6)
                                             .padding(.vertical, 2)
                                             .background(.ultraThinMaterial, in: Capsule())
@@ -359,9 +385,11 @@ private struct InsightsPreviewHarness: View {
 
                 // Weekday-Block als visueller Platzhalter (Case-Study)
                 VStack(alignment: .leading, spacing: AppSpace.sm) {
-                    Text(String(localized: "insights.section.weekday")).font(.headline)
+                    Text(String(localized: "insights.section.weekday"))
+                        .font(AppFont.headingS())
                         .accessibilityIdentifier("insights.section.weekday.title")
-                    Text(String(localized: "insights.section.weekday.subtitle")).font(.subheadline)
+                    Text(String(localized: "insights.section.weekday.subtitle"))
+                        .font(AppFont.bodyStandard())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                         .accessibilityIdentifier("insights.section.weekday.subtitle")
                     VStack(spacing: 8) {
@@ -373,7 +401,7 @@ private struct InsightsPreviewHarness: View {
                                 let val = i == 3 ? 48 : 0
                                 Text("\(val)")
                                     .monospacedDigit()
-                                    .foregroundColor(i == 3 ? AppColors.brandPrimary : AppColors.textPrimary)
+                                    .foregroundStyle(i == 3 ? AppColors.Semantic.tintPrimary : AppColors.Semantic.textPrimary)
                                     .accessibilityIdentifier("insights.weekday.value.\(i)")
                             }
                             .padding(.vertical, 6)
@@ -383,7 +411,7 @@ private struct InsightsPreviewHarness: View {
                             .accessibilityIdentifier("insights.weekday.row.\(i)")
                         }
                         Text(String(localized: "insights.section.weekday.note"))
-                            .font(.caption2)
+                            .font(AppFont.caption2())
                             .foregroundStyle(AppColors.Semantic.textSecondary)
                             .padding(.top, 4)
                             .accessibilityHidden(true)

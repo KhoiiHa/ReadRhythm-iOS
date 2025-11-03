@@ -75,7 +75,7 @@ struct StatsView: View {
         }
         .padding(AppSpace.lg)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColors.Semantic.bgElevated)
+        .background(AppColors.Semantic.bgCard)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
         .shadow(
             color: AppShadow.card.color,
@@ -88,7 +88,7 @@ struct StatsView: View {
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: AppSpace.md) {
             Text("rr.stats.title")
-                .font(AppFont.title)
+                .font(AppFont.headingM())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
                 .accessibilityIdentifier("stats.header.title")
 
@@ -127,18 +127,18 @@ struct StatsView: View {
     private func summaryTile(value: String, labelKey: LocalizedStringKey) -> some View {
         VStack(alignment: .leading, spacing: AppSpace.xs) {
             Text(value)
-                .font(AppFont.title)
+                .font(AppFont.headingM())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
             Text(labelKey)
-                .font(AppFont.caption)
+                .font(AppFont.caption())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
         }
         .padding(AppSpace.md)
-        .background(AppColors.Semantic.bgSecondary)
+        .background(AppColors.Semantic.bgCard)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.m)
-                .stroke(AppColors.Semantic.borderMuted, lineWidth: AppStroke.cardBorder)
+                .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
         )
         .accessibilityElement(children: .combine)
     }

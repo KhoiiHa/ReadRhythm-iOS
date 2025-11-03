@@ -31,7 +31,7 @@ struct DiscoverSectionHeader: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Text(titleKey)
-                .font(.headline)
+                .font(AppFont.headingS())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
                 .accessibilityIdentifier("discover.section.header.title")
 
@@ -42,7 +42,7 @@ struct DiscoverSectionHeader: View {
                     destination
                 } label: {
                     Text(LocalizedStringKey("discover.seeAll"))
-                        .font(.subheadline)
+                        .font(AppFont.caption())
                 }
                 .buttonStyle(.plain)
                 .tint(AppColors.Semantic.tintPrimary)
@@ -52,7 +52,7 @@ struct DiscoverSectionHeader: View {
                     onSeeAll?()
                 } label: {
                     Text(LocalizedStringKey("discover.seeAll"))
-                        .font(.subheadline)
+                        .font(AppFont.caption())
                 }
                 .buttonStyle(.plain)
                 .tint(AppColors.Semantic.tintPrimary)
@@ -62,7 +62,7 @@ struct DiscoverSectionHeader: View {
         .padding(.horizontal, AppSpace._16)
         .padding(.top, AppSpace._8)
         .padding(.bottom, AppSpace._4)
-        .background(AppColors.Semantic.bgPrimary)
+        .background(AppColors.Semantic.bgScreen)
         .accessibilityIdentifier("discover.section.header")
     }
 }

@@ -35,6 +35,29 @@ enum AppFormatter {
         return f
     }()
 
+    /// Formatiert "12 min" / "12 Min." sprachabhängig.
+    static let minutesFormatter: DateComponentsFormatter = {
+        let f = DateComponentsFormatter()
+        f.unitsStyle = .short
+        f.allowedUnits = [.minute]
+        f.zeroFormattingBehavior = [.default]
+        return f
+    }()
+
+    /// Relative Datumsangaben ("yesterday", "heute", "vor 2 Tagen").
+    static let relativeFormatter: RelativeDateTimeFormatter = {
+        let f = RelativeDateTimeFormatter()
+        f.locale = .autoupdatingCurrent
+        f.unitsStyle = .full
+        return f
+    }()
+
+    /// Liefert eine sprachabhängige Minuten-Notierung (z. B. "12 Min.").
+    static func minutesString(_ minutes: Int) -> String {
+        let comps = DateComponents(minute: minutes)
+        return minutesFormatter.string(from: comps) ?? "\(minutes)"
+    }
+
     // MARK: - History / Stats Helpers
 
     /// Formatiert eine History-Zeile („12 Minuten gelesen am Dienstag“).

@@ -52,13 +52,13 @@ struct DiscoverDetailView: View {
         VStack(alignment: .leading, spacing: AppSpace._12) {
             VStack(alignment: .leading, spacing: AppSpace._6) {
                 Text(detail.title)
-                    .font(.title2.weight(.semibold))
+                    .font(AppFont.headingL())
                     .foregroundStyle(AppColors.Semantic.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 if let subtitle = detail.subtitle, !subtitle.isEmpty {
                     Text(subtitle)
-                        .font(.headline)
+                        .font(AppFont.headingS())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -97,12 +97,13 @@ struct DiscoverDetailView: View {
                             .font(.caption)
                             .padding(.vertical, 6)
                             .padding(.horizontal, AppSpace._12)
-                            .background(AppColors.Semantic.bgElevated)
+                            .background(AppColors.Semantic.chipBg)
                             .clipShape(Capsule(style: .continuous))
                             .overlay(
                                 Capsule(style: .continuous)
-                                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+                                    .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                             )
+                            .foregroundStyle(AppColors.Semantic.chipFg)
                     }
                 }
             }
@@ -168,17 +169,17 @@ struct DiscoverDetailView: View {
         }
         .frame(width: coverSize.width, height: coverSize.height)
         .cornerRadius(AppRadius.l)
-        .shadow(color: AppShadow.elevation1, radius: 4, x: 0, y: 2)
+        .shadow(color: AppColors.Semantic.shadowColor, radius: 4, x: 0, y: 2)
         .accessibilityHidden(true)
     }
 
     private var placeholderCover: some View {
         ZStack {
             RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
-                .fill(AppColors.Semantic.bgElevated)
+                .fill(AppColors.Semantic.bgCard)
                 .overlay(
                     RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
-                        .stroke(AppColors.Semantic.borderMuted, lineWidth: 1)
+                        .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                 )
             Text(initials(from: detail.title))
                 .font(.largeTitle.weight(.semibold))

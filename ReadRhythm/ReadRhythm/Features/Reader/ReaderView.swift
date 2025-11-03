@@ -31,20 +31,20 @@ struct ReaderView: View {
             ForEach(Array(content.pages.enumerated()), id: \.offset) { index, page in
                 ScrollView {
                     Text(page)
-                        .font(.body)
+                        .font(AppFont.bodyStandard())
                         .foregroundStyle(AppColors.Semantic.textPrimary)
                         .padding(.horizontal, AppSpace._16)
                         .padding(.vertical, AppSpace._24)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .background(
-                    screenBackground()
+                    AppColors.Semantic.bgScreen
                 )
                 .tag(index)
             }
         }
         .background(
-            screenBackground()
+            AppColors.Semantic.bgScreen
         )
         .tabViewStyle(.page(indexDisplayMode: .automatic))
         .indexViewStyle(.page(backgroundDisplayMode: .always))
@@ -84,18 +84,19 @@ struct ReaderView: View {
                 content.pages.count
             )
         )
-        .font(.caption)
+        .font(AppFont.caption())
         .foregroundStyle(AppColors.Semantic.textSecondary)
         .padding(.horizontal, AppSpace._16)
         .padding(.vertical, AppSpace._8)
         .background(
             Capsule(style: .continuous)
-                .fill(AppColors.Semantic.bgElevated)
+                .fill(AppColors.Semantic.bgCard)
                 .overlay(
                     Capsule(style: .continuous)
-                        .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+                        .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                 )
         )
+        .foregroundStyle(AppColors.Semantic.chipFg)
         .accessibilityIdentifier("reader.pageIndicator")
     }
 }

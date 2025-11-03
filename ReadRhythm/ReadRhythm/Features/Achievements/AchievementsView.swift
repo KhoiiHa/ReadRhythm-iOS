@@ -44,9 +44,9 @@ struct AchievementsView: View {
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: AppSpace.sm) {
             Text(String(localized: "achv.headline"))
-                .font(.title2).bold()
+                .font(AppFont.headingM())
             Text(String(localized: "achv.subtitle"))
-                .font(.subheadline)
+                .font(AppFont.bodyStandard())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
         }
         .padding(.horizontal, AppSpace.lg)
@@ -65,34 +65,32 @@ struct AchievementsView: View {
                     .foregroundStyle(a.unlocked ? AppColors.Brand.primary : AppColors.Semantic.textSecondary)
                     .frame(width: 28)
                 Text(LocalizedStringKey(a.titleKey))
-                    .font(.headline)
+                    .font(AppFont.headingS())
                     .foregroundStyle(fg)
                 Spacer()
             }
 
             Text(LocalizedStringKey(a.subtitleKey))
-                .font(.subheadline)
+                .font(AppFont.bodyStandard())
                 .foregroundStyle(fg)
 
             if let hv = a.highlightValue, a.unlocked {
                 Text(hv)
-                    .font(.caption)
+                    .font(AppFont.caption())
                     .foregroundStyle(AppColors.Brand.primary)
                     .padding(.top, 2)
             }
 
             if !a.unlocked {
                 Text(String(localized: "achv.locked.hint"))
-                    .font(.caption)
+                    .font(AppFont.caption())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
             }
         }
         .padding(AppSpace.lg)
-        .cardBackground()
-        .shadow(color: AppShadow.card.color,
-                radius: AppShadow.card.radius,
-                x: AppShadow.card.x,
-                y: AppShadow.card.y)
+        .background(AppColors.Semantic.bgCard)
+        .cornerRadius(AppRadius.m)
+        .shadow(color: AppColors.Semantic.shadowColor, radius: 3, x: 0, y: 1)
         .opacity(a.unlocked ? 1.0 : 0.8)
         .accessibilityIdentifier("Achievements.Badge.\(a.id)")
     }

@@ -51,10 +51,10 @@ struct ProfileView: View {
 
             VStack(alignment: .leading, spacing: AppSpace.xs) {
                 Text(LocalizedStringKey("profile.greeting"))
-                    .font(AppFont.title)
+                    .font(AppFont.headingM())
                 Text(LocalizedStringKey("profile.subtitle"))
-                    .font(AppFont.body)
-                    .foregroundColor(AppColors.textSecondary)
+                    .font(AppFont.bodyStandard())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
             }
             Spacer()
         }
@@ -122,11 +122,11 @@ struct ProfileView: View {
             } label: {
                 HStack {
                     Text(LocalizedStringKey("profile.cta.insights"))
-                        .font(AppFont.body)
+                        .font(AppFont.bodyStandard())
                     Spacer()
                     Image(systemName: "chevron.right")
-                        .font(AppFont.caption)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .font(AppFont.caption())
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(AppSpace.lg)
@@ -145,7 +145,7 @@ struct ProfileView: View {
                 AchievementsView(context: context)
             } label: {
                 Label(LocalizedStringKey("achv.title"), systemImage: "rosette")
-                    .font(AppFont.body)
+                    .font(AppFont.bodyStandard())
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(AppSpace.lg)
                     .cardBackground()
@@ -167,7 +167,7 @@ struct ProfileView: View {
                 )
             } label: {
                 Label(LocalizedStringKey("audio.nav.title"), systemImage: "waveform")
-                    .font(AppFont.body)
+                    .font(AppFont.bodyStandard())
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(AppSpace.lg)
                     .cardBackground()
@@ -185,7 +185,7 @@ struct ProfileView: View {
                 ReadingHistoryView(context: context)
             } label: {
                 Label(LocalizedStringKey("history.title"), systemImage: "clock")
-                    .font(AppFont.body)
+                    .font(AppFont.bodyStandard())
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(AppSpace.lg)
                     .cardBackground()
@@ -205,11 +205,11 @@ struct ProfileView: View {
         HStack {
             VStack(alignment: .leading, spacing: AppSpace.xs) {
                 Text(title)
-                    .font(AppFont.caption)
-                    .foregroundColor(AppColors.textSecondary)
+                    .font(AppFont.caption())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
                 Text(value)
-                    .font(AppFont.title)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .font(AppFont.headingM())
+                    .foregroundStyle(AppColors.Semantic.textPrimary)
             }
             Spacer()
         }

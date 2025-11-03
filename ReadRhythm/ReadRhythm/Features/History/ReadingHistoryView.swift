@@ -30,7 +30,7 @@ struct ReadingHistoryView: View {
             }
             .padding(.horizontal, AppSpace.lg)
             .padding(.top, AppSpace.lg)
-            .screenBackground()
+            .background(AppColors.Semantic.bgScreen)
         }
         .navigationTitle(Text(LocalizedStringKey("history.title")))
         .task {
@@ -45,9 +45,9 @@ struct ReadingHistoryView: View {
                 .font(.system(size: 40))
                 .foregroundStyle(AppColors.Semantic.textSecondary)
             Text(LocalizedStringKey("history.empty.title"))
-                .font(.headline)
+                .font(AppFont.headingS())
             Text(LocalizedStringKey("history.empty.subtitle"))
-                .font(.subheadline)
+                .font(AppFont.bodyStandard())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .multilineTextAlignment(.center)
         }
@@ -58,7 +58,7 @@ struct ReadingHistoryView: View {
     private func sectionView(_ day: Date, rows: [HistoryRowDisplayData]) -> some View {
         VStack(alignment: .leading, spacing: AppSpace.md) {
             Text(vm.dayLabel(day))
-                .font(.headline)
+                .font(AppFont.headingS())
                 .padding(.horizontal, AppSpace.xs)
 
             VStack(spacing: 8) {
@@ -78,11 +78,11 @@ struct ReadingHistoryView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(row.subtitleText)
-                    .font(.subheadline)
+                    .font(AppFont.bodyStandard())
                     .accessibilityIdentifier("History.Row.Title.\(row.id.uuidString.prefix(6))")
 
                 Text("\(row.timeText) · \(row.titleText)")
-                    .font(.caption)
+                    .font(AppFont.caption())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
             }
 
@@ -90,15 +90,13 @@ struct ReadingHistoryView: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, AppSpace.md)
-        .cardBackground()
+        .background(AppColors.Semantic.bgCard)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-        .shadow(color: AppShadow.card.color,
-                radius: AppShadow.card.radius,
-                x: AppShadow.card.x,
-                y: AppShadow.card.y)
+        .shadow(color: AppColors.Semantic.shadowColor, radius: 3, x: 0, y: 1)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(row.accessibilityLabel)
         .accessibilityIdentifier("History.Row.\(row.id.uuidString.prefix(6))")
     }
 
 }
+

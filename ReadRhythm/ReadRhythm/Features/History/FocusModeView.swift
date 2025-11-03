@@ -34,13 +34,11 @@ struct FocusModeView: View {
             // Header
             VStack(spacing: AppSpace.xs) {
                 Text(LocalizedStringKey("focus.title"))
-                    .font(AppFont.title)
-                    .bold()
-                    .accessibilityIdentifier("Focus.Title")
+                    .font(AppFont.headingM())
 
                 Text(LocalizedStringKey("focus.subtitle"))
-                    .font(AppFont.body)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .font(AppFont.bodyStandard())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
             }
             .padding(.top, AppSpace.xl)
 
@@ -51,18 +49,18 @@ struct FocusModeView: View {
                 HStack(spacing: AppSpace.sm) {
                     Image(systemName: "book.closed")
                         .imageScale(.medium)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
 
                     VStack(alignment: .leading, spacing: AppSpace.xs) {
                         Text(LocalizedStringKey("focus.picker.title"))
-                            .font(AppFont.caption)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .font(AppFont.caption())
+                            .foregroundStyle(AppColors.Semantic.textSecondary)
 
                         Text(
                             vm.selectedBook?.title
                             ?? String(localized: "focus.picker.choose")
                         )
-                        .font(AppFont.body)
+                        .font(AppFont.bodyStandard())
                         .fontWeight(.semibold)
                         .lineLimit(1)
                         .truncationMode(.tail)
@@ -71,8 +69,8 @@ struct FocusModeView: View {
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(AppFont.caption)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .font(AppFont.caption())
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
                 }
                 .padding(AppSpace.md)
                 .frame(maxWidth: .infinity)
@@ -115,8 +113,8 @@ struct FocusModeView: View {
             // Duration Slider
             VStack(alignment: .leading, spacing: AppSpace.sm) {
                 Text(LocalizedStringKey("focus.duration"))
-                    .font(AppFont.body)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .font(AppFont.bodyStandard())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
 
                 Slider(
                     value: Binding(
@@ -128,8 +126,8 @@ struct FocusModeView: View {
                 )
 
                 Text("\(vm.durationMinutes) " + String(localized: "goals.metric.minutes"))
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .font(AppFont.caption())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
             }
             .padding(.horizontal, AppSpace.lg)
             .padding(.vertical, AppSpace.md)
@@ -169,7 +167,7 @@ struct FocusModeView: View {
                         : LocalizedStringKey("focus.action.start"),
                         systemImage: "play.circle.fill"
                     )
-                    .font(AppFont.body)
+                    .font(AppFont.bodyStandard())
                     .fontWeight(.semibold)
                 }
                 .buttonStyle(.borderedProminent)
@@ -185,7 +183,7 @@ struct FocusModeView: View {
                     triggerHaptic(.light)
                 } label: {
                     Label(LocalizedStringKey("focus.action.pause"), systemImage: "pause.circle")
-                        .font(AppFont.body)
+                        .font(AppFont.bodyStandard())
                 }
                 .buttonStyle(.bordered)
                 .disabled(!vm.isRunning)
@@ -203,7 +201,7 @@ struct FocusModeView: View {
                     }
                 } label: {
                     Label(LocalizedStringKey("focus.action.finish"), systemImage: "checkmark.circle")
-                        .font(AppFont.body)
+                        .font(AppFont.bodyStandard())
                 }
                 .buttonStyle(.bordered)
                 .accessibilityIdentifier("Focus.Finish")
@@ -220,7 +218,7 @@ struct FocusModeView: View {
                     }
                 } label: {
                     Label(LocalizedStringKey("focus.action.stop"), systemImage: "stop.circle")
-                        .font(AppFont.body)
+                        .font(AppFont.bodyStandard())
                 }
                 .buttonStyle(.bordered)
                 .accessibilityIdentifier("Focus.Stop")
@@ -263,14 +261,14 @@ private struct BookPickerSheet: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(book.title)
-                                .font(.body)
-                                .foregroundStyle(AppColors.textPrimary)
+                                .font(AppFont.bodyStandard())
+                                .foregroundStyle(AppColors.Semantic.textPrimary)
 
                             // author is now a non-optional String on BookEntity
                             if !book.author.isEmpty {
                                 Text(book.author)
-                                    .font(.caption)
-                                    .foregroundStyle(AppColors.textSecondary)
+                                    .font(AppFont.caption())
+                                    .foregroundStyle(AppColors.Semantic.textSecondary)
                             }
                         }
                         Spacer()

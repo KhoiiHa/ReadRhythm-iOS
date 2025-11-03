@@ -29,7 +29,7 @@ struct BookCoverCard: View {
                         .frame(width: coverSize.width, height: coverSize.height)
                         .clipped()
                         .cornerRadius(AppRadius.l)
-                        .shadow(color: AppShadow.elevation1, radius: 4, x: 0, y: 2)
+                        .shadow(color: AppColors.Semantic.shadowColor, radius: 4, x: 0, y: 2)
                         .accessibilityHidden(true)
                 } else if let coverURL = coverURL {
                     AsyncImage(url: coverURL) { phase in
@@ -43,7 +43,7 @@ struct BookCoverCard: View {
                                 .frame(width: coverSize.width, height: coverSize.height)
                                 .clipped()
                                 .cornerRadius(AppRadius.l)
-                                .shadow(color: AppShadow.elevation1, radius: 4, x: 0, y: 2)
+                                .shadow(color: AppColors.Semantic.shadowColor, radius: 4, x: 0, y: 2)
                                 .accessibilityHidden(true)
                         case .failure:
                             placeholderCover
@@ -74,13 +74,13 @@ struct BookCoverCard: View {
 
             // Texte
             Text(title)
-                .font(.subheadline).bold()
+                .font(AppFont.bodyStandard(.semibold))
                 .lineLimit(2)
                 .foregroundStyle(AppColors.Semantic.textPrimary)
                 .accessibilityIdentifier("bookcard.title")
 
             Text(author ?? String(localized: "book.unknownAuthor"))
-                .font(.caption)
+                .font(AppFont.caption())
                 .lineLimit(1)
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .accessibilityIdentifier("bookcard.author")
@@ -94,8 +94,8 @@ struct BookCoverCard: View {
     private var placeholderCover: some View {
         ZStack {
             RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
-                .fill(AppColors.Semantic.bgElevated)
-                .shadow(color: AppShadow.elevation1, radius: 4, x: 0, y: 2)
+                .fill(AppColors.Semantic.bgCard)
+                .shadow(color: AppColors.Semantic.shadowColor, radius: 4, x: 0, y: 2)
                 .overlay(
                     RoundedRectangle(cornerRadius: AppRadius.l)
                         .stroke(

@@ -33,9 +33,9 @@ struct AudiobookLightView: View {
                 // Header
                 VStack(alignment: .leading, spacing: AppSpace.sm) {
                     Text(LocalizedStringKey("audio.title"))
-                        .font(.title2).bold()
+                        .font(AppFont.headingM())
                     Text(LocalizedStringKey("audio.subtitle"))
-                        .font(.subheadline)
+                        .font(AppFont.bodyStandard())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -44,7 +44,7 @@ struct AudiobookLightView: View {
                 // Text Input
                 VStack(alignment: .leading, spacing: AppSpace.sm) {
                     Text(LocalizedStringKey("audio.input.label"))
-                        .font(.footnote)
+                        .font(AppFont.caption())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
 
                     TextEditor(text: $vm.text)
@@ -90,7 +90,7 @@ struct AudiobookLightView: View {
                         ProgressView(value: vm.progress)
                             .accessibilityIdentifier("Audio.Progress")
                         Text("\(vm.elapsedCharacters)/\(max(vm.totalCharacters,1)) " + NSLocalizedString("audio.progress.chars", comment: "Zeichen"))
-                            .font(.caption)
+                            .font(AppFont.caption())
                             .foregroundStyle(AppColors.Semantic.textSecondary)
                     }
                     .frame(maxWidth: .infinity)
@@ -131,7 +131,7 @@ struct AudiobookLightView: View {
     private func sliderRow(title: String, value: Binding<Double>, range: ClosedRange<Double>) -> some View {
         VStack(alignment: .leading, spacing: AppSpace.sm) {
             Text(LocalizedStringKey(title))
-                .font(.footnote)
+                .font(AppFont.caption())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
             Slider(value: value, in: range)
                 .accessibilityIdentifier("Audio.\(title).Slider")

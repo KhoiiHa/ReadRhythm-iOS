@@ -56,41 +56,19 @@ struct MainTabView: View {
             }
             .accessibilityIdentifier("tab.goals")
 
-            // Profil
+            // More
             NavigationStack {
-                ProfileView(context: context)
+                MoreView()
             }
             .tabItem {
-                Label(LocalizedStringKey("rr.tab.profile"), systemImage: "person.circle")
+                Label("More", systemImage: "ellipsis")
             }
-            .accessibilityIdentifier("tab.profile")
-
-            // Einstellungen
-            NavigationStack {
-                SettingsView()
-            }
-            .tabItem {
-                Label(LocalizedStringKey("rr.tab.settings"), systemImage: "gearshape")
-            }
-            .accessibilityIdentifier("tab.settings")
+            .accessibilityIdentifier("tab.more")
         }
         // Theme / Tint
         .preferredColorScheme(settings.themeMode.colorScheme)
         .tint(AppColors.Semantic.tintPrimary)
+        .background(AppColors.Semantic.bgScreen)
         .accessibilityIdentifier("main.tabview")
-
-        // Seed-Daten nur im Debug
-        .task {
-            #if DEBUG
-            // Dependency Injection statt Singleton:
-            // Wir erzeugen hier eine lokale Service-Instanz mit dem aktuellen ModelContext.
-            let service = DataService(context: context)
-
-            if service.fetchAllBooks().isEmpty {
-                service.seedDemoDataIfNeeded()
-                print("🌱 [MainTabView] Demo data seeded for empty store.")
-            }
-            #endif
-        }
     }
 }

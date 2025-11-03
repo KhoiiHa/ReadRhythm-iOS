@@ -218,10 +218,10 @@ struct DiscoverAllView: View {
                     .padding(.vertical, 8)
                     .background(
                         Capsule()
-                            .fill(AppColors.Semantic.bgElevated)
+                            .fill(AppColors.Semantic.bgCard)
                             .overlay(
                                 Capsule()
-                                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 1)
+                                    .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                             )
                     )
                     .padding(.bottom, 24)
@@ -281,10 +281,10 @@ struct DiscoverAllView: View {
         .frame(height: 44)
         .background(
             RoundedRectangle(cornerRadius: AppRadius.m)
-                .fill(AppColors.Semantic.bgElevated)
+                .fill(AppColors.Semantic.bgCard)
                 .overlay(
                     RoundedRectangle(cornerRadius: AppRadius.m)
-                        .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.5)
+                        .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                 )
         )
         .padding(.horizontal, AppSpace._16)
@@ -314,7 +314,7 @@ struct DiscoverAllView: View {
                         .padding(.vertical, AppSpace._8)
                         .background(
                             Capsule()
-                                .fill(AppColors.Semantic.bgElevated)
+                                .fill(AppColors.Semantic.chipBg)
                         )
                         .overlay(
                             Capsule()

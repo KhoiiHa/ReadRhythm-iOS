@@ -29,6 +29,15 @@ struct LibraryView: View {
                         NavigationLink(value: book) {
                             BookRowView(book: book)
                         }
+                        .listRowInsets(
+                            EdgeInsets(
+                                top: AppSpace._8,
+                                leading: AppSpace._16,
+                                bottom: AppSpace._8,
+                                trailing: AppSpace._16
+                            )
+                        )
+                        .listRowBackground(AppColors.Semantic.bgScreen)
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 // Haptik + Delete-Logik über bestehendes ViewModel API
@@ -49,10 +58,12 @@ struct LibraryView: View {
                     .accessibilityIdentifier("library.list")
                 }
                 .listStyle(.plain)
+                .listRowSeparator(.hidden)
                 .scrollContentBackground(.hidden)
+                .background(AppColors.Semantic.bgScreen)
             }
         }
-        .screenBackground()
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text("library.title"))
         .toolbar {
             ToolbarItem(placement: .topBarLeading) { EditButton() }
@@ -82,9 +93,17 @@ struct LibraryView: View {
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(
-                        Capsule().fill(AppColors.Semantic.bgElevated)
-                            .overlay(Capsule().stroke(AppColors.Semantic.borderMuted, lineWidth: 1))
+                        Capsule()
+                            .fill(AppColors.Semantic.bgCard)
+                            .overlay(
+                                Capsule()
+                                    .stroke(
+                                        AppColors.Semantic.chipBg.opacity(0.6),
+                                        lineWidth: AppStroke.cardBorder
+                                    )
+                            )
                     )
+                    .foregroundStyle(AppColors.Semantic.chipFg)
                     .padding(.bottom, 24)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .animation(.easeInOut(duration: 0.2), value: viewModel.toastMessageKey)
@@ -108,10 +127,10 @@ private struct LibraryEmptyStateView: View {
                 .foregroundStyle(AppColors.Semantic.textSecondary)
 
             Text(LocalizedStringKey("library.empty.title"))
-                .font(.headline)
+                .font(AppFont.headingS())
 
             Text(LocalizedStringKey("library.empty.subtitle"))
-                .font(.subheadline)
+                .font(AppFont.bodyStandard())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, AppSpace._16)
@@ -129,7 +148,7 @@ private struct LibraryEmptyStateView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, AppSpace._16)
-        .screenBackground()
+        .background(AppColors.Semantic.bgScreen)
         .accessibilityIdentifier("library.emptyState")
     }
 }

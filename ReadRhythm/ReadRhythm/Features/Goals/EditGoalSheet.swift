@@ -22,25 +22,32 @@ struct EditGoalSheet: View {
                     Stepper(value: $draft, in: 5...600, step: 5) {
                         HStack {
                             Text(LocalizedStringKey("goals.edit.minutes"))
+                                .font(AppFont.bodyStandard())
+                                .foregroundStyle(AppColors.Semantic.textPrimary)
                             Spacer()
                             Text("\(draft)").monospacedDigit()
+                                .font(AppFont.bodyStandard())
+                                .foregroundStyle(AppColors.Semantic.textPrimary)
                                 .accessibilityIdentifier("Goals.Edit.MinutesValue")
                         }
                     }
                     .accessibilityIdentifier("Goals.Edit.Stepper")
                 } footer: {
                     Text("5–600 \(String(localized: "goals.edit.minutes").lowercased())")
-                        .foregroundStyle(.secondary)
+                        .font(AppFont.caption())
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
                 }
             }
             .navigationTitle(Text(LocalizedStringKey("goals.edit.title")))
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
+            .toolbarBackground(AppColors.Semantic.bgScreen, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(LocalizedStringKey("goals.edit.cancel")) {
                         vm.isEditing = false
                         dismiss()
                     }
+                    .font(AppFont.bodyStandard())
                     .accessibilityIdentifier("Goals.Edit.Cancel")
                 }
                 ToolbarItem(placement: .confirmationAction) {
@@ -52,6 +59,7 @@ struct EditGoalSheet: View {
                         #endif
                         dismiss()
                     }
+                    .font(AppFont.bodyStandard())
                     .accessibilityIdentifier("Goals.Edit.Save")
                 }
             }
@@ -64,4 +72,3 @@ struct EditGoalSheet: View {
         }
     }
 }
-

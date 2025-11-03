@@ -65,23 +65,26 @@ struct AddSessionView: View {
             }
             .navigationTitle(Text("session.add.title"))
             .navigationBarTitleDisplayMode(.inline)
-            .background(AppColors.Semantic.bgPrimary)
+            .background(AppColors.Semantic.bgScreen)
             .tint(AppColors.Semantic.tintPrimary)
             .scrollDismissesKeyboard(.interactively)
             .presentationDragIndicator(.visible)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("common.cancel") { dismiss() }
+                        .font(AppFont.bodyStandard())
                         .accessibilityIdentifier("session.add.cancel")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("common.save") { performSave() }
+                        .font(AppFont.bodyStandard())
                         .disabled(!isValid)
                         .accessibilityIdentifier("session.add.save")
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
                     Button("common.done") { focused = nil }
+                        .font(AppFont.bodyStandard())
                         .accessibilityIdentifier("session.add.keyboard.done")
                 }
             }

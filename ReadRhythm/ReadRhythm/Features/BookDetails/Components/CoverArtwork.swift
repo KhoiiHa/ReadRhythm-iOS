@@ -62,7 +62,7 @@ struct CoverArtwork: View {
         ZStack {
             // Hintergrund-Basis (sichtbar bei Loading / Placeholder / Fehler)
             RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous)
-                .fill(AppColors.Semantic.bgElevated)
+                .fill(AppColors.Semantic.bgCard)
                 .overlay(
                     RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous)
                         .stroke(
@@ -105,7 +105,7 @@ struct CoverArtwork: View {
         .clipShape(
             RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous)
         )
-        .shadow(color: AppShadow.elevation1, radius: 4, x: 0, y: 2)
+        .shadow(color: AppColors.Semantic.shadowColor, radius: 4, x: 0, y: 2)
         .accessibilityHidden(true) // Bild ist dekorativ
     }
 
@@ -114,8 +114,8 @@ struct CoverArtwork: View {
         ZStack {
             LinearGradient(
                 gradient: Gradient(colors: [
-                    AppColors.Semantic.bgElevated,
-                    AppColors.Semantic.bgPrimary.opacity(0.6)
+                    AppColors.Semantic.bgCard,
+                    AppColors.Semantic.tintPrimary.opacity(0.35)
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -163,7 +163,7 @@ struct CoverArtwork_Previews: PreviewProvider {
             )
         }
         .padding()
-        .background(Color.black.opacity(0.05))
+        .background(AppColors.Semantic.bgScreen)
     }
 }
 #endif

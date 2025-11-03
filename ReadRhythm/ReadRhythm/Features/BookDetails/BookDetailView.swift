@@ -71,21 +71,21 @@ struct BookDetailView: View {
 
             VStack(alignment: .leading, spacing: AppSpace._8) {
                 Text(book.title)
-                    .font(.title2.weight(.semibold))
+                    .font(AppFont.headingL())
                     .foregroundStyle(AppColors.Semantic.textPrimary)
                     .multilineTextAlignment(.leading)
                     .accessibilityIdentifier("bookdetail.title")
 
                 if let subtitle = book.subtitle, subtitle.isEmpty == false {
                     Text(subtitle)
-                        .font(.headline)
+                        .font(AppFont.headingS())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                         .multilineTextAlignment(.leading)
                         .accessibilityIdentifier("bookdetail.subtitle")
                 }
 
                 Text(authorText)
-                    .font(.subheadline)
+                    .font(AppFont.bodyStandard())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
                     .lineLimit(2)
                     .accessibilityIdentifier("bookdetail.author")
@@ -93,20 +93,21 @@ struct BookDetailView: View {
                 if isRemoteImported {
                     Text(LocalizedStringKey("detail.source.google"))
                         .font(.caption2)
-                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .foregroundStyle(AppColors.Semantic.chipFg)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
                         .background(
                             Capsule()
-                                .fill(AppColors.Semantic.bgElevated)
+                                .fill(AppColors.Semantic.chipBg)
                                 .overlay(
                                     Capsule()
                                         .stroke(
-                                            AppColors.Semantic.borderMuted,
-                                            lineWidth: 0.5
+                                            AppColors.Semantic.chipBg.opacity(0.6),
+                                            lineWidth: AppStroke.cardBorder
                                         )
                                 )
                         )
+                        .foregroundStyle(AppColors.Semantic.chipFg)
                         .accessibilityIdentifier("bookdetail.badge.google")
                         .accessibilityLabel(Text(LocalizedStringKey("detail.source.google")))
                 }
@@ -126,18 +127,18 @@ struct BookDetailView: View {
         } label: {
             VStack(alignment: .leading, spacing: AppSpace._12) {
                 Text(LocalizedStringKey("bookdetail.reader.title"))
-                    .font(.headline)
+                    .font(AppFont.headingS())
                     .foregroundStyle(AppColors.Semantic.textPrimary)
                     .accessibilityHeading(.h2)
 
                 Text(LocalizedStringKey("bookdetail.reader.open"))
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFont.bodyStandard(.semibold))
                     .foregroundStyle(AppColors.Semantic.tintPrimary)
                     .accessibilityIdentifier("bookdetail.reader.open")
 
                 if let progressLabel = readerProgressLabel(for: content) {
                     Text(progressLabel)
-                        .font(.caption)
+                        .font(AppFont.caption())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                         .accessibilityIdentifier("bookdetail.reader.progress")
                 }
@@ -156,7 +157,7 @@ struct BookDetailView: View {
     private var metaSection: some View {
         VStack(alignment: .leading, spacing: AppSpace._12) {
             Text(LocalizedStringKey("detail.source"))
-                .font(.headline)
+                .font(AppFont.headingS())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
                 .accessibilityHeading(.h2)
 
@@ -202,10 +203,10 @@ struct BookDetailView: View {
             if !book.categories.isEmpty {
                 VStack(alignment: .leading, spacing: AppSpace._8) {
                     Text(LocalizedStringKey("detail.categories"))
-                        .font(.subheadline.weight(.semibold))
+                        .font(AppFont.bodyStandard(.semibold))
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                     Text(book.categories.joined(separator: ", "))
-                        .font(.subheadline)
+                        .font(AppFont.bodyStandard())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                         .accessibilityIdentifier("detail.categories.values")
                 }
@@ -215,11 +216,11 @@ struct BookDetailView: View {
             if let desc = book.descriptionText, !desc.isEmpty {
                 VStack(alignment: .leading, spacing: AppSpace._8) {
                     Text(LocalizedStringKey("detail.description"))
-                        .font(.headline)
+                        .font(AppFont.headingS())
                         .foregroundStyle(AppColors.Semantic.textPrimary)
                         .accessibilityHeading(.h2)
                     Text(desc)
-                        .font(.subheadline)
+                        .font(AppFont.bodyStandard())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                         .lineLimit(showFullDescription ? nil : 3)
                         .accessibilityIdentifier("detail.description.text")
@@ -322,7 +323,7 @@ struct BookDetailView: View {
             Image(systemName: icon)
                 .foregroundStyle(AppColors.Semantic.textSecondary)
             text
-                .font(.subheadline)
+                .font(AppFont.bodyStandard())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
             Spacer(minLength: 0)
         }

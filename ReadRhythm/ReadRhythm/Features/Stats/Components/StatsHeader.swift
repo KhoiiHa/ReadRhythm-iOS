@@ -20,7 +20,7 @@ struct StatsHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpace._16) {
             Text("rr.stats.title")
-                .font(.title2.weight(.semibold))
+                .font(AppFont.headingM())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
                 .accessibilityIdentifier("stats.header.title")
 
@@ -59,14 +59,16 @@ struct StatsHeader: View {
     private func summaryTile(value: String, labelKey: LocalizedStringKey) -> some View {
         VStack(alignment: .leading, spacing: AppSpace._4) {
             Text(value)
-                .font(.title3.weight(.semibold))
+                .font(AppFont.headingS())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
             Text(labelKey)
-                .font(.footnote)
+                .font(AppFont.caption())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
         }
         .padding(AppSpace._12)
-        .cardBackground()
+        .background(AppColors.Semantic.bgCard)
+        .cornerRadius(AppRadius.m)
+        .shadow(color: AppColors.Semantic.shadowColor, radius: 2, x: 0, y: 1)
         .accessibilityElement(children: .combine)
     }
 }

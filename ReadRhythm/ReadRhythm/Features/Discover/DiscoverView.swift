@@ -125,8 +125,9 @@ struct DiscoverView: View {
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(
-                        Capsule().fill(AppColors.Semantic.bgElevated)
-                            .overlay(Capsule().stroke(AppColors.Semantic.borderMuted, lineWidth: 1))
+                        Capsule()
+                            .fill(AppColors.Semantic.bgCard)
+                            .overlay(Capsule().stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder))
                     )
                     .padding(.bottom, 24)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -176,9 +177,10 @@ struct DiscoverView: View {
                         .padding(.horizontal, AppSpace._12)
                         .padding(.vertical, AppSpace._8)
                         .background(
-                            Capsule().fill(AppColors.Semantic.bgElevated)
+                            Capsule()
+                                .fill(AppColors.Semantic.bgCard)
                                 .overlay(
-                                    Capsule().stroke(AppColors.Semantic.borderMuted, lineWidth: 1)
+                                    Capsule().stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                                 )
                         )
                     } else {
@@ -266,10 +268,10 @@ struct DiscoverView: View {
         .contentShape(Rectangle())
         .background(
             RoundedRectangle(cornerRadius: AppRadius.m)
-                .fill(AppColors.Semantic.bgElevated)
+                .fill(AppColors.Semantic.bgCard)
                 .overlay(
                     RoundedRectangle(cornerRadius: AppRadius.m)
-                        .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.5)
+                        .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                 )
         )
         .padding(.horizontal, AppSpace._16)
@@ -293,7 +295,7 @@ struct DiscoverView: View {
                         .font(.footnote)
                         .padding(.horizontal, AppSpace._12)
                         .padding(.vertical, AppSpace._8)
-                        .background(Capsule().fill(AppColors.Semantic.bgElevated))
+                        .background(Capsule().fill(AppColors.Semantic.chipBg))
                         .overlay(
                             Capsule().stroke(isActive ? AppColors.brandPrimary : AppColors.Semantic.borderMuted, lineWidth: 1)
                         )

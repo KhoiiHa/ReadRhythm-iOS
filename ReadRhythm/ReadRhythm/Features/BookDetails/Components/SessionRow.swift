@@ -48,17 +48,19 @@ struct SessionRow: View {
             .padding(.vertical, AppSpace._8)
             .background(
                 Capsule(style: .circular)
-                    .fill(AppColors.Semantic.bgElevated)
+                    .fill(AppColors.Semantic.chipBg)
             )
             .overlay(
                 Capsule()
-                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.5)
+                    .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
             )
+            .foregroundStyle(AppColors.Semantic.chipFg)
             .accessibilityElement(children: .combine)
             .accessibilityLabel(
                 Text("session.a11y.minutes \(minutes)")
             )
         }
+        .background(AppColors.Semantic.bgCard)
         .padding(.vertical, AppSpace._8)
         .accessibilityIdentifier("bookdetail.session.row")
     }
@@ -81,5 +83,3 @@ private extension RelativeDateTimeFormatter {
         return f
     }()
 }
-
-

@@ -49,17 +49,19 @@ struct AddBookView: View {
             }
             .navigationTitle(Text("library.add.title"))
             .navigationBarTitleDisplayMode(.inline)
-            .background(AppColors.Semantic.bgPrimary)
+            .background(AppColors.Semantic.bgScreen)
             .tint(AppColors.Semantic.tintPrimary)
             .scrollDismissesKeyboard(.interactively)
             .presentationDragIndicator(.visible)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("common.cancel") { dismiss() }
+                        .font(AppFont.bodyStandard())
                         .accessibilityIdentifier("addbook.cancel")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("common.save") { performSave() }
+                        .font(AppFont.bodyStandard())
                         .disabled(!isSaveEnabled)
                         .accessibilityIdentifier("addbook.save")
                 }

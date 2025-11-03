@@ -1,4 +1,3 @@
-
 //
 //  BookHeaderView.swift
 //  ReadRhythm
@@ -29,14 +28,14 @@ struct BookHeaderView: View {
 
             VStack(alignment: .leading, spacing: AppSpace._6) {
                 Text(title)
-                    .font(.largeTitle.weight(.semibold))
+                    .font(AppFont.headingL())
                     .foregroundStyle(AppColors.Semantic.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("book.header.title")
 
                 if let author, !author.isEmpty {
                     Text(author)
-                        .font(.headline)
+                        .font(AppFont.bodyStandard())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                         .lineLimit(1)
                         .accessibilityIdentifier("book.header.author")
@@ -50,4 +49,3 @@ struct BookHeaderView: View {
         .accessibilityElement(children: .combine)
     }
 }
-

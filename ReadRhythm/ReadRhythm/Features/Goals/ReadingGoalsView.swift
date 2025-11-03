@@ -40,13 +40,14 @@ struct ReadingGoalsView: View {
                     )
                 } label: {
                     Label(LocalizedStringKey("focus.title"), systemImage: "timer")
+                        .font(AppFont.bodyStandard())
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .cardBackground()
                         .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
                         .overlay(
                             RoundedRectangle(cornerRadius: AppRadius.l)
-                                .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+                                .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                         )
                         .accessibilityIdentifier("Goals.FocusLink.Label")
                 }
@@ -55,38 +56,43 @@ struct ReadingGoalsView: View {
                 // MARK: Progress Ring
                 ZStack {
                     Circle()
-                        .stroke(AppColors.surfaceSecondary, lineWidth: 16)
+                        .stroke(AppColors.Semantic.chartAxis.opacity(0.25), lineWidth: 16)
                     Circle()
                         .trim(from: 0, to: CGFloat(min(max(viewModel.progress, 0), 1)))
-                        .stroke(AppColors.brandPrimary, style: StrokeStyle(lineWidth: 16, lineCap: .round))
+                        .stroke(AppColors.Semantic.tintPrimary, style: StrokeStyle(lineWidth: 16, lineCap: .round))
                         .rotationEffect(.degrees(-90))
                         .animation(.spring(response: 0.6, dampingFraction: 0.8), value: viewModel.progress)
 
                     VStack(spacing: 4) {
                         Text(progressPercent(viewModel.progress))
-                            .font(.system(size: 36, weight: .bold))
-                            .foregroundColor(AppColors.textPrimary)
+                            .font(AppFont.titleLarge)
+                            .foregroundStyle(AppColors.Semantic.textPrimary)
                             .accessibilityIdentifier("Goals.ProgressPercent")
 
                         if let goal = viewModel.activeGoal {
                             Text(String(format: NSLocalizedString("goals.target.minutes", comment: "Ziel-Minuten"), goal.targetMinutes))
-                                .font(.callout)
-                                .foregroundColor(AppColors.textSecondary)
+                                .font(AppFont.caption())
+                                .foregroundStyle(AppColors.Semantic.textSecondary)
                                 .accessibilityIdentifier("Goals.TargetLabel")
                         } else {
                             Text(NSLocalizedString("goals.cta.set", comment: "Ziel festlegen"))
-                                .font(.callout)
-                                .foregroundColor(AppColors.textSecondary)
+                                .font(AppFont.caption())
+                                .foregroundStyle(AppColors.Semantic.textSecondary)
                                 .accessibilityIdentifier("Goals.NoGoalLabel")
                         }
                     }
                     if celebrate {
                         Text(LocalizedStringKey("goals.celebration.reached"))
-                            .font(.caption.weight(.semibold))
+                            .font(AppFont.caption(.semibold))
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
                             .background(.ultraThinMaterial, in: Capsule())
-                            .overlay(Capsule().stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75))
+                            .overlay(
+                                Capsule().stroke(
+                                    AppColors.Semantic.chipBg.opacity(0.6),
+                                    lineWidth: AppStroke.cardBorder
+                                )
+                            )
                             .padding(10)
                             .frame(maxWidth: .infinity, alignment: .topTrailing)
                             .transition(.move(edge: .top).combined(with: .opacity))
@@ -109,10 +115,10 @@ struct ReadingGoalsView: View {
                 HStack(spacing: AppSpace.sm) {
                     Label {
                         Text("\(viewModel.streakCount)")
-                            .font(.headline)
+                            .font(AppFont.headingS())
                         Text(NSLocalizedString("goals.streak.days", comment: "Tage in Folge"))
-                            .font(.subheadline)
-                            .foregroundColor(AppColors.textSecondary)
+                            .font(AppFont.bodyStandard())
+                            .foregroundStyle(AppColors.Semantic.textSecondary)
                     } icon: {
                         Image(systemName: "flame.fill")
                     }
@@ -182,20 +188,21 @@ struct ReadingGoalsView: View {
     private func metricTile(minutes: Int) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(NSLocalizedString("goals.metric.readThisPeriod", comment: "Gelesen in dieser Periode"))
-                .font(.subheadline)
-                .foregroundColor(AppColors.textSecondary)
+                .font(AppFont.bodyStandard())
+                .foregroundStyle(AppColors.Semantic.textSecondary)
             Text("\(minutes) " + NSLocalizedString("goals.metric.minutes", comment: "Minuten"))
-                .font(.title3).bold()
-                .foregroundColor(AppColors.textPrimary)
+                .font(AppFont.headingM())
+                .foregroundStyle(AppColors.Semantic.textPrimary)
         }
         .padding(AppSpace.lg)
-        .cardBackground()
+        .background(AppColors.Semantic.bgCard)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-        .shadow(color: AppShadow.card.color, radius: AppShadow.card.radius, x: AppShadow.card.x, y: AppShadow.card.y)
+        .shadow(color: AppColors.Semantic.shadowColor, radius: 3, x: 0, y: 1)
         .accessibilityIdentifier("Goals.MetricTile")
     }
 }
 
+// MARK: - DEBUG Case-Study Harness
 #if DEBUG
 // MARK: - Case-Study Harness (Preview-only, ohne Produktions-VM/SwiftData)
 private struct GoalsPreviewVM {
@@ -216,48 +223,58 @@ private struct ReadingGoalsCaseStudy: View {
             VStack(spacing: AppSpace.lg) {
                 // Focus-Link (statisch)
                 Label(LocalizedStringKey("focus.title"), systemImage: "timer")
+                    .font(AppFont.bodyStandard())
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(AppColors.surfacePrimary)
+                    .background(AppColors.Semantic.bgCard)
                     .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: AppRadius.l).stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppRadius.l)
+                            .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
+                    )
                     .accessibilityIdentifier("Goals.FocusLink.Label")
                     .accessibilityElement(children: .combine)
 
                 // Progress Ring
                 ZStack {
-                    Circle().stroke(AppColors.surfaceSecondary, lineWidth: 16)
+                    Circle()
+                        .stroke(AppColors.Semantic.chartAxis.opacity(0.25), lineWidth: 16)
                     Circle()
                         .trim(from: 0, to: CGFloat(min(max(vm.progress, 0), 1)))
-                        .stroke(AppColors.brandPrimary, style: StrokeStyle(lineWidth: 16, lineCap: .round))
+                        .stroke(AppColors.Semantic.tintPrimary, style: StrokeStyle(lineWidth: 16, lineCap: .round))
                         .rotationEffect(.degrees(-90))
                         .animation(.spring(response: 0.6, dampingFraction: 0.8), value: vm.progress)
 
                     VStack(spacing: 4) {
                         Text(previewProgressPercent(vm.progress))
-                            .font(.system(size: 36, weight: .bold))
-                            .foregroundColor(AppColors.textPrimary)
+                            .font(AppFont.titleLarge)
+                            .foregroundStyle(AppColors.Semantic.textPrimary)
                             .accessibilityIdentifier("Goals.ProgressPercent")
 
                         if let target = vm.targetMinutes {
                             Text(String(format: NSLocalizedString("goals.target.minutes", comment: "Ziel-Minuten"), target))
-                                .font(.callout)
-                                .foregroundColor(AppColors.textSecondary)
+                                .font(AppFont.caption())
+                                .foregroundStyle(AppColors.Semantic.textSecondary)
                                 .accessibilityIdentifier("Goals.TargetLabel")
                         } else {
                             Text(NSLocalizedString("goals.cta.set", comment: "Ziel festlegen"))
-                                .font(.callout)
-                                .foregroundColor(AppColors.textSecondary)
+                                .font(AppFont.caption())
+                                .foregroundStyle(AppColors.Semantic.textSecondary)
                                 .accessibilityIdentifier("Goals.NoGoalLabel")
                         }
                     }
 
                     if vm.progress >= 1.0 && celebrate {
                         Text(LocalizedStringKey("goals.celebration.reached"))
-                            .font(.caption.weight(.semibold))
+                            .font(AppFont.caption(.semibold))
                             .padding(.horizontal, 10).padding(.vertical, 6)
                             .background(.ultraThinMaterial, in: Capsule())
-                            .overlay(Capsule().stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75))
+                            .overlay(
+                                Capsule().stroke(
+                                    AppColors.Semantic.chipBg.opacity(0.6),
+                                    lineWidth: AppStroke.cardBorder
+                                )
+                            )
                             .padding(10)
                             .frame(maxWidth: .infinity, alignment: .topTrailing)
                             .transition(.move(edge: .top).combined(with: .opacity))
@@ -283,8 +300,10 @@ private struct ReadingGoalsCaseStudy: View {
                 // Streak + Edit-CTA (statisch)
                 HStack(spacing: AppSpace.sm) {
                     Label {
-                        Text("\(vm.streakCount)").font(.headline)
-                        Text(NSLocalizedString("goals.streak.days", comment: "Tage in Folge")).font(.subheadline).foregroundColor(AppColors.textSecondary)
+                        Text("\(vm.streakCount)").font(AppFont.headingS())
+                        Text(NSLocalizedString("goals.streak.days", comment: "Tage in Folge"))
+                            .font(AppFont.bodyStandard())
+                            .foregroundStyle(AppColors.Semantic.textSecondary)
                     } icon: { Image(systemName: "flame.fill") }
                     .accessibilityIdentifier("Goals.StreakBadge")
 
@@ -298,13 +317,17 @@ private struct ReadingGoalsCaseStudy: View {
 
                 // Metric Tile (statisch)
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(NSLocalizedString("goals.metric.readThisPeriod", comment: "Gelesen in dieser Periode")).font(.subheadline).foregroundColor(AppColors.textSecondary)
-                    Text("\(vm.totalMinutes) " + NSLocalizedString("goals.metric.minutes", comment: "Minuten")).font(.title3).bold().foregroundColor(AppColors.textPrimary)
+                    Text(NSLocalizedString("goals.metric.readThisPeriod", comment: "Gelesen in dieser Periode"))
+                        .font(AppFont.bodyStandard())
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                    Text("\(vm.totalMinutes) " + NSLocalizedString("goals.metric.minutes", comment: "Minuten"))
+                        .font(AppFont.headingM())
+                        .foregroundStyle(AppColors.Semantic.textPrimary)
                 }
                 .padding(AppSpace.lg)
-                .background(AppColors.surfacePrimary)
+                .background(AppColors.Semantic.bgCard)
                 .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-                .shadow(color: AppShadow.card.color, radius: AppShadow.card.radius, x: AppShadow.card.x, y: AppShadow.card.y)
+                .shadow(color: AppColors.Semantic.shadowColor, radius: 3, x: 0, y: 1)
                 .accessibilityIdentifier("Goals.MetricTile")
 
                 Spacer(minLength: AppSpace.xl)

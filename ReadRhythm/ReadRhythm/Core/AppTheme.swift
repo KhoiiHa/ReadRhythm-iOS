@@ -1,12 +1,8 @@
-// Kontext: Dieses Theme-Bundle hält unsere Design-Tokens und Styles konsistent.
-// Warum: Buttons, Karten und Container sollen über das ganze Produkt hinweg gleich ticken.
-// Wie: Wir definieren radien, Abstände und Modifiers als zentrale SwiftUI-Helfer.
+/// - Kontext: Phase 15 – visuelles Token-System (Spacing, Radius, Shadow + Farb-Semantik über AppColors).
+/// - Warum: Konsistenter Behance-Look (warm, ruhig), AA-Kontrast, saubere Wiederverwendung.
+/// - Wie: Tokens + ViewModifier + ButtonStyle, alle Farben nur über AppColors.Semantic.
 import SwiftUI
 
-/// Kontext → Warum → Wie
-/// - Kontext: Definiert Design-Tokens (Spacing, Radius, Shadow) und wiederverwendbare ViewStyles.
-/// - Warum: Einheitliches visuelles System für Buttons, Karten, Container – wartbar und portfolio-freundlich.
-/// - Wie: Statische Token-Definitionen + ViewModifier + ButtonStyle.
 
 enum AppRadius {
     static let s: CGFloat = 4
@@ -56,7 +52,7 @@ enum AppShadow {
 struct ScreenBackground: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .background(AppColors.Semantic.bgPrimary)
+            .background(AppColors.Semantic.bgScreen)
     }
 }
 
@@ -64,13 +60,13 @@ struct CardBackground: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(AppSpace._12)
-            .background(AppColors.Semantic.bgElevated)
+            .background(AppColors.Semantic.bgCard)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.l)
                     .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.5)
             )
-            .shadow(color: AppShadow.elevation1, radius: 2, x: 0, y: 1)
+            .shadow(color: AppColors.Semantic.shadowColor, radius: 3, x: 0, y: 1)
     }
 }
 
@@ -79,7 +75,7 @@ struct MetricTile: ViewModifier {
         content
             .padding(.vertical, AppSpace._12)
             .padding(.horizontal, AppSpace._16)
-            .background(AppColors.Semantic.bgElevated)
+            .background(AppColors.Semantic.bgCard)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.l)
@@ -94,12 +90,13 @@ struct TagCapsule: ViewModifier {
             .font(.subheadline)
             .padding(.vertical, 6)
             .padding(.horizontal, AppSpace._12)
-            .background(AppColors.Semantic.bgElevated)
+            .background(AppColors.Semantic.chipBg)
             .clipShape(Capsule(style: .continuous))
             .overlay(
                 Capsule(style: .continuous)
-                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+                    .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: 0.75)
             )
+            .foregroundStyle(AppColors.Semantic.chipFg)
     }
 }
 
@@ -113,14 +110,16 @@ extension View {
 // MARK: - Button Styles
 
 struct PrimaryButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.headline)
             .padding(.vertical, AppSpace._12)
             .frame(maxWidth: .infinity)
+            .frame(minHeight: 44)
             .background(
                 AppColors.Semantic.tintPrimary
-                    .opacity(configuration.isPressed ? 0.84 : 1.0)
+                    .opacity(configuration.isPressed ? 0.84 : (isEnabled ? 1.0 : 0.6))
             )
             .foregroundStyle(AppColors.Semantic.textInverse)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous))
@@ -128,14 +127,16 @@ struct PrimaryButtonStyle: ButtonStyle {
 }
 
 struct SecondaryButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.subheadline)
             .padding(.vertical, AppSpace._8)
             .frame(maxWidth: .infinity)
+            .frame(minHeight: 44)
             .background(
-                AppColors.Semantic.bgElevated
-                    .opacity(configuration.isPressed ? 0.9 : 1.0)
+                AppColors.Semantic.bgCard
+                    .opacity(configuration.isPressed ? 0.9 : (isEnabled ? 1.0 : 0.6))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.m)

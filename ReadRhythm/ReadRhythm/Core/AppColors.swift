@@ -1,62 +1,92 @@
-// Kontext: Diese Farbpalette zentralisiert alle Marken- und UI-Farben der App.
-// Warum: Konsistente Farbnutzung braucht einen einzigen Wahrheitsanker statt Inline-Hexwerte.
-// Wie: Wir mappen definierte Markenfarben auf statische SwiftUI-Properties für hell/dunkel.
 import SwiftUI
 
-/// Kontext → Warum → Wie
-/// - Kontext: Zentrale Farb-Tokens der App. Verweisen auf Color Sets im Asset Catalog (Any/Dark).
-/// - Warum: Einheitliche Farbverwendung über alle Features; leichtes Austauschen im Portfolio-Refactor.
-/// - Wie: `Color`-Initialisierer liefern definierte Markenwerte; semantische Farben bauen auf den Basis-Tokens auf.
+// Kontext → Warum → Wie
+// Kontext: Zentrale Farb-Tokens der App. Phase 15 führt eine warme Editorial-Palette ein.
+// Warum: Konsistente, portfolio-taugliche Visuals (AA-Kontrast), identische Sprache in Light/Dark.
+// Wie: Brand + Neutral → Semantic Tokens. Helper für dynamische Farben ohne Asset-Konflikte.
+
 enum AppColors {
-    // MARK: - Brand & Accent (Basis-Tokens)
+    // MARK: - Brand (gedämpftes Teal + dezentes Ocker)
     enum Brand {
-        static var primary: Color { Color(red: 98/255, green: 140/255, blue: 133/255) }
-        static var secondary: Color { Color(red: 214/255, green: 193/255, blue: 164/255) }
+        /// Primär: gedämpftes Teal (UI-Aktionen, Links, Highlights)
+        static let teal: Color = .dynamic(
+            light: Color(red: 0.50, green: 0.70, blue: 0.67),   // #80B2AB
+            dark:  Color(red: 0.56, green: 0.78, blue: 0.74)    // #8FC7BE (leicht heller im Dark)
+        )
+        /// Sekundär: ruhiges Ocker (Badges, Chart-Akzente)
+        static let ochre: Color = .dynamic(
+            light: Color(red: 0.83, green: 0.64, blue: 0.31),   // #D4A24F
+            dark:  Color(red: 0.86, green: 0.70, blue: 0.42)    // #DBB369
+        )
+
+        // Backwards-compat (alte Namen)
+        static var primary: Color { teal }
+        static var secondary: Color { ochre }
     }
 
-    enum Accent {
-        static var success: Color { Color(red: 112/255, green: 155/255, blue: 117/255) }
-        static var warning: Color { Color(red: 201/255, green: 155/255, blue: 73/255) }
-        static var error: Color { Color("accent.error", bundle: .main) }
-    }
-
-    // MARK: - Neutrals
+    // MARK: - Neutral (warme Neutrals für ruhige Flächen)
     enum Neutral {
-        static var _0: Color   { Color("neutral.0", bundle: .main) }
-        static var _50: Color  { Color("neutral.50", bundle: .main) }
-        static var _100: Color { Color("neutral.100", bundle: .main) }
-        static var _200: Color { Color("neutral.200", bundle: .main) }
-        static var _300: Color { Color("neutral.300", bundle: .main) }
-        static var _700: Color { Color("neutral.700", bundle: .main) }
-        static var _900: Color { Color("neutral.900", bundle: .main) }
+        /// Screen-Hintergrund (große Flächen)
+        static let screen: Color = .dynamic(
+            light: Color(red: 0.97, green: 0.95, blue: 0.91),   // #F7F2E8
+            dark:  Color(red: 0.11, green: 0.11, blue: 0.10)    // #1C1C1A
+        )
+        /// Kartenfläche / Elevated Surface
+        static let surface: Color = .dynamic(
+            light: Color(red: 0.91, green: 0.88, blue: 0.84),   // #E7E0D6
+            dark:  Color(red: 0.16, green: 0.16, blue: 0.14)    // #282823
+        )
+        /// Rahmen/Separator/Axis
+        static let outline: Color = .dynamic(
+            light: Color(red: 0.72, green: 0.68, blue: 0.63),   // #B7ADA0
+            dark:  Color(red: 0.45, green: 0.43, blue: 0.39)    // #736E63
+        )
+        /// Primärtext
+        static let textPrimary: Color = .dynamic(
+            light: Color(red: 0.14, green: 0.14, blue: 0.12),   // #23231F
+            dark:  Color(red: 0.93, green: 0.92, blue: 0.90)    // #EEECE6
+        )
+        /// Sekundärtext
+        static let textSecondary: Color = .dynamic(
+            light: Color(red: 0.36, green: 0.35, blue: 0.32),   // #5C5A51
+            dark:  Color(red: 0.79, green: 0.77, blue: 0.72)    // #C9C4B8
+        )
     }
 
-    // MARK: - Semantik (systemdynamisch für Light/Dark)
+    // MARK: - Semantic Tokens (einheitliche Sprache für UI)
     enum Semantic {
-        // Backgrounds – folgen automatisch dem System (Light/Dark)
-        static var bgPrimary: Color   { Color(UIColor.systemBackground) }
-        static var bgSecondary: Color { Color(UIColor.secondarySystemBackground) }
-        static var bgElevated: Color  { Color(UIColor.tertiarySystemBackground) }
-
-        // Text – dynamische Label-Farben für korrekten Kontrast
-        static var textPrimary: Color   { Color(UIColor.label) }
-        static var textSecondary: Color { Color(UIColor.secondaryLabel) }
-        static var textInverse: Color   { Color(UIColor.systemBackground) }
-
-        // Tints – App-Akzent; Brand.primary bleibt als visueller Akzent verfügbar
-        static var tintPrimary: Color   { Color.accentColor }
-        static var tintSecondary: Color { Brand.secondary }
-
-        // Border/Separator – systemdynamisch
-        static var borderMuted: Color  { Color(UIColor.separator) }
-        static var borderStrong: Color { Color(UIColor.tertiaryLabel) }
-
-        // Charts – Achsen an UI-Labels angelehnt, Balken/Selection aus Accent
-        static var chartBar: Color       { Accent.success }
-        static var chartAxis: Color      { Color(UIColor.tertiaryLabel) }
-        static var chartSelection: Color { Accent.warning }
-
-        // Shadows – dezent in Light, stärker in Dark
+        // Backgrounds
+        static let bgScreen   = Neutral.screen
+        static let bgPrimary  = Neutral.screen       // Alias für Bestandscode
+        static let bgSecondary = Neutral.surface     // Alias für Bestandscode
+        static let bgCard     = Neutral.surface
+        // Text
+        static let text       = Neutral.textPrimary
+        static let textPrimary = Neutral.textPrimary // Alias für Bestandscode
+        static let textSecondary = Neutral.textSecondary
+        static let textMuted  = Neutral.textSecondary
+        static let textInverse: Color = .dynamic(light: .white, dark: .black)
+        // Tints
+        static let tintPrimary   = Brand.teal
+        static let tintSecondary = Brand.ochre
+        // Chips / Pills
+        static let chipBg = Color.dynamic(
+            light: Color(red: 0.90, green: 0.95, blue: 0.93),
+            dark:  Color(red: 0.17, green: 0.24, blue: 0.23)
+        )
+        static let chipFg = Color.dynamic(
+            light: Color(red: 0.14, green: 0.28, blue: 0.27),
+            dark:  Color(red: 0.78, green: 0.89, blue: 0.86)
+        )
+        // Separators
+        static let borderMuted: Color  = Neutral.outline
+        static let borderStrong: Color = Neutral.outline
+        static let separator: Color    = Neutral.outline
+        // Charts
+        static let chartBar  = Brand.teal
+        static let chartAxis = Neutral.outline
+        static let chartSelection = Brand.ochre
+        // Shadows
         static var shadowColor: Color {
             Color(UIColor { trait in
                 let alpha: CGFloat = (trait.userInterfaceStyle == .dark) ? 0.35 : 0.10
@@ -64,9 +94,8 @@ enum AppColors {
             })
         }
     }
-    // MARK: - Aliases (Phase 4 convenience)
-    /// Für Views, die mit systemweiten Tokens arbeiten wollen, ohne die Palette zu kennen.
-    /// Diese Aliase mappen auf die bestehende semantische Palette oben.
+
+    // MARK: - Aliases (Backwards-compat für existierende Aufrufe)
     static var brandPrimary: Color { Brand.primary }
     static var brandSecondary: Color { Brand.secondary }
 
@@ -77,19 +106,73 @@ enum AppColors {
     static var textSecondary: Color { Semantic.textSecondary }
     static var textInverse: Color { Semantic.textInverse }
 
-
-    // MARK: - Charts (extended)
+    // MARK: - Charts (Kompatibilität + Token-Weiterleitung)
     enum Chart {
-        /// Primäre Farbe für Balken
-        static var barPrimary: Color { Accent.success }
-
-        /// Farbe für das Ziel-Linien-Overlay oder Durchschnitt
-        static var goalLine: Color { Accent.warning }
-
-        /// Farbe für Sekundär- oder Vergleichs-Daten
+        static var barPrimary: Color { Semantic.chartBar }
+        static var goalLine: Color { Semantic.chartSelection }
         static var secondaryBar: Color { Brand.secondary.opacity(0.55) }
-
-        /// Achsen und Gridlines
         static var axis: Color { Semantic.chartAxis }
     }
 }
+
+// MARK: - Utilities
+extension Color {
+    /// Einfacher Dynamic-Color-Helper ohne Asset-Katalog.
+    static func dynamic(light: Color, dark: Color) -> Color {
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .dark ? UIColor(dark) : UIColor(light)
+        })
+    }
+}
+
+#if DEBUG
+// MARK: - Preview für Case Study & Visual QA
+struct AppColors_DebugPreview: View {
+    let cols = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("AppColors – Semantic Tokens")
+                    .font(.title3.bold())
+                    .foregroundStyle(AppColors.Semantic.text)
+                LazyVGrid(columns: cols, spacing: 12) {
+                    token("bgScreen", AppColors.Semantic.bgScreen)
+                    token("bgCard", AppColors.Semantic.bgCard)
+                    token("separator", AppColors.Semantic.separator)
+                    token("text", AppColors.Semantic.text)
+                    token("textMuted", AppColors.Semantic.textMuted)
+                    token("tintPrimary", AppColors.Semantic.tintPrimary)
+                    token("tintSecondary", AppColors.Semantic.tintSecondary)
+                    token("chipBg", AppColors.Semantic.chipBg)
+                    token("chipFg", AppColors.Semantic.chipFg)
+                    token("chartBar", AppColors.Semantic.chartBar)
+                    token("chartAxis", AppColors.Semantic.chartAxis)
+                }
+                .padding(16)
+                .background(AppColors.Semantic.bgCard)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .padding()
+            .background(AppColors.Semantic.bgScreen.ignoresSafeArea())
+        }
+    }
+    private func token(_ name: String, _ color: Color) -> some View {
+        VStack {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(color)
+                .frame(height: 56)
+            Text(name).font(.caption)
+                .foregroundStyle(AppColors.Semantic.text)
+        }
+        .accessibilityIdentifier("color.\(name)")
+    }
+}
+struct AppColors_DebugPreview_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            AppColors_DebugPreview().preferredColorScheme(.light)
+            AppColors_DebugPreview().preferredColorScheme(.dark)
+        }
+    }
+}
+#endif

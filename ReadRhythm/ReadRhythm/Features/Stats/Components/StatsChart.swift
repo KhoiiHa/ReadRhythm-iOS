@@ -32,13 +32,13 @@ struct StatsChart: View {
                     x: .value("Date", point.date, unit: .day),
                     y: .value("Minutes", point.minutes)
                 )
-                .foregroundStyle(AppColors.Chart.barPrimary)
-                .cornerRadius(AppRadius.s)
+                .foregroundStyle(AppColors.Semantic.chartBar)
+                .cornerRadius(AppChart.barCornerRadius)
                 .annotation(position: .top, alignment: .center) {
                     if point.minutes > 0 {
                         Text("\(point.minutes)")
-                            .font(.caption2)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .font(AppFont.caption2())
+                            .foregroundStyle(AppColors.Semantic.textSecondary)
                     }
                 }
             }
@@ -46,32 +46,38 @@ struct StatsChart: View {
             // Ziel-Linie
             RuleMark(y: .value("Goal", goalMinutes))
                 .lineStyle(StrokeStyle(lineWidth: AppStroke.chartGoal, dash: [4]))
-                .foregroundStyle(AppColors.Chart.goalLine)
+                .foregroundStyle(AppColors.Semantic.chartSelection)
                 .annotation(position: .topLeading, alignment: .leading) {
                     Text("\(goalMinutes)")
-                        .font(.caption2)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .font(AppFont.caption2())
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
                         .padding(.horizontal, AppSpace.xs)
                 }
         }
         .chartYAxis {
             AxisMarks(position: .leading) {
                 AxisGridLine()
+                    .foregroundStyle(AppColors.Semantic.chartAxis.opacity(0.35))
                 AxisTick()
+                    .foregroundStyle(AppColors.Semantic.chartAxis)
                 AxisValueLabel()
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
             }
         }
         .chartXAxis {
             AxisMarks(values: .stride(by: .day)) {
                 AxisGridLine()
+                    .foregroundStyle(AppColors.Semantic.chartAxis.opacity(0.2))
                 AxisTick()
+                    .foregroundStyle(AppColors.Semantic.chartAxis)
                 AxisValueLabel(format: .dateTime.day().weekday(.narrow))
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
             }
         }
         .chartYScale(domain: 0...maxY)
         .chartPlotStyle { plot in
             plot
-                .background(AppColors.Semantic.bgElevated)
+                .background(AppColors.Semantic.bgCard)
                 .accessibilityHidden(true) // Deko-Hintergrund ist visuell, nicht in VoiceOver relevant
         }
         .frame(height: AppChart.height)
