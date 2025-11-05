@@ -13,7 +13,7 @@ import SwiftUI
 /// - Wie: Hierarchisches SF-Symbol, i18n-Texte, Theme-Farben; kann später durch Illustration ersetzt werden.
 struct StatsEmptyState: View {
     var body: some View {
-        VStack(spacing: AppSpace._12) {
+        VStack(spacing: AppSpace._8) {
             Image(systemName: "chart.bar.doc.horizontal")
                 .symbolRenderingMode(.hierarchical)
                 .font(.system(size: 48))
@@ -33,8 +33,13 @@ struct StatsEmptyState: View {
                 .accessibilityIdentifier("stats.empty.subtitle")
         }
         .padding(.vertical, AppSpace._24)
+        .padding(.horizontal, AppSpace._16)
         .frame(maxWidth: .infinity)
-        .background(AppColors.Semantic.bgScreen)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.l)
+                .fill(AppColors.Semantic.bgCard)
+                .shadow(color: AppColors.Semantic.shadowColor.opacity(0.15), radius: 3, x: 0, y: 1)
+        )
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("stats.emptyState")
     }

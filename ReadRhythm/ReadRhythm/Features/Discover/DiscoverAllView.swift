@@ -170,25 +170,21 @@ struct DiscoverAllView: View {
 
                 } else if let msg = viewModel.errorMessage {
                     Text(LocalizedStringKey(msg))
-                        .font(.footnote)
+                        .font(AppFont.caption2())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
-                        .padding(.horizontal, AppSpace._16)
 
                 } else if !viewModel.results.isEmpty {
                     resultsGrid(viewModel.results)
-                        .padding(.horizontal, AppSpace._16)
 
                 } else if !viewModel.isLoading,
                           viewModel.results.isEmpty,
                           hasActiveFilter {
                     noResultsForCategory
-                        .padding(.horizontal, AppSpace._16)
                 }
 
                 // Lokaler Fallback: deine gespeicherten Bücher
                 if !hasActiveFilter {
                     grid
-                        .padding(.horizontal, AppSpace._16)
 
                     if displayedBooks.isEmpty {
                         emptyLibraryFallback
@@ -197,9 +193,10 @@ struct DiscoverAllView: View {
 
                 Spacer(minLength: AppSpace._16)
             }
-            .padding(.top, AppSpace._16)
+            .padding(.horizontal, AppSpace._16)
+            .padding(.vertical, AppSpace._16)
         }
-        .screenBackground()
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text(navTitleKey))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -213,7 +210,7 @@ struct DiscoverAllView: View {
             // Kleiner Toast unten ("Hinzugefügt", "Schon vorhanden", "Fehler")
             if let key = viewModel.toastText {
                 Text(LocalizedStringKey(key))
-                    .font(.footnote)
+                    .font(AppFont.caption2())
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(
@@ -276,8 +273,7 @@ struct DiscoverAllView: View {
                 Text(LocalizedStringKey("discover.search.placeholder"))
             )
         }
-        .font(.subheadline)
-        .padding(.horizontal, AppSpace._16)
+        .font(AppFont.bodyStandard())
         .frame(height: 44)
         .background(
             RoundedRectangle(cornerRadius: AppRadius.m)
@@ -287,7 +283,6 @@ struct DiscoverAllView: View {
                         .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                 )
         )
-        .padding(.horizontal, AppSpace._16)
         .accessibilityIdentifier("discover.all.search")
     }
 
@@ -309,7 +304,7 @@ struct DiscoverAllView: View {
                             Image(systemName: cat.systemImage)
                             Text(cat.displayName)
                         }
-                        .font(.footnote)
+                        .font(AppFont.caption2())
                         .padding(.horizontal, AppSpace._12)
                         .padding(.vertical, AppSpace._8)
                         .background(
@@ -330,7 +325,6 @@ struct DiscoverAllView: View {
                     .accessibilityIdentifier("discover.all.chip.\(cat.id)")
                 }
             }
-            .padding(.horizontal, AppSpace._16)
         }
     }
 
@@ -403,14 +397,13 @@ struct DiscoverAllView: View {
     private var emptyLibraryFallback: some View {
         VStack(spacing: AppSpace._12) {
             Text(LocalizedStringKey("discover.empty.title"))
-                .font(.headline)
+                .font(AppFont.headingM())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
 
             Text(LocalizedStringKey("discover.empty.subtitle"))
-                .font(.subheadline)
+                .font(AppFont.bodyStandard())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, AppSpace._16)
 
             Button {
                 #if os(iOS)
@@ -441,13 +434,11 @@ struct DiscoverAllView: View {
                 .foregroundStyle(AppColors.Semantic.textSecondary)
 
             Text(LocalizedStringKey("discover.empty.noResultsForCategory"))
-                .font(.subheadline)
+                .font(AppFont.bodyStandard())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, AppSpace._16)
         }
         .frame(maxWidth: .infinity, minHeight: 200)
-        .padding(.horizontal, AppSpace._16)
         .accessibilityIdentifier("discover.empty.category")
     }
 

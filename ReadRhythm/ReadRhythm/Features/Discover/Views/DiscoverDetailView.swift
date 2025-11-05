@@ -33,7 +33,7 @@ struct DiscoverDetailView: View {
             .padding(.horizontal, AppSpace._16)
             .padding(.vertical, AppSpace._24)
         }
-        .screenBackground()
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text(LocalizedStringKey("discover.detail.title")))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("discover.detail")
@@ -71,7 +71,7 @@ struct DiscoverDetailView: View {
                 } icon: {
                     Image(systemName: "person.2")
                 }
-                .font(.subheadline)
+                .font(AppFont.bodyStandard())
                 .accessibilityLabel(Text(String(format: String(localized: String.LocalizationValue("discover.detail.authors.accessibility")), detail.authorsDisplay)))
             }
 
@@ -90,11 +90,11 @@ struct DiscoverDetailView: View {
             if !detail.categories.isEmpty {
                 VStack(alignment: .leading, spacing: AppSpace._8) {
                     Text(LocalizedStringKey("discover.detail.categories"))
-                        .font(.subheadline.weight(.semibold))
+                        .font(AppFont.bodyStandard(.semibold))
                         .foregroundStyle(AppColors.Semantic.textPrimary)
                     WrappingChips(detail.categories) { category in
                         Text(category)
-                            .font(.caption)
+                            .font(AppFont.caption2())
                             .padding(.vertical, 6)
                             .padding(.horizontal, AppSpace._12)
                             .background(AppColors.Semantic.chipBg)
@@ -113,17 +113,17 @@ struct DiscoverDetailView: View {
     private func descriptionSection(_ text: String) -> some View {
         VStack(alignment: .leading, spacing: AppSpace._8) {
             Text(LocalizedStringKey("discover.detail.about"))
-                .font(.headline)
+                .font(AppFont.headingS())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
             Text(text)
-                .font(.body)
+                .font(AppFont.bodyStandard())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .lineLimit(showFullDescription ? nil : 6)
             Button(showFullDescription ? String(localized: "detail.readLess") : String(localized: "detail.readMore")) {
                 showFullDescription.toggle()
             }
             .buttonStyle(.plain)
-            .font(.footnote.weight(.semibold))
+            .font(AppFont.caption2(.semibold))
             .foregroundStyle(AppColors.Semantic.tintPrimary)
             .accessibilityIdentifier("discover.detail.description.toggle")
         }
@@ -199,10 +199,10 @@ struct DiscoverDetailView: View {
             Image(systemName: systemImage)
             VStack(alignment: .leading, spacing: 2) {
                 Text(LocalizedStringKey(labelKey))
-                    .font(.caption)
+                    .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
                 Text(value)
-                    .font(.subheadline)
+                    .font(AppFont.bodyStandard())
                     .foregroundStyle(AppColors.Semantic.textPrimary)
             }
         }

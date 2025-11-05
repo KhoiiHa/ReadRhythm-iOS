@@ -31,8 +31,9 @@ struct DiscoverSectionHeader: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Text(titleKey)
-                .font(AppFont.headingS())
+                .font(AppFont.headingM())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
+                .tracking(0.3)
                 .accessibilityIdentifier("discover.section.header.title")
 
             Spacer()
@@ -42,26 +43,28 @@ struct DiscoverSectionHeader: View {
                     destination
                 } label: {
                     Text(LocalizedStringKey("discover.seeAll"))
-                        .font(AppFont.caption())
+                        .font(AppFont.caption1())
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .tracking(0.2)
                 }
                 .buttonStyle(.plain)
-                .tint(AppColors.Semantic.tintPrimary)
                 .accessibilityIdentifier("discover.section.header.seeall.link")
             } else if showSeeAll {
                 Button {
                     onSeeAll?()
                 } label: {
                     Text(LocalizedStringKey("discover.seeAll"))
-                        .font(AppFont.caption())
+                        .font(AppFont.caption1())
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .tracking(0.2)
                 }
                 .buttonStyle(.plain)
-                .tint(AppColors.Semantic.tintPrimary)
                 .accessibilityIdentifier("discover.section.header.seeall.button")
             }
         }
         .padding(.horizontal, AppSpace._16)
-        .padding(.top, AppSpace._8)
-        .padding(.bottom, AppSpace._4)
+        .padding(.top, AppSpace._12)
+        .padding(.bottom, AppSpace._8)
         .background(AppColors.Semantic.bgScreen)
         .accessibilityIdentifier("discover.section.header")
     }

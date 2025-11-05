@@ -18,17 +18,24 @@ struct MoreView: View {
                     ProfileView(context: context)
                 } label: {
                     Label("Profil", systemImage: "person.crop.circle")
+                        .font(AppFont.bodyStandard())
+                        .foregroundStyle(AppColors.Semantic.textPrimary)
                 }
 
                 NavigationLink {
                     SettingsView()
                 } label: {
                     Label("Einstellungen", systemImage: "gearshape")
+                        .font(AppFont.bodyStandard())
+                        .foregroundStyle(AppColors.Semantic.textPrimary)
                 }
             }
+            .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
             .background(AppColors.Semantic.bgScreen)
-            .navigationTitle("More")
+            .listRowBackground(AppColors.Semantic.bgCard)
+            .tint(AppColors.Semantic.tintPrimary)
+            .navigationTitle(Text("More"))
             .navigationBarTitleDisplayMode(.inline)
         }
     }

@@ -89,7 +89,7 @@ struct LibraryView: View {
         .overlay(alignment: .bottom) {
             if let key = viewModel.toastMessageKey {
                 Text(LocalizedStringKey(key))
-                    .font(.footnote)
+                    .font(AppFont.caption2())
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(

@@ -40,8 +40,13 @@ enum AppFont {
     static func headingM(_ weight: Font.Weight = .semibold) -> Font { font(Size.hM, weight) }
     static func headingS(_ weight: Font.Weight = .semibold) -> Font { font(Size.hS, weight) }
     static func bodyStandard(_ weight: Font.Weight = .regular) -> Font { font(Size.body, weight) }
-    static func caption(_ weight: Font.Weight = .regular) -> Font { font(Size.caption, weight) }
+
+    // Primary caption tokens
+    static func caption1(_ weight: Font.Weight = .regular) -> Font { font(Size.caption, weight) }
     static func caption2(_ weight: Font.Weight = .regular) -> Font { font(Size.caption2, weight) }
+
+    // Backwards-compatible alias (alt: caption() ohne Nummer)
+    static func caption(_ weight: Font.Weight = .regular) -> Font { caption1(weight) }
 
     // MARK: - Backwards Compatibility (bestehende Aufrufe in Views)
     static var titleLarge: Font { font(Size.display, .semibold) }

@@ -46,7 +46,7 @@ struct StatsView: View {
             .padding(.horizontal, AppSpace.lg)
             .padding(.vertical, AppSpace.lg)
         }
-        .screenBackground()
+        .background(AppColors.Semantic.bgScreen)
         .tint(AppColors.Semantic.tintPrimary)
         .task {
             // Initiales Mapping von UI-Range → ViewModel.days
@@ -130,7 +130,7 @@ struct StatsView: View {
                 .font(AppFont.headingM())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
             Text(labelKey)
-                .font(AppFont.caption())
+                .font(AppFont.caption2())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
         }
         .padding(AppSpace.md)

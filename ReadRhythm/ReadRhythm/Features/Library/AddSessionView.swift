@@ -23,6 +23,13 @@ struct AddSessionView: View {
 
     enum Field { case minutes }
 
+    private var footerHint: some View {
+        Text("session.add.hint")
+            .font(AppFont.caption2())
+            .foregroundStyle(AppColors.Semantic.textSecondary)
+            .multilineTextAlignment(.leading)
+    }
+
     private let minMinutes = 1
     private let maxMinutes = 1440 // 24h Obergrenze als sanfter Guard
 
@@ -59,13 +66,14 @@ struct AddSessionView: View {
                 .textCase(nil)
                 .accessibilityIdentifier("session.add.section")
 
-                Section(footer: Text("session.add.hint")) {
+                Section(footer: footerHint) {
                     EmptyView()
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(AppColors.Semantic.bgScreen)
             .navigationTitle(Text("session.add.title"))
             .navigationBarTitleDisplayMode(.inline)
-            .background(AppColors.Semantic.bgScreen)
             .tint(AppColors.Semantic.tintPrimary)
             .scrollDismissesKeyboard(.interactively)
             .presentationDragIndicator(.visible)

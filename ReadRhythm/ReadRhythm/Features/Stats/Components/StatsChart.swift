@@ -32,7 +32,16 @@ struct StatsChart: View {
                     x: .value("Date", point.date, unit: .day),
                     y: .value("Minutes", point.minutes)
                 )
-                .foregroundStyle(AppColors.Semantic.chartBar)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [
+                            AppColors.Semantic.chartBar.opacity(0.95),
+                            AppColors.Semantic.chartBar.opacity(0.7)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
                 .cornerRadius(AppChart.barCornerRadius)
                 .annotation(position: .top, alignment: .center) {
                     if point.minutes > 0 {
@@ -46,7 +55,7 @@ struct StatsChart: View {
             // Ziel-Linie
             RuleMark(y: .value("Goal", goalMinutes))
                 .lineStyle(StrokeStyle(lineWidth: AppStroke.chartGoal, dash: [4]))
-                .foregroundStyle(AppColors.Semantic.chartSelection)
+                .foregroundStyle(AppColors.Semantic.tintPrimary.opacity(0.85))
                 .annotation(position: .topLeading, alignment: .leading) {
                     Text("\(goalMinutes)")
                         .font(AppFont.caption2())
@@ -77,7 +86,7 @@ struct StatsChart: View {
         .chartYScale(domain: 0...maxY)
         .chartPlotStyle { plot in
             plot
-                .background(AppColors.Semantic.bgCard)
+                .background(AppColors.Semantic.bgScreen)
                 .accessibilityHidden(true) // Deko-Hintergrund ist visuell, nicht in VoiceOver relevant
         }
         .frame(height: AppChart.height)

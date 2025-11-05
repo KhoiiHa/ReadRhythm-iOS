@@ -71,19 +71,19 @@ struct ReadingGoalsView: View {
 
                         if let goal = viewModel.activeGoal {
                             Text(String(format: NSLocalizedString("goals.target.minutes", comment: "Ziel-Minuten"), goal.targetMinutes))
-                                .font(AppFont.caption())
+                                .font(AppFont.caption2())
                                 .foregroundStyle(AppColors.Semantic.textSecondary)
                                 .accessibilityIdentifier("Goals.TargetLabel")
                         } else {
                             Text(NSLocalizedString("goals.cta.set", comment: "Ziel festlegen"))
-                                .font(AppFont.caption())
+                                .font(AppFont.caption2())
                                 .foregroundStyle(AppColors.Semantic.textSecondary)
                                 .accessibilityIdentifier("Goals.NoGoalLabel")
                         }
                     }
                     if celebrate {
                         Text(LocalizedStringKey("goals.celebration.reached"))
-                            .font(AppFont.caption(.semibold))
+                            .font(AppFont.caption2(.semibold))
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
                             .background(.ultraThinMaterial, in: Capsule())
@@ -147,7 +147,7 @@ struct ReadingGoalsView: View {
             .padding(.bottom, AppSpace.xl)
             .accessibilityIdentifier("Goals.Screen")
         }
-        .screenBackground()
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text(NSLocalizedString("goals.title", comment: "Lesziele")))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -253,12 +253,12 @@ private struct ReadingGoalsCaseStudy: View {
 
                         if let target = vm.targetMinutes {
                             Text(String(format: NSLocalizedString("goals.target.minutes", comment: "Ziel-Minuten"), target))
-                                .font(AppFont.caption())
+                                .font(AppFont.caption2())
                                 .foregroundStyle(AppColors.Semantic.textSecondary)
                                 .accessibilityIdentifier("Goals.TargetLabel")
                         } else {
                             Text(NSLocalizedString("goals.cta.set", comment: "Ziel festlegen"))
-                                .font(AppFont.caption())
+                                .font(AppFont.caption2())
                                 .foregroundStyle(AppColors.Semantic.textSecondary)
                                 .accessibilityIdentifier("Goals.NoGoalLabel")
                         }
@@ -266,7 +266,7 @@ private struct ReadingGoalsCaseStudy: View {
 
                     if vm.progress >= 1.0 && celebrate {
                         Text(LocalizedStringKey("goals.celebration.reached"))
-                            .font(AppFont.caption(.semibold))
+                            .font(AppFont.caption2(.semibold))
                             .padding(.horizontal, 10).padding(.vertical, 6)
                             .background(.ultraThinMaterial, in: Capsule())
                             .overlay(
@@ -336,6 +336,7 @@ private struct ReadingGoalsCaseStudy: View {
             .padding(.bottom, AppSpace.xl)
             .accessibilityIdentifier("Goals.Screen")
         }
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text(NSLocalizedString("goals.title", comment: "Lesziele")))
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -31,6 +31,7 @@ struct AchievementsView: View {
             }
             .padding(.top, AppSpace.xl)
         }
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text(String(localized: "achv.title")))
         .onAppear { vm.reload() }
     }
@@ -76,14 +77,14 @@ struct AchievementsView: View {
 
             if let hv = a.highlightValue, a.unlocked {
                 Text(hv)
-                    .font(AppFont.caption())
+                    .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Brand.primary)
                     .padding(.top, 2)
             }
 
             if !a.unlocked {
                 Text(String(localized: "achv.locked.hint"))
-                    .font(AppFont.caption())
+                    .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
             }
         }

@@ -44,7 +44,7 @@ struct AudiobookLightView: View {
                 // Text Input
                 VStack(alignment: .leading, spacing: AppSpace.sm) {
                     Text(LocalizedStringKey("audio.input.label"))
-                        .font(AppFont.caption())
+                        .font(AppFont.caption2())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
 
                     TextEditor(text: $vm.text)
@@ -90,7 +90,7 @@ struct AudiobookLightView: View {
                         ProgressView(value: vm.progress)
                             .accessibilityIdentifier("Audio.Progress")
                         Text("\(vm.elapsedCharacters)/\(max(vm.totalCharacters,1)) " + NSLocalizedString("audio.progress.chars", comment: "Zeichen"))
-                            .font(AppFont.caption())
+                            .font(AppFont.caption2())
                             .foregroundStyle(AppColors.Semantic.textSecondary)
                     }
                     .frame(maxWidth: .infinity)
@@ -122,8 +122,8 @@ struct AudiobookLightView: View {
                 Spacer(minLength: AppSpace.xl)
             }
             .padding(.top, AppSpace.lg)
-            .screenBackground()
         }
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text(LocalizedStringKey("audio.nav.title")))
     }
 
@@ -131,7 +131,7 @@ struct AudiobookLightView: View {
     private func sliderRow(title: String, value: Binding<Double>, range: ClosedRange<Double>) -> some View {
         VStack(alignment: .leading, spacing: AppSpace.sm) {
             Text(LocalizedStringKey(title))
-                .font(AppFont.caption())
+                .font(AppFont.caption2())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
             Slider(value: value, in: range)
                 .accessibilityIdentifier("Audio.\(title).Slider")

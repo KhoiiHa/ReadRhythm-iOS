@@ -38,7 +38,7 @@ struct BookDetailView: View {
             .padding(.horizontal, AppSpace._16)
             .padding(.vertical, AppSpace._16)
         }
-        .screenBackground()
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text("book.detail.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -56,46 +56,46 @@ struct BookDetailView: View {
         }
     }
 
-    // MARK: - Header (Cover + Titel + Autor + Quelle)
+    // MARK: - Header (Hero: Cover + Titel + Autor + Quelle)
     private var headerSection: some View {
-        HStack(alignment: .top, spacing: AppSpace._16) {
-
-            // unified cover component (remote cover or initials fallback)
+        VStack(spacing: AppSpace._16) {
+            // Hero-Cover zentriert
             CoverArtwork(
                 thumbnailURLString: book.thumbnailURL,
                 titleForInitials: book.title,
-                width: 100,
-                height: 140
+                width: 140,
+                height: 200
             )
             .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: AppSpace._8) {
+            // Titel / Untertitel / Autor zentriert unter dem Cover
+            VStack(alignment: .center, spacing: AppSpace._6) {
                 Text(book.title)
                     .font(AppFont.headingL())
                     .foregroundStyle(AppColors.Semantic.textPrimary)
-                    .multilineTextAlignment(.leading)
+                    .multilineTextAlignment(.center)
                     .accessibilityIdentifier("bookdetail.title")
 
                 if let subtitle = book.subtitle, subtitle.isEmpty == false {
                     Text(subtitle)
                         .font(AppFont.headingS())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
-                        .multilineTextAlignment(.leading)
+                        .multilineTextAlignment(.center)
                         .accessibilityIdentifier("bookdetail.subtitle")
                 }
 
                 Text(authorText)
                     .font(AppFont.bodyStandard())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
+                    .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .accessibilityIdentifier("bookdetail.author")
 
                 if isRemoteImported {
                     Text(LocalizedStringKey("detail.source.google"))
-                        .font(.caption2)
-                        .foregroundStyle(AppColors.Semantic.chipFg)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
+                        .font(AppFont.caption2())
+                        .padding(.horizontal, AppSpace._8)
+                        .padding(.vertical, AppSpace._4)
                         .background(
                             Capsule()
                                 .fill(AppColors.Semantic.chipBg)
@@ -112,9 +112,15 @@ struct BookDetailView: View {
                         .accessibilityLabel(Text(LocalizedStringKey("detail.source.google")))
                 }
             }
-
-            Spacer(minLength: 0)
+            .frame(maxWidth: .infinity, alignment: .center)
         }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(AppSpace._16)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.l)
+                .fill(AppColors.Semantic.bgCard)
+                .shadow(color: AppColors.Semantic.shadowColor.opacity(0.25), radius: 10, x: 0, y: 6)
+        )
     }
 
     // MARK: - Reader
@@ -138,7 +144,7 @@ struct BookDetailView: View {
 
                 if let progressLabel = readerProgressLabel(for: content) {
                     Text(progressLabel)
-                        .font(AppFont.caption())
+                        .font(AppFont.caption2())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                         .accessibilityIdentifier("bookdetail.reader.progress")
                 }
@@ -228,7 +234,7 @@ struct BookDetailView: View {
                         showFullDescription.toggle()
                     }
                     .buttonStyle(.plain)
-                    .font(.footnote.weight(.semibold))
+                    .font(AppFont.caption2(.semibold))
                     .foregroundStyle(AppColors.Semantic.tintPrimary)
                     .accessibilityIdentifier("detail.description.toggle")
                 }
@@ -240,7 +246,7 @@ struct BookDetailView: View {
                     openURL(url)
                 } label: {
                     Text(LocalizedStringKey("detail.openInGoogleBooks"))
-                        .font(.footnote.weight(.semibold))
+                        .font(AppFont.caption2(.semibold))
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)

@@ -22,12 +22,12 @@ struct SessionRow: View {
                     .day(.twoDigits)
                     .month(.abbreviated)
                     .year(.defaultDigits))
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFont.bodyStandard(.semibold))
                     .foregroundStyle(AppColors.Semantic.textPrimary)
                     .accessibilityLabel(Text("session.date"))
 
                 Text(relativeString(for: date))
-                    .font(.footnote)
+                    .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
                     .accessibilityHidden(true) // dekorativ zusätzlich zum Datum
             }
@@ -39,9 +39,9 @@ struct SessionRow: View {
                 Image(systemName: "stopwatch")
                     .imageScale(.small)
                 Text("\(minutes)")
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFont.bodyStandard(.semibold))
                 Text(String(localized: "session.minutes.suffix")) // z. B. „min“
-                    .font(.footnote)
+                    .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
             }
             .padding(.horizontal, AppSpace._12)

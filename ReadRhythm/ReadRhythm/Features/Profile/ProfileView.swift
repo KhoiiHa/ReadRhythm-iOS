@@ -29,7 +29,7 @@ struct ProfileView: View {
             .padding(.horizontal, AppSpace.lg)
             .padding(.vertical, AppSpace.lg)
         }
-        .screenBackground()
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text(LocalizedStringKey("profile.title")))
         .task {
             vm.reload()
@@ -125,7 +125,7 @@ struct ProfileView: View {
                         .font(AppFont.bodyStandard())
                     Spacer()
                     Image(systemName: "chevron.right")
-                        .font(AppFont.caption())
+                        .font(AppFont.caption2())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -205,7 +205,7 @@ struct ProfileView: View {
         HStack {
             VStack(alignment: .leading, spacing: AppSpace.xs) {
                 Text(title)
-                    .font(AppFont.caption())
+                    .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
                 Text(value)
                     .font(AppFont.headingM())
@@ -215,13 +215,16 @@ struct ProfileView: View {
         }
         .padding(AppSpace.lg)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .cardBackground()
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-        .shadow(
-            color: AppShadow.card.color,
-            radius: AppShadow.card.radius,
-            x: AppShadow.card.x,
-            y: AppShadow.card.y
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                .fill(AppColors.Semantic.bgScreen)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                        .stroke(
+                            AppColors.Semantic.tintPrimary.opacity(0.14),
+                            lineWidth: 1
+                        )
+                )
         )
         .accessibilityIdentifier(a11y)
     }

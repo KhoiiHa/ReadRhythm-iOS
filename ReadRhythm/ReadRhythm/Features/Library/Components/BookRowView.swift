@@ -114,7 +114,7 @@ private struct LibraryRowCoverPlaceholder: View {
                 .strokeBorder(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
 
             Text(initials)
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .font(AppFont.headingS())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
         }
     }

@@ -122,7 +122,7 @@ struct CoverArtwork: View {
             )
 
             Text(initials(from: titleForInitials))
-                .font(.system(size: 32, weight: .semibold, design: .rounded))
+                .font(AppFont.headingL())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)

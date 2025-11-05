@@ -45,15 +45,18 @@ struct DiscoverView: View {
                         .frame(maxWidth: .infinity, minHeight: 120)
                 } else if let msg = viewModel.errorMessage {
                     Text(LocalizedStringKey(msg))
-                        .font(.footnote)
+                        .font(AppFont.caption2())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
-                        .padding(.horizontal, AppSpace._16)
                 } else if !viewModel.results.isEmpty {
-                    DiscoverSectionHeader(
-                        titleKey: "discover.section.results",
-                        showSeeAll: false
-                    )
-                    resultsList(viewModel.results)
+                    VStack(alignment: .leading, spacing: AppSpace._12) {
+                        DiscoverSectionHeader(
+                            titleKey: "discover.section.results",
+                            showSeeAll: false
+                        )
+                        resultsList(viewModel.results)
+                    }
+                    .padding(.top, AppSpace._16)
+                    .padding(.horizontal, AppSpace._4)
                 } else if !viewModel.isLoading && viewModel.results.isEmpty && hasActiveFilter {
                     // Keine Treffer für aktive Suche / Kategorie
                     noResultsForCategory
@@ -66,62 +69,69 @@ struct DiscoverView: View {
                         emptyState
                     } else {
                         // Sektion 1: Empfohlen
-                        DiscoverSectionHeader(
-                            titleKey: "discover.section.recommended",
-                            showSeeAll: true,
-                            seeAllDestination: AnyView(
-                                DiscoverAllView(
-                                    initialSearchText: viewModel.searchQuery,
-                                    initialCategory: nil,
-                                    repository: repository
+                        let recommended = Array(allBooks.prefix(8))
+                        sectionCard {
+                            DiscoverSectionHeader(
+                                titleKey: "discover.section.recommended",
+                                showSeeAll: true,
+                                seeAllDestination: AnyView(
+                                    DiscoverAllView(
+                                        initialSearchText: viewModel.searchQuery,
+                                        initialCategory: nil,
+                                        repository: repository
+                                    )
                                 )
                             )
-                        )
-                        let recommended = Array(allBooks.prefix(8))
-                        horizontalBooks(recommended)
+                            horizontalBooks(recommended)
+                        }
 
                         // Sektion 2: Aus deiner Library
                         let libraryVisible = Array(allBooks.suffix(8))
-                        DiscoverSectionHeader(
-                            titleKey: "discover.section.fromLibrary",
-                            showSeeAll: allBooks.count > 8,
-                            seeAllDestination: AnyView(
-                                DiscoverAllView(
-                                    initialSearchText: viewModel.searchQuery,
-                                    initialCategory: nil,
-                                    repository: repository
+                        sectionCard {
+                            DiscoverSectionHeader(
+                                titleKey: "discover.section.fromLibrary",
+                                showSeeAll: allBooks.count > 8,
+                                seeAllDestination: AnyView(
+                                    DiscoverAllView(
+                                        initialSearchText: viewModel.searchQuery,
+                                        initialCategory: nil,
+                                        repository: repository
+                                    )
                                 )
                             )
-                        )
-                        horizontalBooks(libraryVisible)
+                            horizontalBooks(libraryVisible)
+                        }
 
                         // Sektion 3: Trending
                         let trendingVisible = Array(allBooks.shuffled().prefix(8))
-                        DiscoverSectionHeader(
-                            titleKey: "discover.section.trending",
-                            showSeeAll: allBooks.count > 8,
-                            seeAllDestination: AnyView(
-                                DiscoverAllView(
-                                    initialSearchText: viewModel.searchQuery,
-                                    initialCategory: nil,
-                                    repository: repository
+                        sectionCard {
+                            DiscoverSectionHeader(
+                                titleKey: "discover.section.trending",
+                                showSeeAll: allBooks.count > 8,
+                                seeAllDestination: AnyView(
+                                    DiscoverAllView(
+                                        initialSearchText: viewModel.searchQuery,
+                                        initialCategory: nil,
+                                        repository: repository
+                                    )
                                 )
                             )
-                        )
-                        horizontalBooks(trendingVisible)
+                            horizontalBooks(trendingVisible)
+                        }
                     }
                 }
             }
+            .padding(.horizontal, AppSpace._16)
             .padding(.vertical, AppSpace._16)
         }
-        .screenBackground()
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text(LocalizedStringKey("rr.tab.discover")))
         .tint(AppColors.Semantic.tintPrimary)
         .accessibilityIdentifier("discover.view")
         .overlay(alignment: .bottom) {
             if let key = viewModel.toastText {
                 Text(LocalizedStringKey(key))
-                    .font(.footnote)
+                    .font(AppFont.caption2())
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(
@@ -144,15 +154,14 @@ struct DiscoverView: View {
                 HStack {
                     // TODO: i18n folgt in Phase 11 (Bonus-Feature)
                     Text("Filter")
-                        .font(.headline)
+                        .font(AppFont.headingM())
                     Spacer()
                     Button {
                         showFilterSheet = false
                     } label: {
                         // TODO: i18n folgt in Phase 11 (Bonus-Feature)
                         Text("Fertig")
-                            .font(.subheadline)
-                            .bold()
+                            .font(AppFont.bodyStandard(.semibold))
                     }
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("discover.filter.done")
@@ -165,7 +174,7 @@ struct DiscoverView: View {
                 VStack(alignment: .leading, spacing: AppSpace._12) {
                     // TODO: i18n folgt in Phase 11 (Bonus-Feature)
                     Text("Aktive Kategorie")
-                        .font(.footnote)
+                        .font(AppFont.caption2())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
 
                     if let cat = viewModel.selectedCategory {
@@ -173,7 +182,7 @@ struct DiscoverView: View {
                             Image(systemName: cat.systemImage)
                             Text(cat.displayName)
                         }
-                        .font(.subheadline)
+                        .font(AppFont.bodyStandard())
                         .padding(.horizontal, AppSpace._12)
                         .padding(.vertical, AppSpace._8)
                         .background(
@@ -186,7 +195,7 @@ struct DiscoverView: View {
                     } else {
                         // TODO: i18n folgt in Phase 11 (Bonus-Feature)
                         Text("Keine Kategorie ausgewählt")
-                            .font(.subheadline)
+                            .font(AppFont.bodyStandard())
                             .foregroundStyle(AppColors.Semantic.textSecondary)
                     }
                 }
@@ -219,6 +228,7 @@ struct DiscoverView: View {
 
                 Spacer()
             }
+            .background(AppColors.Semantic.bgScreen)
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
@@ -262,8 +272,7 @@ struct DiscoverView: View {
             .buttonStyle(.plain)
             .accessibilityIdentifier("discover.filterButton")
         }
-        .font(.subheadline)
-        .padding(.horizontal, AppSpace._16)
+        .font(AppFont.bodyStandard())
         .frame(height: 44)
         .contentShape(Rectangle())
         .background(
@@ -274,7 +283,6 @@ struct DiscoverView: View {
                         .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                 )
         )
-        .padding(.horizontal, AppSpace._16)
         .accessibilityIdentifier("discover.searchBar")
     }
 
@@ -292,7 +300,7 @@ struct DiscoverView: View {
                             Image(systemName: cat.systemImage)
                             Text(cat.displayName)
                         }
-                        .font(.footnote)
+                        .font(AppFont.caption2())
                         .padding(.horizontal, AppSpace._12)
                         .padding(.vertical, AppSpace._8)
                         .background(Capsule().fill(AppColors.Semantic.chipBg))
@@ -311,7 +319,12 @@ struct DiscoverView: View {
     }
 
     private func resultsList(_ items: [RemoteBook]) -> some View {
-        LazyVStack(spacing: AppSpace._12) {
+        let columns = [
+            GridItem(.flexible(), spacing: AppSpace._12),
+            GridItem(.flexible(), spacing: AppSpace._12)
+        ]
+
+        return LazyVGrid(columns: columns, spacing: AppSpace._12) {
             ForEach(items, id: \.id) { book in
                 NavigationLink {
                     DiscoverDetailView(detail: DiscoverBookDetail(from: book))
@@ -328,17 +341,15 @@ struct DiscoverView: View {
                             viewModel.addToLibrary(from: book)
                         }
                     )
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .simultaneousGesture(TapGesture().onEnded {
                     viewModel.cancelToast()
                 })
-
-                Divider().opacity(0.1)
             }
         }
-        .padding(.horizontal, AppSpace._16)
     }
 
     private func horizontalBooks(_ books: [BookEntity]) -> some View {
@@ -378,13 +389,12 @@ struct DiscoverView: View {
                 .font(.system(size: 44))
                 .foregroundStyle(AppColors.Semantic.textSecondary)
             Text(LocalizedStringKey("discover.empty.title"))
-                .font(.headline)
+                .font(AppFont.headingM())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
             Text(LocalizedStringKey("discover.empty.subtitle"))
-                .font(.subheadline)
+                .font(AppFont.bodyStandard())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, AppSpace._16)
         }
         .frame(maxWidth: .infinity, minHeight: 320)
         .accessibilityIdentifier("discover.empty")
@@ -398,16 +408,33 @@ struct DiscoverView: View {
                 .foregroundStyle(AppColors.Semantic.textSecondary)
 
             Text(LocalizedStringKey("discover.empty.noResultsForCategory"))
-                .font(.subheadline)
+                .font(AppFont.bodyStandard())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, AppSpace._16)
 
             // Optional später: Button "Filter zurücksetzen"
         }
         .frame(maxWidth: .infinity, minHeight: 200)
-        .padding(.horizontal, AppSpace._16)
         .accessibilityIdentifier("discover.empty.category")
+    }
+    
+    /// Umschließt eine Discover-Sektion (Header + Inhalt) in einer weichen Card,
+    /// angelehnt an das Behance-Layout (mehr Weißraum, bgCard, Shadow).
+    private func sectionCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: AppSpace._12) {
+            content()
+        }
+        .padding(AppSpace._16)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.l)
+                .fill(AppColors.Semantic.bgCard)
+                .shadow(
+                    color: AppColors.Semantic.shadowColor.opacity(0.18),
+                    radius: 10,
+                    x: 0,
+                    y: 6
+                )
+        )
     }
     
     // MARK: - Init

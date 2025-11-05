@@ -21,6 +21,13 @@ struct AddBookView: View {
 
     enum Field { case title, author }
 
+    private var footerHint: some View {
+        Text("library.add.hint")
+            .font(AppFont.caption2())
+            .foregroundStyle(AppColors.Semantic.textSecondary)
+            .multilineTextAlignment(.leading)
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -43,13 +50,14 @@ struct AddBookView: View {
                 .textCase(nil)
                 .accessibilityIdentifier("addbook.section.info")
 
-                Section(footer: Text("library.add.hint")) {
+                Section(footer: footerHint) {
                     EmptyView()
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(AppColors.Semantic.bgScreen)
             .navigationTitle(Text("library.add.title"))
             .navigationBarTitleDisplayMode(.inline)
-            .background(AppColors.Semantic.bgScreen)
             .tint(AppColors.Semantic.tintPrimary)
             .scrollDismissesKeyboard(.interactively)
             .presentationDragIndicator(.visible)

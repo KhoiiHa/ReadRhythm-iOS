@@ -29,7 +29,6 @@ struct BookCoverCard: View {
                         .frame(width: coverSize.width, height: coverSize.height)
                         .clipped()
                         .cornerRadius(AppRadius.l)
-                        .shadow(color: AppColors.Semantic.shadowColor, radius: 4, x: 0, y: 2)
                         .accessibilityHidden(true)
                 } else if let coverURL = coverURL {
                     AsyncImage(url: coverURL) { phase in
@@ -43,7 +42,6 @@ struct BookCoverCard: View {
                                 .frame(width: coverSize.width, height: coverSize.height)
                                 .clipped()
                                 .cornerRadius(AppRadius.l)
-                                .shadow(color: AppColors.Semantic.shadowColor, radius: 4, x: 0, y: 2)
                                 .accessibilityHidden(true)
                         case .failure:
                             placeholderCover
@@ -80,11 +78,22 @@ struct BookCoverCard: View {
                 .accessibilityIdentifier("bookcard.title")
 
             Text(author ?? String(localized: "book.unknownAuthor"))
-                .font(AppFont.caption())
+                .font(AppFont.caption2())
                 .lineLimit(1)
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .accessibilityIdentifier("bookcard.author")
         }
+        .padding(AppSpace._8)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.l)
+                .fill(AppColors.Semantic.bgCard)
+                .shadow(
+                    color: AppColors.Semantic.shadowColor.opacity(0.22),
+                    radius: 8,
+                    x: 0,
+                    y: 4
+                )
+        )
         .frame(width: coverSize.width)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(Text(title))
@@ -95,7 +104,6 @@ struct BookCoverCard: View {
         ZStack {
             RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
                 .fill(AppColors.Semantic.bgCard)
-                .shadow(color: AppColors.Semantic.shadowColor, radius: 4, x: 0, y: 2)
                 .overlay(
                     RoundedRectangle(cornerRadius: AppRadius.l)
                         .stroke(
@@ -109,7 +117,7 @@ struct BookCoverCard: View {
                 )
 
             Text(initials(from: title))
-                .font(.largeTitle).bold()
+                .font(AppFont.headingL())
                 .foregroundStyle(AppColors.Semantic.tintPrimary.opacity(0.8))
         }
         .frame(width: coverSize.width, height: coverSize.height)

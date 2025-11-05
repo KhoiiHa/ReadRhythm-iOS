@@ -53,7 +53,7 @@ struct FocusModeView: View {
 
                     VStack(alignment: .leading, spacing: AppSpace.xs) {
                         Text(LocalizedStringKey("focus.picker.title"))
-                            .font(AppFont.caption())
+                            .font(AppFont.caption2())
                             .foregroundStyle(AppColors.Semantic.textSecondary)
 
                         Text(
@@ -69,7 +69,7 @@ struct FocusModeView: View {
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(AppFont.caption())
+                        .font(AppFont.caption2())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                 }
                 .padding(AppSpace.md)
@@ -126,7 +126,7 @@ struct FocusModeView: View {
                 )
 
                 Text("\(vm.durationMinutes) " + String(localized: "goals.metric.minutes"))
-                    .font(AppFont.caption())
+                    .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
             }
             .padding(.horizontal, AppSpace.lg)
@@ -228,7 +228,7 @@ struct FocusModeView: View {
         }
         .padding(.horizontal, AppSpace.lg)
         .padding(.bottom, AppSpace.xl)
-        .screenBackground()
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text(LocalizedStringKey("focus.nav.title")))
         .onAppear {
             if vm.selectedBook == nil {
@@ -267,7 +267,7 @@ private struct BookPickerSheet: View {
                             // author is now a non-optional String on BookEntity
                             if !book.author.isEmpty {
                                 Text(book.author)
-                                    .font(AppFont.caption())
+                                    .font(AppFont.caption2())
                                     .foregroundStyle(AppColors.Semantic.textSecondary)
                             }
                         }
@@ -278,6 +278,8 @@ private struct BookPickerSheet: View {
                     "Focus.BookPicker.Row.\(String(describing: book.persistentModelID))"
                 )
             }
+            .scrollContentBackground(.hidden)
+            .background(AppColors.Semantic.bgScreen)
             .navigationTitle(Text(LocalizedStringKey("focus.picker.nav")))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

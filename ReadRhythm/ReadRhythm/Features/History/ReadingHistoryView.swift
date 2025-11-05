@@ -30,8 +30,8 @@ struct ReadingHistoryView: View {
             }
             .padding(.horizontal, AppSpace.lg)
             .padding(.top, AppSpace.lg)
-            .background(AppColors.Semantic.bgScreen)
         }
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text(LocalizedStringKey("history.title")))
         .task {
             vm.reload()
@@ -82,7 +82,7 @@ struct ReadingHistoryView: View {
                     .accessibilityIdentifier("History.Row.Title.\(row.id.uuidString.prefix(6))")
 
                 Text("\(row.timeText) · \(row.titleText)")
-                    .font(AppFont.caption())
+                    .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
             }
 
@@ -99,4 +99,3 @@ struct ReadingHistoryView: View {
     }
 
 }
-

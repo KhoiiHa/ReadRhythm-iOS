@@ -34,10 +34,12 @@ struct EditGoalSheet: View {
                     .accessibilityIdentifier("Goals.Edit.Stepper")
                 } footer: {
                     Text("5–600 \(String(localized: "goals.edit.minutes").lowercased())")
-                        .font(AppFont.caption())
+                        .font(AppFont.caption2())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(AppColors.Semantic.bgScreen)
             .navigationTitle(Text(LocalizedStringKey("goals.edit.title")))
             .toolbarTitleDisplayMode(.inline)
             .toolbarBackground(AppColors.Semantic.bgScreen, for: .navigationBar)

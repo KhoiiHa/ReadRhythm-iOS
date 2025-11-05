@@ -41,7 +41,7 @@ struct InsightsView: View {
             .accessibilityIdentifier("Insights.Screen")
         }
         .accessibilityIdentifier("Insights.Screen.Scroll")
-        .screenBackground()
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text(LocalizedStringKey(vm.titleKey)))
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -426,6 +426,7 @@ private struct InsightsPreviewHarness: View {
             .padding(.top, AppSpace.lg)
             .accessibilityIdentifier("Insights.Screen")
         }
+        .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text("insights.title"))
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -84,7 +84,7 @@ struct ReaderView: View {
                 content.pages.count
             )
         )
-        .font(AppFont.caption())
+        .font(AppFont.caption2())
         .foregroundStyle(AppColors.Semantic.textSecondary)
         .padding(.horizontal, AppSpace._16)
         .padding(.vertical, AppSpace._8)

@@ -62,13 +62,21 @@ struct StatsHeader: View {
                 .font(AppFont.headingS())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
             Text(labelKey)
-                .font(AppFont.caption())
+                .font(AppFont.caption2())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
         }
         .padding(AppSpace._12)
-        .background(AppColors.Semantic.bgCard)
-        .cornerRadius(AppRadius.m)
-        .shadow(color: AppColors.Semantic.shadowColor, radius: 2, x: 0, y: 1)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous)
+                .fill(AppColors.Semantic.bgScreen)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous)
+                        .stroke(
+                            AppColors.Semantic.tintPrimary.opacity(0.18),
+                            lineWidth: 1
+                        )
+                )
+        )
         .accessibilityElement(children: .combine)
     }
 }
