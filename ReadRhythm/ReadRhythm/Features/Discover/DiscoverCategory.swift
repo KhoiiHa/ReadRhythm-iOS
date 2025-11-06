@@ -25,7 +25,7 @@ enum DiscoverCategory: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    /// Lokaliserter Anzeigename (aus .strings). Fallback = i18n-Key.
+    /// Lokalisierter Anzeigename (aus .strings). Fallback = i18n-Key.
     var displayName: String {
         let text = NSLocalizedString(rawValue, comment: "Discover category title")
         return text.isEmpty ? rawValue : text

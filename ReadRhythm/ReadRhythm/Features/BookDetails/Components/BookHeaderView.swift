@@ -29,13 +29,14 @@ struct BookHeaderView: View {
             VStack(alignment: .leading, spacing: AppSpace._6) {
                 Text(title)
                     .font(AppFont.headingL())
-                    .foregroundStyle(AppColors.Semantic.textPrimary)
+                    .lineLimit(3)
+                    .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("book.header.title")
 
                 if let author, !author.isEmpty {
                     Text(author)
-                        .font(AppFont.bodyStandard())
+                        .font(AppFont.caption2())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                         .lineLimit(1)
                         .accessibilityIdentifier("book.header.author")
@@ -43,9 +44,7 @@ struct BookHeaderView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.top, AppSpace._4)
         .padding(.vertical, AppSpace._8)
-        .padding(.bottom, AppSpace._8)
         .accessibilityElement(children: .combine)
     }
 }

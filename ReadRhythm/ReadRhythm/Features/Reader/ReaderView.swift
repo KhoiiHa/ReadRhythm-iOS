@@ -37,15 +37,10 @@ struct ReaderView: View {
                         .padding(.vertical, AppSpace._24)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .background(
-                    AppColors.Semantic.bgScreen
-                )
                 .tag(index)
             }
         }
-        .background(
-            AppColors.Semantic.bgScreen
-        )
+        .screenBackground()
         .tabViewStyle(.page(indexDisplayMode: .automatic))
         .indexViewStyle(.page(backgroundDisplayMode: .always))
         .navigationTitle(Text(bookTitle))
@@ -96,7 +91,6 @@ struct ReaderView: View {
                         .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                 )
         )
-        .foregroundStyle(AppColors.Semantic.chipFg)
         .accessibilityIdentifier("reader.pageIndicator")
     }
 }

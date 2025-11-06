@@ -21,8 +21,7 @@ struct DiscoverDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpace._24) {
-                coverSection
-                metaSection
+                headerCard
                 if let description = detail.description, !description.isEmpty {
                     descriptionSection(description)
                 }
@@ -37,6 +36,26 @@ struct DiscoverDetailView: View {
         .navigationTitle(Text(LocalizedStringKey("discover.detail.title")))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("discover.detail")
+    }
+
+    /// Hero-Header: Cover + Meta in einer Card, angelehnt an das Behance-Detail-Layout.
+    private var headerCard: some View {
+        VStack(alignment: .leading, spacing: AppSpace._16) {
+            coverSection
+            metaSection
+        }
+        .padding(AppSpace._16)
+        .frame(maxWidth: .infinity, alignment: .center)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                .fill(AppColors.Semantic.bgCard)
+                .shadow(
+                    color: AppColors.Semantic.shadowColor.opacity(0.18),
+                    radius: 10,
+                    x: 0,
+                    y: 6
+                )
+        )
     }
 
     // MARK: - Sections
@@ -132,7 +151,7 @@ struct DiscoverDetailView: View {
     private func googleBooksLink(_ url: URL) -> some View {
         Link(destination: url) {
             Text(LocalizedStringKey("discover.detail.openGoogleBooks"))
-                .font(.headline)
+                .font(AppFont.bodyStandard(.semibold))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpace._12)
                 .background(AppColors.Semantic.tintPrimary)
@@ -182,7 +201,7 @@ struct DiscoverDetailView: View {
                         .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
                 )
             Text(initials(from: detail.title))
-                .font(.largeTitle.weight(.semibold))
+                .font(AppFont.headingL())
                 .foregroundStyle(AppColors.Semantic.tintPrimary.opacity(0.8))
         }
         .frame(width: coverSize.width, height: coverSize.height)

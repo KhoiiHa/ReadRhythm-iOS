@@ -123,8 +123,9 @@ struct AudiobookLightView: View {
             }
             .padding(.top, AppSpace.lg)
         }
-        .background(AppColors.Semantic.bgScreen)
+        .screenBackground()
         .navigationTitle(Text(LocalizedStringKey("audio.nav.title")))
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     // MARK: - Subviews

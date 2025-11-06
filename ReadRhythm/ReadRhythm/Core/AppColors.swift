@@ -6,14 +6,15 @@ import SwiftUI
 // Wie: Brand + Neutral → Semantic Tokens. Helper für dynamische Farben ohne Asset-Konflikte.
 
 enum AppColors {
-    // MARK: - Brand (gedämpftes Teal + dezentes Ocker)
+    // MARK: - Brand (Behance-inspiriertes Rot + dezentes Ocker)
     enum Brand {
-        /// Primär: gedämpftes Teal (UI-Aktionen, Links, Highlights)
+        /// Primär: warmes Rot (UI-Aktionen, Links, Highlights – Behance-Style)
         static let teal: Color = .dynamic(
-            light: Color(red: 0.50, green: 0.70, blue: 0.67),   // #80B2AB
-            dark:  Color(red: 0.56, green: 0.78, blue: 0.74)    // #8FC7BE (leicht heller im Dark)
+            // Behance-Red Palette: 500 #ba7876, 600 #a55250
+            light: Color(red: 0.73, green: 0.47, blue: 0.46),   // #BA7876
+            dark:  Color(red: 0.65, green: 0.32, blue: 0.31)    // #A55250
         )
-        /// Sekundär: ruhiges Ocker (Badges, Chart-Akzente)
+        /// Sekundär: ruhiges Ocker (Badges, Chart-Akzente – ergänzend zum Rot)
         static let ochre: Color = .dynamic(
             light: Color(red: 0.83, green: 0.64, blue: 0.31),   // #D4A24F
             dark:  Color(red: 0.86, green: 0.70, blue: 0.42)    // #DBB369
@@ -71,13 +72,18 @@ enum AppColors {
         static let tintSecondary = Brand.ochre
         // Chips / Pills
         static let chipBg = Color.dynamic(
-            light: Color(red: 0.90, green: 0.95, blue: 0.93),
-            dark:  Color(red: 0.17, green: 0.24, blue: 0.23)
+            // Behance-Red-Soft: angelehnt an 100/200 (#EFD6D6 / #E4C3C3)
+            light: Color(red: 0.94, green: 0.84, blue: 0.84),
+            dark:  Color(red: 0.26, green: 0.15, blue: 0.15)
         )
         static let chipFg = Color.dynamic(
-            light: Color(red: 0.14, green: 0.28, blue: 0.27),
-            dark:  Color(red: 0.78, green: 0.89, blue: 0.86)
+            // Text/Icons in Chips: tieferes Rot für Kontrast
+            light: Color(red: 0.56, green: 0.28, blue: 0.27),   // etwa zwischen 600/700
+            dark:  Color(red: 0.93, green: 0.88, blue: 0.87)
         )
+        // Badges (z.B. "Google Books", Status-Tags)
+        static let badgeBg: Color = Brand.teal.opacity(0.14)
+        static let badgeFg: Color = Brand.teal
         // Separators
         static let borderMuted: Color  = Neutral.outline
         static let borderStrong: Color = Neutral.outline
@@ -145,6 +151,8 @@ struct AppColors_DebugPreview: View {
                     token("tintSecondary", AppColors.Semantic.tintSecondary)
                     token("chipBg", AppColors.Semantic.chipBg)
                     token("chipFg", AppColors.Semantic.chipFg)
+                    token("badgeBg", AppColors.Semantic.badgeBg)
+                    token("badgeFg", AppColors.Semantic.badgeFg)
                     token("chartBar", AppColors.Semantic.chartBar)
                     token("chartAxis", AppColors.Semantic.chartAxis)
                 }

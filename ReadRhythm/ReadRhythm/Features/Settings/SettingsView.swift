@@ -17,19 +17,25 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            // MARK: - Theme Mode
+
             Section {
                 Picker("settings.theme.title", selection: $settings.themeMode) {
                     ForEach(AppThemeMode.allCases) { mode in
-                        Text(mode.localizedTitleKey).tag(mode)
+                        Text(mode.localizedTitleKey)
+                            .tag(mode)
                     }
                 }
                 .pickerStyle(.segmented)
                 .accessibilityIdentifier("settings.theme.picker")
             } header: {
                 Text("settings.appearance.section")
+                    .font(AppFont.caption2())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
             }
 
-            // Theme Preview Section
+            // MARK: - Theme Preview
+
             Section {
                 VStack(alignment: .leading, spacing: AppSpace._12) {
                     Text("settings.preview.section")
@@ -60,7 +66,10 @@ struct SettingsView: View {
                         RoundedRectangle(cornerRadius: AppRadius.m)
                             .fill(AppColors.Semantic.tintPrimary)
                             .frame(width: 60, height: 60)
-                            .overlay(Image(systemName: "star.fill").foregroundStyle(AppColors.Semantic.textInverse))
+                            .overlay(
+                                Image(systemName: "star.fill")
+                                    .foregroundStyle(AppColors.Semantic.textInverse)
+                            )
                             .accessibilityIdentifier("settings.preview.tile.tint")
                     }
                     .padding(.vertical, AppSpace._4)
@@ -68,24 +77,36 @@ struct SettingsView: View {
                 .padding(.vertical, AppSpace._8)
             } header: {
                 Text("settings.preview.section")
+                    .font(AppFont.caption2())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
             }
+
+            // MARK: - Debug
 
 #if DEBUG
             Section {
                 Button(role: .destructive) {
                     DataService.resetDemoData(context)
                 } label: {
-                    Label(String(localized: "settings.debug.resetData"),
-                          systemImage: "arrow.clockwise")
+                    Label {
+                        Text(String(localized: "settings.debug.resetData"))
+                            .font(AppFont.bodyStandard())
+                    } icon: {
+                        Image(systemName: "arrow.clockwise")
+                    }
                 }
                 .accessibilityIdentifier("settings.debug.resetData")
             } header: {
                 Text("Debug")
+                    .font(AppFont.caption2())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
             }
 #endif
         }
+        .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
-        .background(AppColors.Semantic.bgScreen)
+        .listRowBackground(AppColors.Semantic.bgCard)
+        .background(AppColors.Semantic.bgScreen.ignoresSafeArea())
         .navigationTitle(Text("rr.tab.settings"))
         .navigationBarTitleDisplayMode(.inline)
         .tint(AppColors.Semantic.tintPrimary)

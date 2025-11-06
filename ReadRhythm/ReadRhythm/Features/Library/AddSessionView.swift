@@ -35,43 +35,65 @@ struct AddSessionView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section(header: Text("session.add.section.info")) {
-                    DatePicker(
-                        "session.add.date",
-                        selection: $date,
-                        displayedComponents: [.date, .hourAndMinute]
+            ScrollView {
+                VStack(alignment: .leading, spacing: AppSpace._24) {
+                    // Sektionstitel
+                    Text("session.add.section.info")
+                        .font(AppFont.caption2())
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .accessibilityIdentifier("session.add.section")
+
+                    // Card mit Feldern
+                    VStack(alignment: .leading, spacing: AppSpace._16) {
+                        DatePicker(
+                            "session.add.date",
+                            selection: $date,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                        .datePickerStyle(.compact)
+                        .accessibilityIdentifier("session.add.date")
+
+                        VStack(alignment: .leading, spacing: AppSpace._6) {
+                            Text("session.add.minutes")
+                                .font(AppFont.bodyStandard(.semibold))
+                            TextField(String(localized: "session.add.minutes.placeholder"), text: $minutesText)
+                                .keyboardType(.numberPad)
+                                .multilineTextAlignment(.trailing)
+                                .focused($focused, equals: .minutes)
+                                .accessibilityIdentifier("session.add.minutes")
+                                .onChange(of: minutesText) { oldValue, newValue in
+                                    let filtered = newValue.filter { $0.isNumber }
+                                    if filtered != newValue { minutesText = filtered }
+                                    if let m = Int(filtered), m > maxMinutes { minutesText = String(maxMinutes) }
+                                }
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityHint(Text("session.add.minutes.hint"))
+                        .accessibilityValue(Text(minutesText.isEmpty ? "0" : minutesText))
+                    }
+                    .padding(AppSpace._16)
+                    .background(
+                        RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                            .fill(AppColors.Semantic.bgCard)
+                            .shadow(
+                                color: AppColors.Semantic.shadowColor.opacity(0.12),
+                                radius: 10,
+                                x: 0,
+                                y: 6
+                            )
                     )
-                    .datePickerStyle(.compact)
-                    .accessibilityIdentifier("session.add.date")
 
-                    HStack {
-                        Text("session.add.minutes")
-                        TextField(String(localized: "session.add.minutes.placeholder"), text: $minutesText)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                            .focused($focused, equals: .minutes)
-                            .accessibilityIdentifier("session.add.minutes")
-                    }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityHint(Text("session.add.minutes.hint"))
-                    .accessibilityValue(Text(minutesText.isEmpty ? "0" : minutesText))
-                    .onChange(of: minutesText) { oldValue, newValue in
-                        // Nur Ziffern erlauben und weich auf max cappen
-                        let filtered = newValue.filter { $0.isNumber }
-                        if filtered != newValue { minutesText = filtered }
-                        if let m = Int(filtered), m > maxMinutes { minutesText = String(maxMinutes) }
-                    }
-                }
-                .textCase(nil)
-                .accessibilityIdentifier("session.add.section")
+                    footerHint
+                        .padding(.horizontal, AppSpace._4)
 
-                Section(footer: footerHint) {
-                    EmptyView()
+                    Spacer(minLength: AppSpace._16)
                 }
+                .padding(.horizontal, AppSpace._16)
+                .padding(.top, AppSpace._20)
+                .padding(.bottom, AppSpace._24)
             }
             .scrollContentBackground(.hidden)
-            .background(AppColors.Semantic.bgScreen)
+            .background(AppColors.Semantic.bgScreen.ignoresSafeArea())
             .navigationTitle(Text("session.add.title"))
             .navigationBarTitleDisplayMode(.inline)
             .tint(AppColors.Semantic.tintPrimary)

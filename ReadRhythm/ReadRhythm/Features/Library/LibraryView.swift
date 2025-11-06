@@ -37,7 +37,7 @@ struct LibraryView: View {
                                 trailing: AppSpace._16
                             )
                         )
-                        .listRowBackground(AppColors.Semantic.bgScreen)
+                        .listRowBackground(Color.clear)
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 // Haptik + Delete-Logik über bestehendes ViewModel API

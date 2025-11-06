@@ -41,6 +41,11 @@ enum AppFont {
     static func headingS(_ weight: Font.Weight = .semibold) -> Font { font(Size.hS, weight) }
     static func bodyStandard(_ weight: Font.Weight = .regular) -> Font { font(Size.body, weight) }
 
+    // Optional: Body Small (z. B. für Metadaten, Autorenzeile)
+    static func bodySmall(_ weight: Font.Weight = .regular) -> Font {
+        font(Size.caption, weight) // 14pt – etwas kleiner als Body, ideal für Meta-Texte
+    }
+
     // Primary caption tokens
     static func caption1(_ weight: Font.Weight = .regular) -> Font { font(Size.caption, weight) }
     static func caption2(_ weight: Font.Weight = .regular) -> Font { font(Size.caption2, weight) }

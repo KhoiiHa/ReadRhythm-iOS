@@ -16,74 +16,94 @@ struct BookCoverCard: View {
     /// Wird aufgerufen, wenn der Nutzer auf "+" tippt.
     var onAddToLibrary: (() -> Void)?
 
-    private let coverSize = CGSize(width: 120, height: 180)
+    // Breiteres Verhältnis für Behance-Style-Cards 
+    private let coverSize = CGSize(width: 140, height: 190)
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: AppSpace._8) {
-            ZStack(alignment: .topTrailing) {
-                // Cover Image or Placeholder
-                if let coverAssetName = coverAssetName {
-                    Image(coverAssetName)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: coverSize.width, height: coverSize.height)
-                        .clipped()
-                        .cornerRadius(AppRadius.l)
-                        .accessibilityHidden(true)
-                } else if let coverURL = coverURL {
-                    AsyncImage(url: coverURL) { phase in
-                        switch phase {
-                        case .empty:
-                            placeholderCover
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: coverSize.width, height: coverSize.height)
-                                .clipped()
-                                .cornerRadius(AppRadius.l)
-                                .accessibilityHidden(true)
-                        case .failure:
-                            placeholderCover
-                        @unknown default:
-                            placeholderCover
-                        }
+    private var coverView: some View {
+        Group {
+            if let coverAssetName = coverAssetName {
+                Image(coverAssetName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: coverSize.width, height: coverSize.height)
+                    .clipped()
+                    .cornerRadius(AppRadius.l)
+                    .accessibilityHidden(true)
+            } else if let coverURL = coverURL {
+                AsyncImage(url: coverURL) { phase in
+                    switch phase {
+                    case .empty:
+                        placeholderCover
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: coverSize.width, height: coverSize.height)
+                            .clipped()
+                            .cornerRadius(AppRadius.l)
+                            .accessibilityHidden(true)
+                    case .failure:
+                        placeholderCover
+                    @unknown default:
+                        placeholderCover
                     }
-                } else {
-                    placeholderCover
                 }
-
-                // Add-to-Library Button
-                if let onAddToLibrary = onAddToLibrary {
-                    Button(action: {
-                        onAddToLibrary()
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 26))
-                            .symbolRenderingMode(.hierarchical)
-                            .foregroundStyle(AppColors.Semantic.tintPrimary)
-                            .shadow(radius: 2)
-                    }
-                    .padding(6)
-                    .accessibilityLabel(Text("book.addToLibrary"))
-                    .accessibilityIdentifier("bookcard.addButton")
-                }
+            } else {
+                placeholderCover
             }
+        }
+    }
 
-            // Texte
+    private var infoSection: some View {
+        VStack(alignment: .leading, spacing: AppSpace._4) {
             Text(title)
                 .font(AppFont.bodyStandard(.semibold))
                 .lineLimit(2)
                 .foregroundStyle(AppColors.Semantic.textPrimary)
                 .accessibilityIdentifier("bookcard.title")
 
-            Text(author ?? String(localized: "book.unknownAuthor"))
-                .font(AppFont.caption2())
-                .lineLimit(1)
-                .foregroundStyle(AppColors.Semantic.textSecondary)
-                .accessibilityIdentifier("bookcard.author")
+            if let onAddToLibrary = onAddToLibrary {
+                HStack(alignment: .firstTextBaseline, spacing: AppSpace._4) {
+                    Text(author ?? String(localized: "book.unknownAuthor"))
+                        .font(AppFont.caption2())
+                        .lineLimit(1)
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .accessibilityIdentifier("bookcard.author")
+
+                    Spacer(minLength: AppSpace._4)
+
+                    Button(action: {
+                        onAddToLibrary()
+                    }) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 14, weight: .semibold))
+                            .padding(8)
+                            .background(
+                                Circle()
+                                    .fill(AppColors.Semantic.tintPrimary)
+                            )
+                            .foregroundStyle(AppColors.Semantic.bgCard)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("book.addToLibrary"))
+                    .accessibilityIdentifier("bookcard.addButton")
+                }
+            } else {
+                Text(author ?? String(localized: "book.unknownAuthor"))
+                    .font(AppFont.caption2())
+                    .lineLimit(1)
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
+                    .accessibilityIdentifier("bookcard.author")
+            }
         }
         .padding(AppSpace._8)
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            coverView
+            infoSection
+        }
         .background(
             RoundedRectangle(cornerRadius: AppRadius.l)
                 .fill(AppColors.Semantic.bgCard)

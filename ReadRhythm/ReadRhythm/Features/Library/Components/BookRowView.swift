@@ -49,51 +49,61 @@ struct BookRowView: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
-            // <-- kleines Cover
-            LibraryRowCoverArtwork(
-                thumbnailURL: thumbnailURL,
-                initials: initials
-            )
-            .accessibilityHidden(true)
+        ZStack {
+            RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous)
+                .fill(AppColors.Semantic.bgCard)
+                .shadow(color: AppShadow.card.color, radius: AppShadow.card.radius, x: AppShadow.card.x, y: AppShadow.card.y)
+            HStack(spacing: 12) {
+                // <-- kleines Cover
+                LibraryRowCoverArtwork(
+                    thumbnailURL: thumbnailURL,
+                    initials: initials
+                )
+                .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(book.title)
-                    .font(AppFont.headingS())
-                    .foregroundStyle(AppColors.Semantic.textPrimary)
-                    .lineLimit(1)
-                    .accessibilityIdentifier("library.row.title.\(book.persistentModelID.hashValue)")
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(book.title)
+                        .font(AppFont.headingM())
+                        .foregroundStyle(AppColors.Semantic.textPrimary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                        .accessibilityIdentifier("library.row.title.\(book.persistentModelID.hashValue)")
 
-                Text(authorText)
-                    .font(AppFont.bodyStandard())
-                    .foregroundStyle(AppColors.Semantic.textSecondary)
-                    .lineLimit(1)
-                    .accessibilityIdentifier("library.row.author.\(book.persistentModelID.hashValue)")
-
-                // Badge für echte API-Importe (Google Books)
-                if isRemoteImported {
-                    Text("Google Books")
+                    Text(authorText)
                         .font(AppFont.caption2())
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            Capsule()
-                                .fill(AppColors.Semantic.chipBg)
-                                .overlay(
-                                    Capsule()
-                                        .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
-                                )
-                        )
-                        .foregroundStyle(AppColors.Semantic.chipFg)
-                        .accessibilityIdentifier("library.row.badge.google.\(book.persistentModelID.hashValue)")
-                }
-            }
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .opacity(0.8)
+                        .lineLimit(1)
+                        .padding(.top, 1)
+                        .accessibilityIdentifier("library.row.author.\(book.persistentModelID.hashValue)")
 
-            Spacer()
+                    // Badge für echte API-Importe (Google Books)
+                    if isRemoteImported {
+                        Text("Google Books")
+                            .font(AppFont.caption2())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(AppColors.Brand.primary.opacity(0.1))
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(AppColors.Brand.primary.opacity(0.6), lineWidth: AppStroke.cardBorder)
+                                    )
+                            )
+                            .foregroundStyle(AppColors.Brand.primary)
+                            .accessibilityIdentifier("library.row.badge.google.\(book.persistentModelID.hashValue)")
+                    }
+                }
+
+                Spacer()
+            }
+            .padding(.vertical, 10)
+            .padding(.horizontal, 16)
         }
+        .contentShape(RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous))
+        .hoverEffect(.highlight)
         .accessibilityLabel(Text("\(book.title), \(authorText)"))
-        .padding(.vertical, 8)
-        .background(Color.clear)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("library.row.\(book.persistentModelID.hashValue)")
     }

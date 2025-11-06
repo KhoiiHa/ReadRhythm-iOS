@@ -147,7 +147,7 @@ struct ReadingGoalsView: View {
             .padding(.bottom, AppSpace.xl)
             .accessibilityIdentifier("Goals.Screen")
         }
-        .background(AppColors.Semantic.bgScreen)
+        .screenBackground()
         .navigationTitle(Text(NSLocalizedString("goals.title", comment: "Lesziele")))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -195,9 +195,16 @@ struct ReadingGoalsView: View {
                 .foregroundStyle(AppColors.Semantic.textPrimary)
         }
         .padding(AppSpace.lg)
-        .background(AppColors.Semantic.bgCard)
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-        .shadow(color: AppColors.Semantic.shadowColor, radius: 3, x: 0, y: 1)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                .fill(AppColors.Semantic.bgCard)
+                .shadow(
+                    color: AppColors.Semantic.shadowColor.opacity(0.12),
+                    radius: 10,
+                    x: 0,
+                    y: 6
+                )
+        )
         .accessibilityIdentifier("Goals.MetricTile")
     }
 }
@@ -226,12 +233,7 @@ private struct ReadingGoalsCaseStudy: View {
                     .font(AppFont.bodyStandard())
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(AppColors.Semantic.bgCard)
-                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppRadius.l)
-                            .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
-                    )
+                    .cardBackground()
                     .accessibilityIdentifier("Goals.FocusLink.Label")
                     .accessibilityElement(children: .combine)
 
@@ -325,9 +327,16 @@ private struct ReadingGoalsCaseStudy: View {
                         .foregroundStyle(AppColors.Semantic.textPrimary)
                 }
                 .padding(AppSpace.lg)
-                .background(AppColors.Semantic.bgCard)
-                .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-                .shadow(color: AppColors.Semantic.shadowColor, radius: 3, x: 0, y: 1)
+                .background(
+                    RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                        .fill(AppColors.Semantic.bgCard)
+                        .shadow(
+                            color: AppColors.Semantic.shadowColor.opacity(0.12),
+                            radius: 10,
+                            x: 0,
+                            y: 6
+                        )
+                )
                 .accessibilityIdentifier("Goals.MetricTile")
 
                 Spacer(minLength: AppSpace.xl)
@@ -336,7 +345,7 @@ private struct ReadingGoalsCaseStudy: View {
             .padding(.bottom, AppSpace.xl)
             .accessibilityIdentifier("Goals.Screen")
         }
-        .background(AppColors.Semantic.bgScreen)
+        .screenBackground()
         .navigationTitle(Text(NSLocalizedString("goals.title", comment: "Lesziele")))
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -24,6 +24,9 @@ struct DiscoverView: View {
     @State private var didAutoLoad = false
     @State private var showFilterSheet = false
 
+    /// Fixe Liste aller Kategorien, entlastet die ForEach-Generics
+    private let allCategories: [DiscoverCategory] = DiscoverCategory.ordered
+
     /// true, wenn der Nutzer aktiv filtert/sucht (Kategorie gewählt oder Text eingegeben)
     private var hasActiveFilter: Bool {
         let q = viewModel.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -150,85 +153,11 @@ struct DiscoverView: View {
             viewModel.cancelToast()
         }
         .sheet(isPresented: $showFilterSheet) {
-            VStack(spacing: AppSpace._16) {
-                HStack {
-                    // TODO: i18n folgt in Phase 11 (Bonus-Feature)
-                    Text("Filter")
-                        .font(AppFont.headingM())
-                    Spacer()
-                    Button {
-                        showFilterSheet = false
-                    } label: {
-                        // TODO: i18n folgt in Phase 11 (Bonus-Feature)
-                        Text("Fertig")
-                            .font(AppFont.bodyStandard(.semibold))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("discover.filter.done")
-                }
-                .padding(.horizontal, AppSpace._16)
-                .padding(.top, AppSpace._16)
-
-                Divider()
-
-                VStack(alignment: .leading, spacing: AppSpace._12) {
-                    // TODO: i18n folgt in Phase 11 (Bonus-Feature)
-                    Text("Aktive Kategorie")
-                        .font(AppFont.caption2())
-                        .foregroundStyle(AppColors.Semantic.textSecondary)
-
-                    if let cat = viewModel.selectedCategory {
-                        HStack(spacing: AppSpace._8) {
-                            Image(systemName: cat.systemImage)
-                            Text(cat.displayName)
-                        }
-                        .font(AppFont.bodyStandard())
-                        .padding(.horizontal, AppSpace._12)
-                        .padding(.vertical, AppSpace._8)
-                        .background(
-                            Capsule()
-                                .fill(AppColors.Semantic.bgCard)
-                                .overlay(
-                                    Capsule().stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
-                                )
-                        )
-                    } else {
-                        // TODO: i18n folgt in Phase 11 (Bonus-Feature)
-                        Text("Keine Kategorie ausgewählt")
-                            .font(AppFont.bodyStandard())
-                            .foregroundStyle(AppColors.Semantic.textSecondary)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, AppSpace._16)
-
-                Divider()
-
-                VStack(spacing: AppSpace._12) {
-                    Button {
-                        // Reset: Kategorie weg, Suchfeld leeren, lokale Fallback-Sektionen zeigen
-                        viewModel.searchQuery = ""
-                        viewModel.applyFilter(category: nil)
-                        showFilterSheet = false
-                        #if DEBUG
-                        print("🧼 [DiscoverView] filters reset")
-                        #endif
-                    } label: {
-                        Label(
-                            LocalizedStringKey("discover.empty.resetFilters"),
-                            systemImage: "arrow.counterclockwise"
-                        )
-                        .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(AppColors.Semantic.tintPrimary)
-                    .accessibilityIdentifier("discover.filter.reset")
-                }
-                .padding(.horizontal, AppSpace._16)
-
-                Spacer()
-            }
-            .background(AppColors.Semantic.bgScreen)
+            DiscoverFilterView(
+                viewModel: viewModel,
+                allCategories: allCategories,
+                isPresented: $showFilterSheet
+            )
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
@@ -289,13 +218,15 @@ struct DiscoverView: View {
     private var categoryChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: AppSpace._8) {
-                ForEach(DiscoverCategory.ordered, id: \.id) { cat in
+                ForEach(Array(allCategories.enumerated()), id: \.offset) { _, cat in
                     Button {
                         // Toggle selection
-                        let newSelection: DiscoverCategory? = (viewModel.selectedCategory == cat) ? nil : cat
+                        let newSelection: DiscoverCategory? =
+                            (viewModel.selectedCategory == cat) ? nil : cat
                         viewModel.applyFilter(category: newSelection)
                     } label: {
                         let isActive = (viewModel.selectedCategory == cat)
+
                         HStack(spacing: AppSpace._6) {
                             Image(systemName: cat.systemImage)
                             Text(cat.displayName)
@@ -305,26 +236,30 @@ struct DiscoverView: View {
                         .padding(.vertical, AppSpace._8)
                         .background(Capsule().fill(AppColors.Semantic.chipBg))
                         .overlay(
-                            Capsule().stroke(isActive ? AppColors.brandPrimary : AppColors.Semantic.borderMuted, lineWidth: 1)
+                            Capsule().stroke(
+                                isActive ? AppColors.brandPrimary
+                                         : AppColors.Semantic.borderMuted,
+                                lineWidth: 1
+                            )
                         )
                         .accessibilityIdentifier("discover.chip.\(cat.id)")
                     }
                     .buttonStyle(.plain)
                 }
             }
+            .padding(.horizontal, AppSpace._16)
         }
-        .contentMargins(.horizontal, AppSpace._16)
         .scrollIndicators(.hidden)
         .accessibilityIdentifier("discover.chips")
     }
 
     private func resultsList(_ items: [RemoteBook]) -> some View {
         let columns = [
-            GridItem(.flexible(), spacing: AppSpace._12),
-            GridItem(.flexible(), spacing: AppSpace._12)
+            GridItem(.flexible(minimum: 0, maximum: 220), spacing: AppSpace._16),
+            GridItem(.flexible(minimum: 0, maximum: 220), spacing: AppSpace._16)
         ]
 
-        return LazyVGrid(columns: columns, spacing: AppSpace._12) {
+        return LazyVGrid(columns: columns, spacing: AppSpace._16) {
             ForEach(items, id: \.id) { book in
                 NavigationLink {
                     DiscoverDetailView(detail: DiscoverBookDetail(from: book))
@@ -341,7 +276,7 @@ struct DiscoverView: View {
                             viewModel.addToLibrary(from: book)
                         }
                     )
-                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                    .frame(maxWidth: .infinity, alignment: .top)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)

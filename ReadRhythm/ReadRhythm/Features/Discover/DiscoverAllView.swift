@@ -196,7 +196,9 @@ struct DiscoverAllView: View {
             .padding(.horizontal, AppSpace._16)
             .padding(.vertical, AppSpace._16)
         }
-        .background(AppColors.Semantic.bgScreen)
+        .background(
+            screenBackground()
+        )
         .navigationTitle(Text(navTitleKey))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

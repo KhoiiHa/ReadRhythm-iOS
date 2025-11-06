@@ -21,3 +21,21 @@
 // Book detail navigation & fallback (EN)
 "book.detail.title" = "Book";
 "book.unknownAuthor" = "Unknown author";
+
+// Tabs
+"rr.tab.library" = "Library";
+"rr.tab.discover" = "Discover";
+"rr.tab.stats" = "Stats";
+"rr.tab.goals" = "Goals";
+"rr.tab.settings" = "Settings";
+"rr.tab.profile" = "Profile";
+"rr.tab.more" = "More";
+
+// Discover
+"discover.sort.byTitle" = "Title";
+"discover.sort.byAuthor" = "Author";
+"discover.sort.byDate" = "Date";
+"discover.filter.title" = "Filter";
+"discover.filter.activeCategory" = "Active category";
+"discover.filter.categories" = "Categories";
+"discover.filter.reset" = "Reset filter";

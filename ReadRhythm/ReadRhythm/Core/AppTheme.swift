@@ -20,6 +20,7 @@ enum AppSpace {
     static let _8:  CGFloat = 8
     static let _12: CGFloat = 12
     static let _16: CGFloat = 16
+    static let _20: CGFloat = 20
     static let _24: CGFloat = 24
     static let _32: CGFloat = 32
 

@@ -163,7 +163,7 @@ struct CoverArtwork_Previews: PreviewProvider {
             )
         }
         .padding()
-        .background(AppColors.Semantic.bgScreen)
+        .screenBackground()
     }
 }
 #endif

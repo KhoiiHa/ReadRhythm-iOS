@@ -29,7 +29,7 @@ struct ProfileView: View {
             .padding(.horizontal, AppSpace.lg)
             .padding(.vertical, AppSpace.lg)
         }
-        .background(AppColors.Semantic.bgScreen)
+        .screenBackground()
         .navigationTitle(Text(LocalizedStringKey("profile.title")))
         .task {
             vm.reload()
@@ -217,7 +217,7 @@ struct ProfileView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .fill(AppColors.Semantic.bgScreen)
+                .fill(AppColors.Semantic.bgCard)
                 .overlay(
                     RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                         .stroke(

@@ -30,32 +30,54 @@ struct AddBookView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section(header: Text("library.add.section.info")) {
-                    TextField(String(localized: "library.add.title.placeholder"), text: $title)
-                        .textInputAutocapitalization(.words)
-                        .submitLabel(.next)
-                        .focused($focusedField, equals: .title)
-                        .onSubmit { focusedField = .author }
-                        .accessibilityIdentifier("addbook.title")
+            ScrollView {
+                VStack(alignment: .leading, spacing: AppSpace._24) {
+                    // Sektionstitel (statt Form-Section-Header)
+                    Text("library.add.section.info")
+                        .font(AppFont.caption2())
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .accessibilityIdentifier("addbook.section.info")
 
-                    TextField(String(localized: "library.add.author.placeholder"), text: $author)
-                        .textInputAutocapitalization(.words)
-                        .textContentType(.name)
-                        .submitLabel(.done)
-                        .focused($focusedField, equals: .author)
-                        .onSubmit { performSave() }
-                        .accessibilityIdentifier("addbook.author")
-                }
-                .textCase(nil)
-                .accessibilityIdentifier("addbook.section.info")
+                    // Card mit den Eingabefeldern
+                    VStack(alignment: .leading, spacing: AppSpace._16) {
+                        TextField(String(localized: "library.add.title.placeholder"), text: $title)
+                            .textInputAutocapitalization(.words)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .title)
+                            .onSubmit { focusedField = .author }
+                            .accessibilityIdentifier("addbook.title")
 
-                Section(footer: footerHint) {
-                    EmptyView()
+                        TextField(String(localized: "library.add.author.placeholder"), text: $author)
+                            .textInputAutocapitalization(.words)
+                            .textContentType(.name)
+                            .submitLabel(.done)
+                            .focused($focusedField, equals: .author)
+                            .onSubmit { performSave() }
+                            .accessibilityIdentifier("addbook.author")
+                    }
+                    .padding(AppSpace._16)
+                    .background(
+                        RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                            .fill(AppColors.Semantic.bgCard)
+                            .shadow(
+                                color: AppColors.Semantic.shadowColor.opacity(0.12),
+                                radius: 10,
+                                x: 0,
+                                y: 6
+                            )
+                    )
+
+                    // Footer-Hinweis als eigener Block unterhalb der Card
+                    footerHint
+                        .padding(.horizontal, AppSpace._4)
+
+                    Spacer(minLength: AppSpace._16)
                 }
+                .padding(.horizontal, AppSpace._16)
+                .padding(.top, AppSpace._20)
+                .padding(.bottom, AppSpace._24)
             }
-            .scrollContentBackground(.hidden)
-            .background(AppColors.Semantic.bgScreen)
+            .background(AppColors.Semantic.bgScreen.ignoresSafeArea())
             .navigationTitle(Text("library.add.title"))
             .navigationBarTitleDisplayMode(.inline)
             .tint(AppColors.Semantic.tintPrimary)

@@ -228,7 +228,7 @@ struct FocusModeView: View {
         }
         .padding(.horizontal, AppSpace.lg)
         .padding(.bottom, AppSpace.xl)
-        .background(AppColors.Semantic.bgScreen)
+        .screenBackground()
         .navigationTitle(Text(LocalizedStringKey("focus.nav.title")))
         .onAppear {
             if vm.selectedBook == nil {
@@ -279,7 +279,7 @@ private struct BookPickerSheet: View {
                 )
             }
             .scrollContentBackground(.hidden)
-            .background(AppColors.Semantic.bgScreen)
+            .screenBackground()
             .navigationTitle(Text(LocalizedStringKey("focus.picker.nav")))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

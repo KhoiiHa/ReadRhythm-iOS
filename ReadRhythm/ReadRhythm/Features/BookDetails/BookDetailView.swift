@@ -38,7 +38,7 @@ struct BookDetailView: View {
             .padding(.horizontal, AppSpace._16)
             .padding(.vertical, AppSpace._16)
         }
-        .background(AppColors.Semantic.bgScreen)
+        .screenBackground()
         .navigationTitle(Text("book.detail.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -72,6 +72,7 @@ struct BookDetailView: View {
             VStack(alignment: .center, spacing: AppSpace._6) {
                 Text(book.title)
                     .font(AppFont.headingL())
+                    .lineLimit(3)
                     .foregroundStyle(AppColors.Semantic.textPrimary)
                     .multilineTextAlignment(.center)
                     .accessibilityIdentifier("bookdetail.title")
@@ -85,7 +86,7 @@ struct BookDetailView: View {
                 }
 
                 Text(authorText)
-                    .font(AppFont.bodyStandard())
+                    .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
@@ -98,16 +99,16 @@ struct BookDetailView: View {
                         .padding(.vertical, AppSpace._4)
                         .background(
                             Capsule()
-                                .fill(AppColors.Semantic.chipBg)
+                                .fill(AppColors.Semantic.badgeBg)
                                 .overlay(
                                     Capsule()
                                         .stroke(
-                                            AppColors.Semantic.chipBg.opacity(0.6),
+                                            AppColors.Semantic.badgeBg.opacity(0.6),
                                             lineWidth: AppStroke.cardBorder
                                         )
                                 )
                         )
-                        .foregroundStyle(AppColors.Semantic.chipFg)
+                        .foregroundStyle(AppColors.Semantic.badgeFg)
                         .accessibilityIdentifier("bookdetail.badge.google")
                         .accessibilityLabel(Text(LocalizedStringKey("detail.source.google")))
                 }
@@ -119,7 +120,7 @@ struct BookDetailView: View {
         .background(
             RoundedRectangle(cornerRadius: AppRadius.l)
                 .fill(AppColors.Semantic.bgCard)
-                .shadow(color: AppColors.Semantic.shadowColor.opacity(0.25), radius: 10, x: 0, y: 6)
+                .shadow(color: AppColors.Semantic.shadowColor.opacity(0.12), radius: 10, x: 0, y: 6)
         )
     }
 

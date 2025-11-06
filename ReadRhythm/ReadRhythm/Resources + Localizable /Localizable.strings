@@ -60,6 +60,7 @@
 "rr.tab.goals" = "Ziele";
 "rr.tab.settings" = "Einstellungen";
 "rr.tab.profile" = "Profil";
+"rr.tab.more" = "Mehr";
 
 // Settings
 "settings.appearance.section" = "Erscheinungsbild";
@@ -101,6 +102,10 @@
 "discover.sort.byTitle" = "Titel";
 "discover.sort.byAuthor" = "Autor";
 "discover.sort.byDate" = "Datum";
+"discover.filter.title" = "Filter";
+"discover.filter.activeCategory" = "Aktive Kategorie";
+"discover.filter.categories" = "Kategorien";
+"discover.filter.reset" = "Filter zurücksetzen";
 
 // Profile
 "profile.title" = "Profil";

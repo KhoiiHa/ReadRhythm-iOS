@@ -14,28 +14,33 @@ struct MoreView: View {
     var body: some View {
         NavigationStack {
             List {
-                NavigationLink {
-                    ProfileView(context: context)
-                } label: {
-                    Label("Profil", systemImage: "person.crop.circle")
-                        .font(AppFont.bodyStandard())
-                        .foregroundStyle(AppColors.Semantic.textPrimary)
-                }
+                Section {
+                    NavigationLink {
+                        ProfileView(context: context)
+                    } label: {
+                        Label("Profil", systemImage: "person.crop.circle")
+                            .font(AppFont.bodyStandard())
+                            .foregroundStyle(AppColors.Semantic.textPrimary)
+                    }
 
-                NavigationLink {
-                    SettingsView()
-                } label: {
-                    Label("Einstellungen", systemImage: "gearshape")
-                        .font(AppFont.bodyStandard())
-                        .foregroundStyle(AppColors.Semantic.textPrimary)
+                    NavigationLink {
+                        SettingsView()
+                    } label: {
+                        Label("Einstellungen", systemImage: "gearshape")
+                            .font(AppFont.bodyStandard())
+                            .foregroundStyle(AppColors.Semantic.textPrimary)
+                    }
                 }
             }
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
-            .background(AppColors.Semantic.bgScreen)
+            .background(
+                AppColors.Semantic.bgScreen
+                    .ignoresSafeArea()
+            )
             .listRowBackground(AppColors.Semantic.bgCard)
             .tint(AppColors.Semantic.tintPrimary)
-            .navigationTitle(Text("More"))
+            .navigationTitle("Mehr")
             .navigationBarTitleDisplayMode(.inline)
         }
     }

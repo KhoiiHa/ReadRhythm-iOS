@@ -39,7 +39,7 @@ struct EditGoalSheet: View {
                 }
             }
             .scrollContentBackground(.hidden)
-            .background(AppColors.Semantic.bgScreen)
+            .screenBackground()
             .navigationTitle(Text(LocalizedStringKey("goals.edit.title")))
             .toolbarTitleDisplayMode(.inline)
             .toolbarBackground(AppColors.Semantic.bgScreen, for: .navigationBar)

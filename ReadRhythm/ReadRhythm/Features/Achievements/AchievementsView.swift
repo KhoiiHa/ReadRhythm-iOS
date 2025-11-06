@@ -31,7 +31,7 @@ struct AchievementsView: View {
             }
             .padding(.top, AppSpace.xl)
         }
-        .background(AppColors.Semantic.bgScreen)
+        .screenBackground()
         .navigationTitle(Text(String(localized: "achv.title")))
         .onAppear { vm.reload() }
     }
@@ -89,9 +89,16 @@ struct AchievementsView: View {
             }
         }
         .padding(AppSpace.lg)
-        .background(AppColors.Semantic.bgCard)
-        .cornerRadius(AppRadius.m)
-        .shadow(color: AppColors.Semantic.shadowColor, radius: 3, x: 0, y: 1)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous)
+                .fill(AppColors.Semantic.bgCard)
+                .shadow(
+                    color: AppColors.Semantic.shadowColor.opacity(0.12),
+                    radius: 10,
+                    x: 0,
+                    y: 6
+                )
+        )
         .opacity(a.unlocked ? 1.0 : 0.8)
         .accessibilityIdentifier("Achievements.Badge.\(a.id)")
     }

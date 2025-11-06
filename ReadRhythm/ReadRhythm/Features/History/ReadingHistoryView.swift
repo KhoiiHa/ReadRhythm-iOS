@@ -31,7 +31,7 @@ struct ReadingHistoryView: View {
             .padding(.horizontal, AppSpace.lg)
             .padding(.top, AppSpace.lg)
         }
-        .background(AppColors.Semantic.bgScreen)
+        .screenBackground()
         .navigationTitle(Text(LocalizedStringKey("history.title")))
         .task {
             vm.reload()
@@ -88,11 +88,18 @@ struct ReadingHistoryView: View {
 
             Spacer()
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, AppSpace.sm)
         .padding(.horizontal, AppSpace.md)
-        .background(AppColors.Semantic.bgCard)
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-        .shadow(color: AppColors.Semantic.shadowColor, radius: 3, x: 0, y: 1)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                .fill(AppColors.Semantic.bgCard)
+                .shadow(
+                    color: AppColors.Semantic.shadowColor.opacity(0.12),
+                    radius: 10,
+                    x: 0,
+                    y: 6
+                )
+        )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(row.accessibilityLabel)
         .accessibilityIdentifier("History.Row.\(row.id.uuidString.prefix(6))")

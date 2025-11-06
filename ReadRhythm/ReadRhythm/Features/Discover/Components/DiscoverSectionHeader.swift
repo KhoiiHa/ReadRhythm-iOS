@@ -63,9 +63,7 @@ struct DiscoverSectionHeader: View {
             }
         }
         .padding(.horizontal, AppSpace._16)
-        .padding(.top, AppSpace._12)
-        .padding(.bottom, AppSpace._8)
-        .background(AppColors.Semantic.bgScreen)
+        .padding(.vertical, AppSpace._12)
         .accessibilityIdentifier("discover.section.header")
     }
 }
