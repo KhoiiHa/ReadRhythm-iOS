@@ -1,16 +1,19 @@
-// Kontext: Dieser Formatter-Hub liefert lokalisierte Strings und vermeidet Formatter-Suppe im UI.
-// Warum: Wiederverwendbare DateFormatter & Co. sparen Performance und halten Formatlogik zentral.
-// Wie: Wir cachen Formatter als statische Properties und exponieren Utility-Methoden für Views und Services.
+// MARK: - Formatter Hub / Formatter-Hub
+// Kontext: Zentralisiert lokalisierte Formatierung / Context: Centralizes localized formatting logic.
+// Warum: Wiederverwendung verbessert Performance / Why: Reuse boosts performance and consistency.
+// Wie: Statische Formatter + Utilities für Views & Services / How: Static formatters plus utilities for views and services.
 import Foundation
 
-/// Zentraler Formatter-Service für Datum, Zeit und Text-Lokalisierung.
-/// Vermeidet wiederholte `DateFormatter`-Erstellung auf dem MainActor.
+/// Zentraler Formatter-Service für Datum, Zeit und Text /
+/// Central formatter service for date, time, and text localization.
+/// Vermeidet wiederholte `DateFormatter`-Erstellung /
+/// Avoids repeated `DateFormatter` instantiation on the main actor.
 @MainActor
 enum AppFormatter {
 
     // MARK: - Cached Formatters
 
-    /// Zeigt z. B. „Dienstag“ oder „Tuesday“ je nach Locale.
+    /// Liefert den Wochentag lokalisiert / Returns localized weekday names
     static let weekdayFormatter: DateFormatter = {
         let f = DateFormatter()
         f.locale = .autoupdatingCurrent
@@ -18,7 +21,7 @@ enum AppFormatter {
         return f
     }()
 
-    /// Zeigt z. B. „27. Okt 2025“ oder „Oct 27, 2025“.
+    /// Liefert ein mittleres Datum / Produces medium-style localized dates
     static let shortDateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.locale = .autoupdatingCurrent
@@ -26,7 +29,7 @@ enum AppFormatter {
         return f
     }()
 
-    /// Zeigt z. B. "21:34" je nach Locale.
+    /// Formatiert kurze Uhrzeiten / Formats short time strings
     static let timeShortFormatter: DateFormatter = {
         let f = DateFormatter()
         f.locale = .autoupdatingCurrent
@@ -35,7 +38,7 @@ enum AppFormatter {
         return f
     }()
 
-    /// Formatiert "12 min" / "12 Min." sprachabhängig.
+    /// Formatiert Minutenwerte lokalisiert / Formats minute values localized
     static let minutesFormatter: DateComponentsFormatter = {
         let f = DateComponentsFormatter()
         f.unitsStyle = .short
@@ -44,7 +47,7 @@ enum AppFormatter {
         return f
     }()
 
-    /// Relative Datumsangaben ("yesterday", "heute", "vor 2 Tagen").
+    /// Liefert relative Datumsangaben / Provides relative date strings
     static let relativeFormatter: RelativeDateTimeFormatter = {
         let f = RelativeDateTimeFormatter()
         f.locale = .autoupdatingCurrent
@@ -52,7 +55,7 @@ enum AppFormatter {
         return f
     }()
 
-    /// Liefert eine sprachabhängige Minuten-Notierung (z. B. "12 Min.").
+    /// Hilfsfunktion für Minutenanzeige / Helper producing localized minute strings
     static func minutesString(_ minutes: Int) -> String {
         let comps = DateComponents(minute: minutes)
         return minutesFormatter.string(from: comps) ?? "\(minutes)"
@@ -60,7 +63,7 @@ enum AppFormatter {
 
     // MARK: - History / Stats Helpers
 
-    /// Formatiert eine History-Zeile („12 Minuten gelesen am Dienstag“).
+    /// Formatiert History-Zeilen / Formats history row titles
     static func historyRowText(minutes: Int, medium: String, date: Date) -> String {
         let day = weekdayFormatter.string(from: date)
         switch medium {
@@ -81,7 +84,8 @@ enum AppFormatter {
         }
     }
 
-    /// Accessibility-freundliche Variante mit Datum.
+    /// Accessibility-freundliche Variante mit Datum /
+    /// Accessibility-friendly variant including the date
     static func historyAccessibilityLabel(minutes: Int, medium: String, date: Date) -> String {
         let fullDate = shortDateFormatter.string(from: date)
         switch medium {

@@ -1,12 +1,14 @@
-// Kontext: Dieses Repository verwaltet Bücher im lokalen SwiftData-Store.
-// Warum: Features wie Discover und Add Book brauchen eine zentrale Persistenzschicht.
-// Wie: Wir kapseln CRUD-Operationen über ModelContext und exponieren sie via BookRepository-Protokoll.
+// MARK: - Lokales Buch-Repository / Local Book Repository
+// Kontext: Verwaltet Bücher im SwiftData-Store / Context: Manages books in the SwiftData store.
+// Warum: Discover & Add-Book benötigen eine zentrale Persistenzschicht / Why: Discover and add-book flows need a central persistence layer.
+// Wie: Kapselt CRUD-Operationen über ModelContext und exponiert BookRepository / How: Wraps ModelContext CRUD behind the BookRepository protocol.
 import Foundation
 import SwiftData
 
-/// Kapselt lokale Persistenz (SwiftData) für Bücher.
-/// Wird z.B. vom Discover-Screen (Speichern aus API)
-/// und vom Add-Book-Flow (manuell hinzufügen) verwendet.
+/// Kapselt lokale Persistenz (SwiftData) für Bücher /
+/// Encapsulates local SwiftData persistence for books.
+/// Wird vom Discover-Screen und Add-Book-Flow genutzt /
+/// Used by the Discover screen and the add-book flow.
 final class LocalBookRepository: BookRepository {
 
     private let context: ModelContext
@@ -15,6 +17,7 @@ final class LocalBookRepository: BookRepository {
         self.context = context
     }
 
+    /// Lädt Bücher mit Sortierkriterien / Loads books with custom sort descriptors
     func fetchBooks(sortedBy descriptors: [SortDescriptor<BookEntity>]) throws -> [BookEntity] {
         let effectiveDescriptors = descriptors.isEmpty
             ? [SortDescriptor(\BookEntity.dateAdded, order: .reverse)]
@@ -24,15 +27,14 @@ final class LocalBookRepository: BookRepository {
         return try context.fetch(descriptor)
     }
 
-    /// Fügt ein Buch in die lokale Bibliothek ein und speichert.
+    /// Fügt ein Buch in die lokale Bibliothek ein und speichert /
+    /// Inserts a book into the local library and persists it.
     /// - Parameters:
-    ///   - title: Buchtitel (Pflicht)
-    ///   - author: Autor / Autor:innen (kann leer sein)
-    ///   - thumbnailURL: optionales Cover (z.B. vom Google Books API Thumbnail)
-    ///   - sourceID: eindeutige ID der Quelle.
-    ///              - Bei Google Books: volumeID
-    ///              - Bei manuell hinzugefügt: generierte UUID
-    ///   - source: z.B. "Google Books" oder "User Added"
+    ///   - title: Buchtitel (Pflicht) / Book title (required)
+    ///   - author: Autor:innen (optional) / Author string (optional)
+    ///   - thumbnailURL: Optionales Cover / Optional cover URL
+    ///   - sourceID: Eindeutige Quellen-ID / Unique source identifier
+    ///   - source: Quelle wie "Google Books" / Source label such as "Google Books"
     @discardableResult
     func add(
         title: String,
@@ -51,7 +53,7 @@ final class LocalBookRepository: BookRepository {
         source: String
     ) throws -> BookEntity {
 
-        // 1. Aufräumen / Defaults
+        // 1. Aufräumen / Defaults / Sanitize inputs and derive defaults
         let cleanedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         precondition(!cleanedTitle.isEmpty, "Book title must not be empty")
 
@@ -70,14 +72,13 @@ final class LocalBookRepository: BookRepository {
 
         let cleanedThumbnail = trimmedOrNil(thumbnailURL)
 
-        // Wir brauchen IMMER eine sourceID, laut BookEntity.
-        // Falls keine kam (z.B. User hat manuell ein Buch angelegt),
-        // erzeugen wir eine stabile UUID.
+        // Wir brauchen immer eine sourceID / Always require a sourceID
+        // Fehlt sie, erzeugen wir eine UUID / Generate a UUID when missing
         let finalSourceID = (sourceID?.trimmingCharacters(in: .whitespacesAndNewlines))
             .flatMap { $0.isEmpty ? nil : $0 }
             ?? UUID().uuidString
 
-        // 2. Neues Model bauen
+        // 2. Neues Model bauen / Build the SwiftData model instance
         let entity = BookEntity(
             sourceID: finalSourceID,
             title: cleanedTitle,
@@ -96,7 +97,7 @@ final class LocalBookRepository: BookRepository {
             previewLink: previewLink
         )
 
-        // 3. Persistieren
+        // 3. Persistieren / Persist into the model context
         context.insert(entity)
 
         do {
@@ -117,7 +118,8 @@ final class LocalBookRepository: BookRepository {
         }
     }
 
-    /// Buch löschen inkl. Save()
+    /// Buch löschen inkl. Save() /
+    /// Deletes a book and persists the change.
     func delete(_ book: BookEntity) throws {
         context.delete(book)
         do {

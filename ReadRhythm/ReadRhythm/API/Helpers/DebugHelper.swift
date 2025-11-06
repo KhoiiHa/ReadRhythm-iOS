@@ -1,14 +1,10 @@
-//
-//  DebugHelper.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 22.10.25.
-//
+// MARK: - Debug Helper / Debug-Helfer
+// Stellt Laufzeitmessung für Netzwerk-Logs bereit / Provides runtime measurement for network logs.
 
 import Foundation
 
 #if DEBUG
-/// Misst die Zeitdifferenz in Millisekunden (z. B. für Logs).
+/// Misst Zeitdifferenzen in Millisekunden / Measures time deltas in milliseconds.
 func durationMillis(since start: DispatchTime) -> Int {
     let end = DispatchTime.now()
     let nanos = end.uptimeNanoseconds - start.uptimeNanoseconds

@@ -1,32 +1,32 @@
-// Kontext: Wir definieren ein einheitliches Typografie-System für ReadRhythm.
-// Warum: Konsistente Schriftgrößen stärken das Branding und reduzieren Styling-Duplikate.
-// Wie: Statische SwiftUI-Fonts stellen klar benannte Tokens bereit, die Views konsumieren.
+// MARK: - Typografie-System / Typography System
+// Kontext: Einheitliches Typografie-System für ReadRhythm / Context: Unified typography system for ReadRhythm.
+// Warum: Stärkt Branding & reduziert Styling-Duplikate / Why: Strengthens branding and reduces styling duplication.
+// Wie: Statische SwiftUI-Fonts als benannte Tokens / How: Provides named SwiftUI font tokens.
 import SwiftUI
 
-// Kontext → Warum → Wie
-// Kontext: Zentrales Typo-System für ReadRhythm (Phase 15 – Behance-Look, ruhige Lesbarkeit).
-// Warum: Konsistente, skalierbare Tokens; klare Headings/Body-Hierarchie; A11y-freundliche Defaults.
-// Wie: Tokenisierte Größen + optionale Custom-Font; Line-Height via lineSpacing; #if DEBUG Previews.
+// Kontext: Behance-inspirierte Lesbarkeit / Context: Behance-inspired readability
+// Warum: Konsistente Hierarchie & A11y-Defaults / Why: Consistent hierarchy and accessibility defaults
+// Wie: Tokenisierte Größen + optionale Custom-Font / How: Tokenized sizes with optional custom font support
 
 enum AppFont {
-    // Optional: Trage hier den Custom-Font-Namen ein, falls eingebunden (z. B. "Poppins").
-    // Bei nil wird System (SF/Inter) genutzt – für portable Builds.
+    // Optionaler Custom-Font-Name / Optional custom font name
+    // Nil nutzt die Systemschrift für portable Builds / Nil falls back to the system font
     static let customName: String? = nil
 
-    // MARK: - Token Sizes (Behance-orientiert)
+    // MARK: - Token Sizes / Schriftgrößen-Tokens
     enum Size {
-        static let display: CGFloat  = 32   // Hero/Timer
-        static let hL: CGFloat       = 22   // Heading Large
-        static let hM: CGFloat       = 20   // Heading Medium
-        static let hS: CGFloat       = 18   // Heading Small
-        static let body: CGFloat     = 16   // Standard Body
+        static let display: CGFloat  = 32   // Hero/Timer / Hero or timer display
+        static let hL: CGFloat       = 22   // Heading Large / Large heading
+        static let hM: CGFloat       = 20   // Heading Medium / Medium heading
+        static let hS: CGFloat       = 18   // Heading Small / Small heading
+        static let body: CGFloat     = 16   // Standard Body / Default body copy
         static let caption: CGFloat  = 14
         static let caption2: CGFloat = 12
-        // Legacy/BC (falls altes Layout 17pt erwartet)
+        // Legacy/BC für 17pt Layouts / Legacy compatibility for 17pt layouts
         static let bodyLegacy17: CGFloat = 17
     }
 
-    // MARK: - Core Font Builders
+    // MARK: - Core Font Builders / Zentrale Font-Helfer
     private static func font(_ size: CGFloat, _ weight: Font.Weight) -> Font {
         if let name = customName, UIFont(name: name, size: size) != nil {
             return .custom(name, size: size).weight(weight)
@@ -35,40 +35,41 @@ enum AppFont {
         }
     }
 
-    // MARK: - Public Tokens (neue Skala)
+    // MARK: - Public Tokens / Öffentliche Tokens
     static func headingL(_ weight: Font.Weight = .semibold) -> Font { font(Size.hL, weight) }
     static func headingM(_ weight: Font.Weight = .semibold) -> Font { font(Size.hM, weight) }
     static func headingS(_ weight: Font.Weight = .semibold) -> Font { font(Size.hS, weight) }
     static func bodyStandard(_ weight: Font.Weight = .regular) -> Font { font(Size.body, weight) }
 
-    // Optional: Body Small (z. B. für Metadaten, Autorenzeile)
+    // Body Small für Metadaten / Body small for metadata rows
     static func bodySmall(_ weight: Font.Weight = .regular) -> Font {
-        font(Size.caption, weight) // 14pt – etwas kleiner als Body, ideal für Meta-Texte
+        font(Size.caption, weight) // 14pt – ideal für Meta-Texte / 14pt – ideal for meta text
     }
 
-    // Primary caption tokens
+    // Primary caption tokens / Primäre Caption-Tokens
     static func caption1(_ weight: Font.Weight = .regular) -> Font { font(Size.caption, weight) }
     static func caption2(_ weight: Font.Weight = .regular) -> Font { font(Size.caption2, weight) }
 
-    // Backwards-compatible alias (alt: caption() ohne Nummer)
+    // Backwards-kompatibler Alias / Backwards-compatible alias
     static func caption(_ weight: Font.Weight = .regular) -> Font { caption1(weight) }
 
-    // MARK: - Backwards Compatibility (bestehende Aufrufe in Views)
+    // MARK: - Backwards Compatibility / Rückwärtskompatibilität
     static var titleLarge: Font { font(Size.display, .semibold) }
-    static var title: Font { font(Size.hL, .semibold) }      // war 22 → gleich
-    static var body: Font { font(Size.body, .regular) }      // vorher 17 → jetzt 16 (ruhiger, Behance)
-    static var captionLegacy13: Font {                       // BC für 13pt-Aufrufer
+    static var title: Font { font(Size.hL, .semibold) }      // war 22 → gleich / remains 22 pt
+    static var body: Font { font(Size.body, .regular) }      // vorher 17 → jetzt 16 / calmer body text
+    static var captionLegacy13: Font {                       // BC für 13pt-Aufrufer / compatibility for 13 pt usage
         .system(size: 13, weight: .regular, design: .rounded)
     }
 
-    // MARK: - Line Height Helpers (≈1.6 für Headings, ≈1.5 für Body)
+    // MARK: - Line Height Helpers / Zeilenabstands-Helfer
     static func lineSpacing(for size: CGFloat, multiplier: CGFloat) -> CGFloat {
-        // SwiftUI: Zeilenabstand = (Ziellinie - FontSize)
+        // SwiftUI: Zeilenabstand = Ziellinie - Fontgröße /
+        // SwiftUI line spacing = target line height minus font size
         (size * multiplier) - size
     }
 }
 
-// MARK: - Convenience Modifiers (einheitliche Nutzung in Views)
+// MARK: - Convenience Modifiers / Konsistente Nutzung in Views
 struct HeadingL: ViewModifier {
     func body(content: Content) -> some View {
         content

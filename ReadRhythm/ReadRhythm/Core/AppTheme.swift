@@ -1,6 +1,10 @@
-/// - Kontext: Phase 15 – visuelles Token-System (Spacing, Radius, Shadow + Farb-Semantik über AppColors).
-/// - Warum: Konsistenter Behance-Look (warm, ruhig), AA-Kontrast, saubere Wiederverwendung.
-/// - Wie: Tokens + ViewModifier + ButtonStyle, alle Farben nur über AppColors.Semantic.
+// MARK: - Theme Tokens / Theme Tokens
+/// Kontext: Visuelles Token-System für Spacing, Radius und Shadows /
+/// Context: Visual token system covering spacing, radius, and shadows.
+/// Warum: Konsistenter Behance-Look mit AA-Kontrast /
+/// Why: Consistent Behance-inspired look with AA contrast.
+/// Wie: Tokens & Modifiers, Farben aus AppColors.Semantic /
+/// How: Tokens and modifiers, colors sourced from AppColors.Semantic.
 import SwiftUI
 
 
@@ -8,13 +12,13 @@ enum AppRadius {
     static let s: CGFloat = 4
     static let m: CGFloat = 8
     static let l: CGFloat = 16
-    /// Alias for large radius
+    /// Alias für großen Radius / Alias for large radius
     static let lg: CGFloat = l
     static let xl: CGFloat = 24
 }
 
 enum AppSpace {
-    // Base scale (legacy-safe)
+    // Base scale (legacy-safe) / Basisskala für Legacy-Kompatibilität
     static let _4:  CGFloat = 4
     static let _6:  CGFloat = 6
     static let _8:  CGFloat = 8
@@ -24,7 +28,7 @@ enum AppSpace {
     static let _24: CGFloat = 24
     static let _32: CGFloat = 32
 
-    // Semantic aliases (preferred)
+    // Semantic aliases (preferred) / Semantische Aliase (bevorzugt)
     static let xs: CGFloat = _4
     static let sm: CGFloat = _8
     static let md: CGFloat = _12
@@ -32,7 +36,7 @@ enum AppSpace {
     static let xl: CGFloat = _24
     static let xxl: CGFloat = _32
 
-    // Convenience gaps for stacks
+    // Convenience gaps for stacks / Abstände für Stacks
     static let stackTight: CGFloat = sm
     static let stack: CGFloat = md
     static let stackLoose: CGFloat = lg
@@ -40,7 +44,7 @@ enum AppSpace {
 
 enum AppShadow {
     struct Spec { let color: Color; let radius: CGFloat; let x: CGFloat; let y: CGFloat }
-    /// Sanfter Schatten für Karten/Tiles (Phase 4)
+    /// Sanfter Schatten für Karten/Tiles / Soft shadow for cards and tiles
     static let card = Spec(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
     static let elevation1 = Color.black.opacity(0.08)
     static let elevation2 = Color.black.opacity(0.12)
@@ -48,7 +52,7 @@ enum AppShadow {
     static let elevation4 = Color.black.opacity(0.20)
 }
 
-// MARK: - Reusable Modifiers
+// MARK: - Reusable Modifiers / Wiederverwendbare Modifiers
 
 struct ScreenBackground: ViewModifier {
     func body(content: Content) -> some View {
@@ -102,13 +106,17 @@ struct TagCapsule: ViewModifier {
 }
 
 extension View {
+    /// Wendet den Screen-Hintergrund an / Applies the screen background
     func screenBackground() -> some View { modifier(ScreenBackground()) }
+    /// Wendet das Karten-Styling an / Applies the card styling
     func cardBackground() -> some View { modifier(CardBackground()) }
+    /// Wendet das Metric-Tile-Styling an / Applies the metric tile styling
     func metricTile() -> some View { modifier(MetricTile()) }
+    /// Wendet die Tag-Capsule an / Applies the tag capsule styling
     func tagCapsule() -> some View { modifier(TagCapsule()) }
 }
 
-// MARK: - Button Styles
+// MARK: - Button Styles / Button-Stile
 
 struct PrimaryButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
@@ -117,7 +125,7 @@ struct PrimaryButtonStyle: ButtonStyle {
             .font(.headline)
             .padding(.vertical, AppSpace._12)
             .frame(maxWidth: .infinity)
-            .frame(minHeight: 44)
+            .frame(minHeight: 44) // HIG-konforme Höhe / HIG-compliant height
             .background(
                 AppColors.Semantic.tintPrimary
                     .opacity(configuration.isPressed ? 0.84 : (isEnabled ? 1.0 : 0.6))
@@ -134,7 +142,7 @@ struct SecondaryButtonStyle: ButtonStyle {
             .font(.subheadline)
             .padding(.vertical, AppSpace._8)
             .frame(maxWidth: .infinity)
-            .frame(minHeight: 44)
+            .frame(minHeight: 44) // HIG-konforme Höhe / HIG-compliant height
             .background(
                 AppColors.Semantic.bgCard
                     .opacity(configuration.isPressed ? 0.9 : (isEnabled ? 1.0 : 0.6))

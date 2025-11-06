@@ -1,58 +1,58 @@
-// Kontext: Diese SwiftData-Entity modelliert ein Buch innerhalb unseres lokalen Katalogs.
-// Warum: Features wie Discover, Focus Mode und History brauchen konsistente Buchdaten.
-// Wie: Wir speichern IDs, Metadaten und Bilder als persistente Eigenschaften für Beziehungen.
+// MARK: - BookEntity / Buch-Entity
+// Kontext: Modelliert ein Buch im lokalen Katalog / Context: Models a book in the local catalog.
+// Warum: Discover, Focus Mode & History benötigen konsistente Daten / Why: Discover, focus mode, and history need consistent data.
+// Wie: Persistiert IDs, Metadaten und Assets für Beziehungen / How: Persists IDs, metadata, and assets for relationships.
 import Foundation
 import SwiftData
 
 @Model
 final class BookEntity {
 
-    /// Eindeutige ID aus der Quelle (z.B. Google Books Volume ID)
+    /// Eindeutige ID aus der Quelle / Unique source identifier
     @Attribute(.unique)
     var sourceID: String
 
-    /// Buchtitel (Pflicht)
+    /// Buchtitel (Pflicht) / Book title (required)
     var title: String
 
-    /// Autor oder Autoren (kommagetrennt)
+    /// Autor oder Autoren (kommagetrennt) / Author string (comma separated)
     var author: String
 
-    /// Thumbnail/Cover-URL als String (optional),
-    /// wird für die Anzeige in der Bibliothek benutzt
+    /// Thumbnail/Cover-URL (optional) / Thumbnail or cover URL (optional)
     var thumbnailURL: String?
 
-    /// Quelle der Daten, z.B. "Google Books"
+    /// Quelle der Daten, z. B. "Google Books" / Data source label such as "Google Books"
     var source: String
 
-    /// Wann hat der User das Buch gespeichert
+    /// Zeitpunkt des Speicherns / Timestamp when the user saved the book
     var dateAdded: Date
 
-    /// Optionaler Untertitel des Buches
+    /// Optionaler Untertitel / Optional subtitle
     var subtitle: String?
 
-    /// Verlag / Publisher, sofern verfügbar
+    /// Verlag / Publisher, sofern verfügbar / Publisher when available
     var publisher: String?
 
-    /// Veröffentlichungsdatum (ISO-String oder frei formatiert)
+    /// Veröffentlichungsdatum (ISO-String oder frei formatiert) / Publication date string
     var publishedDate: String?
 
-    /// Anzahl der Seiten, falls bekannt
+    /// Anzahl der Seiten, falls bekannt / Page count when known
     var pageCount: Int?
 
-    /// Sprachcode (BCP-47), z.B. "en", "de"
+    /// Sprachcode (BCP-47), z. B. "en", "de" / Language code (BCP-47)
     var language: String?
 
-    /// Kategorien / Genres als Schlagwortliste
+    /// Kategorien / Genres als Schlagwortliste / Categories or genres as keyword list
     var categories: [String]
 
-    /// Lange Beschreibungstexte (ggf. aus Remote-Quelle)
+    /// Lange Beschreibungstexte (optional) / Long description text stored externally
     @Attribute(.externalStorage)
     var descriptionText: String?
 
-    /// Link zur Google-Books-Infoseite
+    /// Link zur Info-Seite / Link to info page
     var infoLink: URL?
 
-    /// Link zur Vorschau / Reader der Quelle
+    /// Link zur Vorschau / Preview link from the source
     var previewLink: URL?
 
     init(

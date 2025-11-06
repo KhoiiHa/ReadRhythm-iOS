@@ -1,32 +1,28 @@
-//
-//  BooksAPIClient.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 22.10.25.
-//
+// MARK: - Google Books API-Client / Google Books API Client
+// Stellt typisierte Aufrufe für Suche & Details bereit / Provides typed calls for search & detail endpoints.
 
 import Foundation
 
-/// Abstraktion für Google Books API-Aufrufe (Search, Detail).
+/// Abstraktion für Google Books API-Aufrufe / Abstraction around Google Books API calls.
 public protocol BooksAPIClientProtocol {
-    /// Führt eine Buchsuche aus und liefert die Rohdaten der JSON-Response.
-    /// Decoding erfolgt in Schritt 3 (DTOs & Mapper).
+    /// Führt eine Buchsuche aus und liefert Rohdaten / Performs a book search and returns raw data.
+    /// Decoding erfolgt später über DTOs / Decoding happens later through DTOs.
     func search(query: String, maxResults: Int) async throws -> Data
 
-    /// Optional für später: Detailabruf zu einer Volume-ID.
+    /// Detailabruf zu einer Volume-ID / Fetches detail data for a volume id.
     func detail(id: String) async throws -> Data
 }
 
-/// Konkreter Client für Google Books v1.
-/// Nutzt den generischen NetworkClient + URLRequestBuilder.
+/// Konkreter Client auf Basis des generischen NetworkClient /
+/// Concrete client powered by the generic network layer.
 public final class BooksAPIClient: BooksAPIClientProtocol {
 
     private let network: NetworkClientProtocol
     private let baseURL: URL
 
     /// - Parameters:
-    ///   - network: injizierbarer NetworkClient (für Tests mockbar)
-    ///   - baseURL: default = Google Books v1
+    ///   - network: injizierbarer NetworkClient / injectable network client
+    ///   - baseURL: Standard-Endpunkt / default API endpoint
     public init(network: NetworkClientProtocol,
                 baseURL: URL = URL(string: "https://www.googleapis.com/books/v1")!) {
         self.network = network
@@ -50,6 +46,8 @@ public final class BooksAPIClient: BooksAPIClientProtocol {
         let start = DispatchTime.now()
         #endif
 
+        // Reicht Request an die schlanke Netzwerkabstraktion weiter /
+        // Delegates the request to the lightweight network abstraction
         let (data, _) = try await network.request(request)
 
         #if DEBUG
@@ -71,6 +69,7 @@ public final class BooksAPIClient: BooksAPIClientProtocol {
         let start = DispatchTime.now()
         #endif
 
+        // Wiederverwendung desselben Netzwerklayers / Reuses the same network layer
         let (data, _) = try await network.request(request)
 
         #if DEBUG
