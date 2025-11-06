@@ -1,4 +1,4 @@
-# 📚 ReadRhythm – iOS Reading Tracker App (Portfolio Case Study)
+# 📚 ReadRhythm – SwiftUI Reading & Listening Tracker
 
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-Framework-blue?logo=swift&logoColor=white)
 ![SwiftData](https://img.shields.io/badge/SwiftData-Ready-orange)
@@ -12,150 +12,176 @@
 
 ---
 
-## 🌟 Überblick
+## 🌍 Projektübersicht · Project Overview
 
-**ReadRhythm** ist eine iOS-App zum **Lesetracking und Hörzeit-Tracking**,  
-fokussiert auf eine ruhige, klare User Experience und modernes SwiftUI-Design.  
-Die App kombiniert Lesestatistiken, Hörbuchzeit und Achtsamkeit im digitalen Alltag.  
+**DE:**  
+ReadRhythm ist eine iOS-App, die Lesen und Hören in einer ruhigen SwiftUI-Oberfläche vereint –  
+von Bibliotheksverwaltung über Discover-Empfehlungen bis hin zu Statistiken, Zielen und Focus Mode für konzentrierte Sessions.  
 
-📱 **Technologien:** SwiftUI · SwiftData · Swift Charts · MVVM  
-🎨 **Design-System:** AppColors · AppFont · AppSpace · AppRadius · AppShadow  
-🧩 **Architektur:** MVVM + Repository + Service Pattern  
-
----
-
-## 🧭 Zielsetzung
-
-Ziel war es, eine App zu schaffen, die:
-- **Fokus & Ruhe** fördert statt visuellem Overload  
-- **Zustände klar trennt:** Lesen vs. Hören  
-- **Architektonisch erweiterbar** bleibt für Portfolio- & Produktions-Use-Cases  
-- **Visuell konsistent** im Light/Dark Mode ist  
-- Und als **Portfolio-Projekt** technische Reife mit UX-Bewusstsein zeigt  
+**EN:**  
+ReadRhythm blends reading and listening into a calm SwiftUI experience,  
+covering library management, discovery feeds, goal tracking, and a focus timer for deep-work sessions.
 
 ---
 
-## 🏗 Architektur
+## ✨ Hauptfeatures · Key Features
 
-**App-Layer:** `ReadRhythmApp`, `MainTabView`  
-**Core:** Theme-System & Design Tokens (`AppColors`, `AppFont`, `AppSpace`, `AppRadius`, `AppShadow`)  
-**Features:** Library · Discover · Stats · Profile · Settings  
-**Repositories:** `BookRepository`, `SessionRepository`  
-**Services:** `DataService`, `StatsService`, `AppSettingsService`, `SpeechService`, `AppFormatter`  
+### 📚 Bibliothek / Library
+- @Query-gestützte Listen mit SwiftData-Integration  
+- Swipe-to-Delete, Add-Sheet, Toast-Feedback  
+- ViewModel entkoppelt CRUD-Logik und UI-Zustand  
 
----
-
-## ✨ Features
-
-### 📚 Library
-- Bücher hinzufügen, löschen, verwalten  
-- BookDetail mit Sessions (Datum & Minuten)  
-- Add-Session mit Haptic Feedback  
-- SwiftData-basierte Persistenz  
-
-### 🎧 Audiobook Light
-- Text-to-Speech via `AVSpeechSynthesizer`  
-- Echtzeit-Playback-Tracking  
-- Speichert Hördauer automatisch als Session  
-
-### 📊 Stats
-- Lesestatistik per Swift Charts  
-- Ziel-Linie (RuleMark) für tägliche Lese-Minuten  
-- Integer-Y-Achse, klare BarMarks  
-- i18n-kompatible Texte & VoiceOver-Labelling  
-
-### 🧘‍♀️ Focus Mode
-- Timer für Leseeinheiten  
-- Sanfte Haptics & Fade-Animationen  
-- Speichert Sitzungen automatisch als Lesesessions  
-
-### ⚙️ Settings
-- Theme-Picker (System, Light, Dark)  
-- Persistente Speicherung über `AppSettingsService`  
-- Debug-Reset für Demo-Daten  
+**EN:**  
+SwiftData-backed lists with swipe deletion and add sheet; dedicated view models handle CRUD logic and toast messaging.
 
 ---
 
-## 🪄 Design-System
+### ✨ Discover & Empfehlungen / Discover & Recommendations
+- Kombination aus Kategorie-Chips, Suchfeld und API-Ergebnissen  
+- Repository orchestriert Google-Books-Requests mit Feed-/Memory-Cache  
+- SwiftData persistiert Suchergebnisse für Offline-Zugriff  
 
-| Kategorie | Datei | Beschreibung |
-|:--|:--|:--|
-| Farben | `AppColors.swift` | Türkis-Sand-Farbwelt mit semantischen Tokens |
-| Typografie | `AppFont.swift` | Strukturierte Hierarchie für Titel, Body, Caption |
-| Abstände | `AppSpace.swift` | Einheitliche Layout-Spacing-Variablen |
-| Radius | `AppRadius.swift` | Corner-Radius-Token |
-| Schatten | `AppShadow.swift` | Weiche UI-Tiefenstufen für Cards & Panels |
-
-> Designziel: „Ruhig, fokussiert, lesbar“ – inspiriert von modernen Reading Apps auf Behance.
+**EN:**  
+Discover mixes category chips, search, and remote results; a repository coordinates memory/feed caches  
+with Google Books and persists selections to SwiftData.
 
 ---
 
-## 🧩 Architektur-Philosophie
+### 📊 Statistiken & Insights / Stats & Insights
+- Swift Charts visualisieren tägliche Lesezeit, Streaks & Gesamtwerte  
+- StatsService aggregiert Sitzungen über Zeiträume  
+- Debug-Seeding & deterministische Tests  
 
-- **MVVM:** klare Layer-Trennung von Logik & UI  
-- **Repository-Pattern:** abstrahiert Datenzugriff  
-- **Service-Pattern:** aggregiert Berechnungen und Zustände  
-- **SwiftData:** typensicheres Model-Layer mit Entity-Beziehungen  
-- **Design Tokens:** garantieren UI-Konsistenz  
+**EN:**  
+Swift Charts visualize daily minutes, streaks, and totals; repository and StatsService aggregate sessions and support debug seeding.
+
+---
+
+### 🧘‍♀️ Ziele & Fokus / Goals & Focus
+- Progress-Ring mit Haptics und Edit-Sheet  
+- Focus Mode Timer speichert Sitzungen automatisch als Sessions  
+- Motivationsfeedback durch visuelle Interaktionen  
+
+**EN:**  
+Progress ring with haptics and editing sheet; focus timer auto-saves reading sessions and provides visual feedback.
+
+---
+
+### ⚙️ Settings & Theming
+- Globaler Settings-Service steuert Theme & Sprache  
+- SwiftData-Container + EnvironmentObjects  
+- i18n-kompatible Texte, Debug-Reset für Demo-Daten  
+
+---
+
+## 🧩 Architekturüberblick · Architecture Overview
+
+**DE:**  
+Die App nutzt **MVVM** mit einem gemeinsamen SwiftData-Container (`PersistenceController.shared`).  
+Tabs reichen den ModelContext weiter, Repositories kapseln CRUD-Logik für Bücher und Sessions.  
+ViewModels koordinieren Datenflüsse zwischen Services (Library, Discover, Stats),  
+wodurch Views reaktiv, testbar und sauber formatiert bleiben.  
+
+**EN:**  
+The app adopts **MVVM** with a shared SwiftData container. Tabs pass the model context,  
+repositories encapsulate CRUD logic for books and sessions, and view models marshal  
+data flows between services to keep views reactive and testable.
+
+---
+
+### 🧠 Repository & Services
+- Lokale Repositories (Book, Session) abstrahieren SwiftData-Zugriffe  
+- NetworkClient & GoogleBooksClient kapseln Remote-Requests  
+- DataService dient als zentraler CRUD- und Fallback-Layer  
+
+**EN:**  
+Local repositories abstract SwiftData access; network clients wrap Google Books APIs;  
+DataService serves as a central CRUD and persistence fallback layer.
+
+---
+
+### 🌐 Networking
+- Gekapselte Netzwerkschicht mit Memory-Cache, URLSession & DTO-Mapping  
+- „Stale-While-Revalidate“-Strategie für Suchergebnisse  
+- Testbare API-Schicht mit klarer Fehlerpropagierung  
+
+---
+
+## 🎨 Design-System & UI
+
+**DE:**  
+Farben, Typografie-, Spacing-, Radius- und Schatten-Tokens sind zentral dokumentiert  
+und werden in Komponenten wie StatsCard, Tabs und Toasts konsistent wiederverwendet.  
+
+**EN:**  
+Color, typography, spacing, radius, and shadow tokens live in dedicated files  
+and power reusable components across the UI.
+
+> **Designziel:** „Ruhig, fokussiert, lesbar“ – inspiriert von modernen Reading Apps auf Behance.  
+
+> 🎨 **UI/UX-Inspiration:**  
+> Das visuelle Konzept wurde inspiriert von der hervorragenden  
+> [Reading App Case Study (UI/UX Design) auf Behance](https://www.behance.net/gallery/182903381/Reading-App-Case-Study-UIUX-Design).  
+> Diese Arbeit verdient Credits – sie zeigt, wie Design und Lesefluss in Einklang gebracht werden können.
+
+---
+
+## 🧠 Learnings & Challenges
+
+**DE:**  
+- Aufbau einer Stale-While-Revalidate-Suche zeigte, wie Repository-Muster Netzwerk & Persistenz vereint.  
+- Aggregationslogik im StatsService entlastet ViewModels und erhöht Testbarkeit.  
+- Konsequent eingesetzte Design Tokens halten Light/Dark-Mode konsistent.  
+- Text-to-Speech & SwiftData-Tests zeigten Integration von AVFoundation + Persistence-Lifecycles.  
+
+**EN:**  
+- Implementing stale-while-revalidate search unified networking and persistence layers.  
+- StatsService aggregation logic proved how services offload logic from view models.  
+- Design tokens kept UI modes consistent and prevented duplication.  
+- TTS and SwiftData tests demonstrated reliable coordination between speech and data lifecycles.
 
 ---
 
 ## 🧪 Teststrategie & Qualitätssicherung
 
-**Kontext:** Fokus auf stabile, nachvollziehbare Logik-Tests statt UI-Flakiness.  
-**Warum:** CI-taugliche Stabilität durch deterministische Tests der Kernmodule.  
-**Wie:** Unit-Tests für Repositories, Services, Formatter – klar abgegrenzt vom UI-Schema.  
+**Getestete Kernmodule:**  
+- LocalSessionRepository: validiert Idempotenz  
+- StatsService: aggregiert Lesezeit deterministisch  
+- SpeechService: testet Start/Stop-Lifecycle  
+- AppFormatter: prüft lokalisierte Texte & VoiceOver-Kompatibilität  
 
-### Getestete Kernmodule
-- **LocalSessionRepository:** validiert Idempotenz (keine Duplikate, kein Leak)  
-- **StatsService:** aggregiert Lese- & Hörzeit korrekt über Datumsfenster  
-- **SpeechService:** testet Lifecycle und Start/Stop-Übergänge synchron  
-- **AppFormatter:** prüft lokalisierten Text + VoiceOver-Kompatibilität  
-
-UI-Smoke-Tests (FocusMode, AudiobookLight, Stats, Profile) sind dokumentiert,  
-aber **nicht Teil des CI-Schemes**, um Stabilität der Kernlogik zu priorisieren.  
-
-> Alles, was produktionsrelevant ist, läuft deterministisch grün –  
-> alles Visuelle bleibt als nachvollziehbarer Showcase im Repo.  
+> Fokus: deterministische Tests, CI-ready Stabilität, klar getrennt von UI-Smokes.  
+> Alles Produktive läuft grün; visuelle Tests dienen als Showcase.
 
 ---
 
-## 📦 Phase 12 – Code Freeze / Technischer Abschluss
+## 🔧 Future Improvements
 
-🧩 **Status:** Alle Kern-Tests grün · Architektur stabil · Design-Tokens konsolidiert  
-🧱 **UI-Smokes:** bleiben im Repo, aber außerhalb des CI-Laufs  
-🎨 **Phase 11:** Branding Polish & Case Study Visuals vorbereitet  
+**DE:**  
+- DataService & LocalBookRepository zusammenführen, um doppelte Logik zu vermeiden.  
+- DiscoverViewModel-Dependencies explizit injizieren, um Tests zu vereinfachen.  
+- Fehlerhandling verbessern (kein `try!`, klare Propagierung).  
+- Debounce- oder Cancel-Logik für Suchfeld einführen.  
 
-**Commit-Vermerk:**  
-> 🧪 QA: UI-Smokes optional, Kern-Tests grün  
-> – Repositories & Services voll getestet  
-> – SpeechService & Formatter deterministisch stabil  
-> – Phase 12 = Code Freeze → Nächster Schritt: Case Study / Canva Export
-
----
-
-## 📊 Screenshots & Visuals *(folgen in Canva-Phase)*
-
-| Light Mode | Dark Mode |
-|:--|:--|
-| ![Focus Light](screenshots/focus_light.png) | ![Focus Dark](screenshots/focus_dark.png) |
-| ![Stats Light](screenshots/stats_light.png) | ![Stats Dark](screenshots/stats_dark.png) |
-| ![Profile Light](screenshots/profile_light.png) | ![Profile Dark](screenshots/profile_dark.png) |
+**EN:**  
+- Consolidate DataService & LocalBookRepository to eliminate duplication.  
+- Inject DiscoverViewModel dependencies explicitly to ease testing.  
+- Replace `try!` with safe error propagation.  
+- Add debouncing or cancellation to search task.
 
 ---
 
-## 🧠 Learnings
+## 🧩 Tech Stack
 
-- Saubere MVVM-Architektur mit Repository & Service Layer  
-- SwiftData + Swift Charts im produktionsnahen Setup  
-- Micro-Interactions (Haptics, Fade) gezielt eingesetzt  
-- Designsystem = visuelle Wartbarkeit  
-- Logiktests > visuelle Tests: CI-ready Stabilität  
-- Ruhe im UI = Klarheit im Denken  
+- **SwiftUI + SwiftData:** native UI- und Persistenzschicht  
+- **Swift Charts:** Visualisierung & Accessibility  
+- **Repository & Services:** lokalisierte Logik + Abstraktion  
+- **Networking:** Google Books API via NetworkClient  
+- **Tests:** In-Memory-Container, deterministische Kernlogik  
 
 ---
 
-## 📦 Setup
+## 💡 Setup
 
 1. Repository klonen  
 2. Öffne `ReadRhythm.xcodeproj` in **Xcode 16+**  
@@ -164,12 +190,22 @@ aber **nicht Teil des CI-Schemes**, um Stabilität der Kernlogik zu priorisieren
 
 ---
 
-## 💡 Autor
+## 🙌 Credits
 
-**Vu Minh Khoi Ha**  
+**DE:**  
+Google Books API für Discover-Daten, umgesetzt über einen eigenen BooksAPIClient und NetworkClient.  
+
+**EN:**  
+Google Books API powers the discovery feed via a lightweight NetworkClient wrapper.
+
+---
+
+## 💬 Autor
+
+** Minh Khoi Ha**  
 📍 iOS Developer · Product Strategist · Portfolio-Projekt *ReadRhythm*  
 📧 Kontakt auf Anfrage  
 
 ---
 
-© 2025 Vu Minh Khoi Ha · Projekt: ReadRhythm
+© 2025 Minh Khoi Ha · Projekt: ReadRhythm
