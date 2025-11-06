@@ -1,36 +1,38 @@
-//
-//  LibraryViewModel.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 15.10.25.
-//
+// MARK: - Library ViewModel / Bibliotheks-ViewModel
+// Steuert CRUD-Flows für lokale Bücher und Toast-Feedback /
+// Drives local book CRUD flows and toast feedback in the library feature.
 
 
 import Foundation
 import SwiftUI
 import SwiftData
 
-/// ViewModel für die Library-Ansicht.
-/// Orchestriert Add/Delete, Toast-Feedback und Repository-Binding.
-/// Die eigentliche Liste der Bücher kommt reaktiv aus der View via @Query.
+/// ViewModel für die Library-Ansicht / ViewModel powering the library screen.
+/// Orchestriert Add/Delete, Toast-Feedback und Repository-Binding /
+/// Orchestrates add/delete flows, toast feedback, and repository binding.
+/// Die Liste der Bücher kommt reaktiv via @Query /
+/// The book list itself is supplied reactively via `@Query`.
 @MainActor
 final class LibraryViewModel: ObservableObject {
 
     // MARK: - Persistence
+    // Repository wird lazily gebunden / Repository is bound lazily
     private var repository: BookRepository?
 
     // MARK: - UI State
     @Published var showAddSheet = false
     @Published var errorMessageKey: LocalizedStringKey?
-    /// Kurzlebige UI-Rückmeldung (i18n-Key), z. B. "toast.added" / "toast.deleted" / "toast.error"
+    /// Kurzlebige UI-Rückmeldung (i18n-Key) / Ephemeral UI feedback using i18n keys
     @Published var toastMessageKey: String? = nil
 
     // MARK: - Public Setup
 
-    /// Muss aus der View aufgerufen werden (z. B. in .onAppear),
-    /// damit das ViewModel Zugriff auf SwiftData bekommt.
+    /// Muss aus der View (z. B. .onAppear) aufgerufen werden /
+    /// Needs to be invoked from the view (e.g. `.onAppear`).
+    /// Bindet den SwiftData-Kontext an das Repository /
+    /// Binds the SwiftData context to the repository instance.
     func bind(context: ModelContext) {
-        // Nur einmal binden
+        // Nur einmal binden / Bind only once
         if repository == nil {
             repository = LocalBookRepository(context: context)
             #if DEBUG
@@ -41,7 +43,8 @@ final class LibraryViewModel: ObservableObject {
 
     // MARK: - Toast Helper
 
-    /// Zeigt eine kurze Rückmeldung an und blendet sie automatisch wieder aus.
+    /// Zeigt eine kurze Rückmeldung an und blendet sie wieder aus /
+    /// Shows a short feedback toast and hides it automatically.
     private func showToast(_ key: String, duration: UInt64 = 1_500_000_000) {
         toastMessageKey = key
 
@@ -57,28 +60,29 @@ final class LibraryViewModel: ObservableObject {
 
     // MARK: - Actions
 
-    /// Fügt ein Buch lokal hinzu. Das ist der Flow aus dem "Buch hinzufügen"-Sheet.
-    /// - title: Titel aus dem Sheet (Pflichtfeld in der UI)
-    /// - author: Autor aus dem Sheet (optional in der UI, aber wir speichern am Ende immer einen String)
+    /// Fügt ein Buch lokal hinzu (Sheet-Flow) /
+    /// Adds a book locally through the add-sheet flow.
+    /// - title: Titel aus dem Sheet / Title provided by the sheet
+    /// - author: Autor aus dem Sheet / Optional author provided by the sheet
     func addBook(title: String, author: String?) {
         guard let repository else { return }
 
-        // Normalize Felder für unser Datenmodell:
+        // Normalisiert Eingaben fürs Datenmodell / Normalizes inputs for the data model
         let cleanedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanedAuthor = (author ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard cleanedTitle.isEmpty == false else {
-            // keine leeren Titel speichern
+            // Keine leeren Titel speichern / Do not persist empty titles
             errorMessageKey = "library.add.error"
             showToast("toast.error")
             return
         }
 
-        // Manuell hinzugefügte Bücher haben:
-        // - eigene generierte sourceID
-        // - kein Cover
-        // - Quelle "User Added"
+        // Manuell hinzugefügte Bücher / Manually added books:
+        // - Eigene sourceID / Own sourceID
+        // - Kein Cover / No cover asset
+        // - Quelle "User Added" / Source labeled "User Added"
         do {
             _ = try repository.add(
                 title: cleanedTitle,
@@ -111,7 +115,8 @@ final class LibraryViewModel: ObservableObject {
         }
     }
 
-    /// Löscht ein Buch anhand des IndexSets aus der aktuell sichtbaren Liste (`books` aus der View).
+    /// Löscht ein Buch anhand des IndexSets aus der aktuell sichtbaren Liste /
+    /// Deletes books based on the index set coming from the visible list.
     func delete(at offsets: IndexSet, from books: [BookEntity]) {
         guard let repository else { return }
 

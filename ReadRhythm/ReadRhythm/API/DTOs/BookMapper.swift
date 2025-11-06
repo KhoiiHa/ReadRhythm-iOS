@@ -1,15 +1,11 @@
-//
-//  BookMapper.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 22.10.25.
-//
+// MARK: - Mapping von Google Books / Mapping Google Books Data
+// Übersetzt API-DTOs in Domain-Objekte für Discover / Converts API DTOs into domain objects for Discover.
 
 import Foundation
 
-// MARK: - Domain (leichtgewichtig für Discover)
+// MARK: - Domain (Discover) / Domain (Discover)
 
-/// Leichtes Domain-Modell für API-Suchergebnisse (ohne Persistenz).
+/// Leichtes Domain-Modell für API-Suchergebnisse / Lightweight domain model for API search results.
 public struct RemoteBook: Equatable, Hashable, Sendable {
     public let id: String
     public let title: String
@@ -27,7 +23,7 @@ public struct RemoteBook: Equatable, Hashable, Sendable {
 }
 
 public extension RemoteBook {
-    /// Vereinheitlichte Anzeige für Autor:innen.
+    /// Vereinheitlichte Anzeige für Autor:innen / Unified author display formatting.
     var authorsDisplay: String {
         let trimmed = authors
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -35,7 +31,8 @@ public extension RemoteBook {
         return trimmed.isEmpty ? "—" : trimmed.joined(separator: ", ")
     }
 
-    /// Convenience-Initializer für Caches, die nur einen Autor:innen-String gespeichert haben.
+    /// Convenience-Initializer für Caches mit Autor:innen-String /
+    /// Convenience initializer for caches storing a single author string.
     init(id: String, title: String, authorsDisplay: String?, thumbnailURL: URL?) {
         let authorList = authorsDisplay?
             .split(separator: ",")
@@ -60,18 +57,21 @@ public extension RemoteBook {
     }
 }
 
-// MARK: - Mapping
+// MARK: - Mapping / Mapping
 
 extension VolumeDTO {
-    /// Mappt ein einzelnes VolumeDTO in ein `RemoteBook`,
-    /// oder `nil`, wenn die Daten unbrauchbar sind.
+    /// Mappt ein einzelnes VolumeDTO in ein `RemoteBook` /
+    /// Maps a single `VolumeDTO` into a `RemoteBook`.
+    /// Gibt `nil` zurück, wenn Daten unbrauchbar sind /
+    /// Returns `nil` when the payload is unusable.
     func toRemoteBook() -> RemoteBook? {
-        // volumeInfo ist laut API optional – wenn's fehlt, können wir das Buch nicht darstellen
+        // volumeInfo ist optional – ohne Info kein darstellbares Buch /
+        // volumeInfo is optional; without it the book cannot be rendered
         guard let info = volumeInfo else {
             return nil
         }
 
-        // Titel ist Pflicht. Ohne echten Titel zeigen wir das Buch gar nicht.
+        // Titel muss vorhanden sein / Title is mandatory
         let rawTitle = info.title?
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .nilIfEmpty
@@ -80,12 +80,14 @@ extension VolumeDTO {
             return nil
         }
 
-        // Autorenliste ist optional → wir erlauben "—" als Fallback
+        // Autorenliste ist optional → Fallback erlaubt /
+        // Authors list is optional; fallback is allowed
         let authorsList = (info.authors ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
 
-        // Thumbnail kann an mehreren Stellen stehen; wir upgraden http → https
+        // Thumbnail an mehreren Stellen → http → https upgraden /
+        // Thumbnail may appear in different fields; upgrade http to https
         let thumb = info.imageLinks?.thumbnail
                  ?? info.imageLinks?.smallThumbnail
         let normalizedURL = thumb.flatMap { URL(string: $0) }?.forcingHTTPS()
@@ -94,8 +96,7 @@ extension VolumeDTO {
             .flatMap { URL(string: $0) }?
             .forcingHTTPS()
 
-        // Defensive fallback: if the DTO has no explicit infoLink/language fields,
-        // use previewLink as external link and leave language unset.
+        // Defensive Fallback: previewLink als infoLink nutzen / Use previewLink as fallback info link
         let infoURL = previewURL
         let language: String? = nil
 
@@ -128,30 +129,33 @@ private extension VolumeDTO {
         let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
 
-        // Google Books liefert Datumsstrings in verschiedenen Formaten ("2021-03-12", "1987").
-        // Wir extrahieren defensiv die ersten vier Ziffern, sofern vorhanden.
+        // Google Books liefert unterschiedliche Datumsformate / Google Books returns varying date formats
+        // Wir extrahieren defensiv die ersten vier Ziffern / We defensively extract the first four digits
         let digits = trimmed.prefix(4)
         if digits.count == 4, digits.allSatisfy({ $0.isNumber }) {
             return String(digits)
         }
 
-        // Fallback: Wenn kein Jahr extrahierbar ist, geben wir den Rohwert zurück.
+        // Fallback: Rohwert zurückgeben / Fallback: return the raw value
         return trimmed
     }
 }
 
 extension BooksSearchResponseDTO {
-    /// Extrahiert eine Liste von `RemoteBook` aus der Suchantwort (defensiv, stabil).
-    /// Ungültige / unvollständige Volumes werden dabei übersprungen.
+    /// Extrahiert eine Liste von `RemoteBook` aus der Suche /
+    /// Extracts a list of `RemoteBook` from the search response.
+    /// Ungültige Volumes werden übersprungen / Invalid volumes are skipped.
     func toRemoteBooks() -> [RemoteBook] {
         (items ?? []).compactMap { $0.toRemoteBook() }
     }
 }
 
-// MARK: - Decoding Convenience
+// MARK: - Decoding Convenience / Dekodierhilfe
 
-/// Kleiner Decoder, der Roh-`Data` in `[RemoteBook]` überführt.
-/// (Repository kann das direkt nutzen, UI bleibt Domain-pur.)
+/// Kleiner Decoder für die Repository-Schicht /
+/// Lightweight decoder turning raw `Data` into `[RemoteBook]`.
+/// Repository nutzt ihn direkt, UI bleibt Domain-pur /
+/// Repository consumes it directly so the UI stays domain pure.
 public enum BooksDecoder {
     public static func decodeSearchList(from data: Data) throws -> [RemoteBook] {
         let decoder = JSONDecoder()
@@ -166,14 +170,14 @@ public enum BooksDecoder {
     }
 }
 
-// MARK: - Helpers
+// MARK: - Helpers / Hilfsfunktionen
 
 private extension String {
     var nilIfEmpty: String? { isEmpty ? nil : self }
 }
 
 private extension URL {
-    /// Erzwingt HTTPS, falls Google-Links mal `http` liefern.
+    /// Erzwingt HTTPS für Google-Links / Forces HTTPS for Google links.
     func forcingHTTPS() -> URL {
         guard scheme?.lowercased() == "http" else { return self }
         var comps = URLComponents(url: self, resolvingAgainstBaseURL: false)

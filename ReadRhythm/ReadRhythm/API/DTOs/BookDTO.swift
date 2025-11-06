@@ -1,27 +1,23 @@
-//
-//  BookDTO.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 22.10.25.
-//
+// MARK: - Google Books DTOs / Google Books DTOs
+// Definieren schlanke Codable-Container für API-Responses / Provide lightweight Codable containers for API responses.
 
 import Foundation
 
-/// Root-Response für: GET /volumes?q=...
+/// Root-Response für die Suche / Root response for search results.
 struct BooksSearchResponseDTO: Codable {
     let items: [VolumeDTO]?
 
-    // Google Books liefert u. U. auch Felder wie totalItems etc.
-    // Für MVP nicht nötig; wir lassen sie weg, um das DTO schlank zu halten.
+    // Weitere Metadaten werden bewusst ausgelassen / Additional metadata omitted intentionally
 }
 
-/// Einzelnes Volume (Buch) in der Suche.
+/// Einzelnes Volume (Buch) in der Suche / Individual volume in the search response.
 struct VolumeDTO: Codable {
     let id: String
     let volumeInfo: VolumeInfoDTO?
 }
 
-/// Metadaten eines Buchs (Teilmenge für MVP).
+/// Metadaten eines Buchs, reduziert aufs MVP /
+/// Book metadata reduced to MVP scope.
 struct VolumeInfoDTO: Codable {
     let title: String?
     let subtitle: String?
@@ -33,17 +29,18 @@ struct VolumeInfoDTO: Codable {
     let description: String?
     let previewLink: String?
     let imageLinks: ImageLinksDTO?
-    // Raum für spätere Felder:
+    // Raum für spätere Felder / Space for future fields
     // let industryIdentifiers: [IndustryIdentifierDTO]?
 }
 
-/// Bild-Links (nicht immer vorhanden).
+/// Bild-Links, optional laut API /
+/// Image links, optional according to the API.
 struct ImageLinksDTO: Codable {
     let smallThumbnail: String?
     let thumbnail: String?
 }
 
-// Optional für später, falls du ISBN brauchst:
+// Optional für spätere Erweiterungen wie ISBN / Optional placeholder for ISBN support
 // struct IndustryIdentifierDTO: Codable {
 //     let type: String?
 //     let identifier: String?

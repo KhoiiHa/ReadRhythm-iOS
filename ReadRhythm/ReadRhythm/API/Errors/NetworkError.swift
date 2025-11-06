@@ -1,13 +1,9 @@
-//
-//  NetworkError.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 22.10.25.
-//
+// MARK: - Netzwerkfehler / Network Error
+// Vereinheitlicht Fehlercodes für den API-Layer / Unifies error codes for the API layer.
 
 import Foundation
 
-/// Einheitlicher, typisierter Netzwerkfehler (API-Layer).
+/// Einheitlicher, typisierter Netzwerkfehler / Unified, typed network error representation.
 public enum NetworkError: Error, Equatable, LocalizedError {
     case invalidURL
     case timeout
@@ -17,7 +13,8 @@ public enum NetworkError: Error, Equatable, LocalizedError {
     case transport(URLError)
     case unknown(Error)
 
-    // Manuelles Equatable: vergleicht nur sinnvolle Eigenschaften.
+    // Manuelles Equatable vergleicht nur sinnvolle Eigenschaften /
+    // Manual Equatable implementation comparing relevant properties only
     public static func == (lhs: NetworkError, rhs: NetworkError) -> Bool {
         switch (lhs, rhs) {
         case (.invalidURL, .invalidURL),
@@ -42,7 +39,7 @@ public enum NetworkError: Error, Equatable, LocalizedError {
         }
     }
 
-    // Lesbare Beschreibung (für Logs/UI-Mapping im Core).
+    // Lesbare Beschreibung für Logs & UI / Human-readable description for logs and UI
     public var errorDescription: String? {
         switch self {
         case .invalidURL: return "Ungültige URL."

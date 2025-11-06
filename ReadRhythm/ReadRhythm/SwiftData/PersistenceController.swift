@@ -1,9 +1,6 @@
-//
-//  PersistenceController.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 24.10.25.
-//
+// MARK: - Persistence Controller / Persistenz-Kontroller
+// Kapselt den SwiftData ModelContainer für die gesamte App /
+// Encapsulates the SwiftData model container for the entire app.
 
 import SwiftData
 
@@ -24,11 +21,12 @@ enum PersistenceController {
             print("[ReadRhythm][SwiftData] ❌ Failed to create persistent ModelContainer: \(error)")
             print("[ReadRhythm][SwiftData] → Falling back to IN-MEMORY container (no persistence).")
             #endif
-            // Fallback: in-memory container so the app can launch instead of crashing.
+            // Fallback: in-memory container, damit die App launchen kann /
+            // Fallback: use an in-memory container so the app can still launch.
             let models: [any PersistentModel.Type] = ReadRhythmSchemaV2.models
             let schema = Schema(models)
             let memoryConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-            let fallback = try! ModelContainer(for: schema, configurations: memoryConfig)
+            let fallback = try! ModelContainer(for: schema, configurations: memoryConfig) // try! bewusst, da Test-only / intentional for test-only fallback
             return fallback
         }
     }()

@@ -1,34 +1,25 @@
-//
-//  BookRepository.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 17.10.25.
-//
+// MARK: - Buch-Repository-Protokoll / Book Repository Protocol
+// Kontext: Schnittstelle für den lokalen SwiftData-Store / Context: Interface for the local SwiftData store.
+// Warum: Discover & Library programmieren gegen das Protokoll / Why: Discover and Library code against this protocol.
+// Wie: Unterstützt manuell hinzugefügte & API-Bücher mit optionalen Metadaten /
+// How: Supports manual and API-imported books with optional metadata.
 
 import Foundation
 import SwiftData
 
-// MARK: - Kontext → Warum → Wie
-// Kontext: Diese Datei definiert die Schnittstelle für das **lokale** Bücher-Repository (SwiftData).
-// Warum: Andere Komponenten (z. B. DiscoverViewModel, LibraryViewModel) programmieren nur gegen
-//        dieses Protokoll – die konkrete Implementierung (LocalBookRepository) bleibt austauschbar
-//        und ist leicht mockbar für Tests / Previews.
-// Wie: Wir speichern Bücher aus zwei Quellen:
-//      - vom Nutzer manuell hinzugefügt
-//      - aus der Google Books API importiert
-//      Deshalb erlauben wir optionale Metadaten wie Cover-URL und sourceID.
-
-/// Abstraktion für lokale Buch-Operationen (SwiftData).
+/// Abstraktion für lokale Buch-Operationen (SwiftData) /
+/// Abstraction for local book operations backed by SwiftData.
 protocol BookRepository {
-    /// Persistiert ein Buch in SwiftData und gibt die gespeicherte Entität zurück.
+    /// Persistiert ein Buch in SwiftData und gibt die Entität zurück /
+    /// Persists a book in SwiftData and returns the stored entity.
     /// - Parameters:
-    ///   - title: Anzeigename des Buches (Pflicht)
-    ///   - author: Autor oder Autor:innen-Liste (optional)
-    ///   - subtitle/publisher/publishedDate/pageCount/language/categories/descriptionText: optionale, reichhaltige Metadaten
-    ///   - thumbnailURL: (optional) Remote-Cover-URL (z. B. Google Books Thumbnail)
-    ///   - infoLink/previewLink: optionale externe URLs
-    ///   - sourceID: (optional) Eine externe ID (z. B. Google Books Volume ID)
-    ///   - source: Kennzeichnung der Quelle (z. B. "Google Books", "User")
+    ///   - title: Anzeigename des Buches (Pflicht) / Display title (required)
+    ///   - author: Autor:innen-Liste (optional) / Author list (optional)
+    ///   - subtitle/publisher/...: Optionale Metadaten / Optional rich metadata
+    ///   - thumbnailURL: Optionales Remote-Cover / Optional remote cover URL
+    ///   - infoLink/previewLink: Optionale externe Links / Optional external links
+    ///   - sourceID: Externe ID (optional) / External identifier (optional)
+    ///   - source: Kennzeichnung der Quelle / Source label
     @discardableResult
     func add(
         title: String,
@@ -47,17 +38,17 @@ protocol BookRepository {
         source: String
     ) throws -> BookEntity
 
-    /// Löscht ein Buch aus der Persistenz.
+    /// Löscht ein Buch aus der Persistenz /
+    /// Deletes a book from persistence.
     func delete(_ book: BookEntity) throws
 
-    /// Lädt Bücher aus der Persistenzschicht, optional sortiert.
+    /// Lädt Bücher aus der Persistenzschicht, optional sortiert /
+    /// Loads books from persistence with optional sorting.
     func fetchBooks(sortedBy descriptors: [SortDescriptor<BookEntity>]) throws -> [BookEntity]
 }
 
-// MARK: - Default Convenience
-// Das hier ist nice für Aufrufe aus UI/Previews, die (noch) keine Metadaten haben.
-// Wir liefern Standardwerte für Thumbnail/Source, damit ältere Call Sites weiter kompilieren
-// (z. B. AddBookView oder Seeder-Code).
+// MARK: - Default Convenience / Komfort-Helfer
+// Convenience für UI/Previews ohne Metadaten / Convenience for UI and previews without metadata.
 extension BookRepository {
     @discardableResult
     func add(
@@ -78,11 +69,11 @@ extension BookRepository {
             infoLink: nil,
             previewLink: nil,
             sourceID: nil,
-            source: "User" // Fallback-Quelle für manuell hinzugefügte Bücher
+            source: "User" // Fallback-Quelle für manuell hinzugefügte Bücher / Fallback source label
         )
     }
 
-    /// Bequemer Aufruf ohne Sort-Descriptor – nutzt standardmäßig `dateAdded` absteigend.
+    /// Bequemer Aufruf ohne Sort-Descriptor / Convenience call defaulting to `dateAdded` descending
     func fetchBooks() throws -> [BookEntity] {
         try fetchBooks(sortedBy: [SortDescriptor(\BookEntity.dateAdded, order: .reverse)])
     }

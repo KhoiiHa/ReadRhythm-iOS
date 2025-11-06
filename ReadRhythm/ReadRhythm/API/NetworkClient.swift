@@ -1,33 +1,35 @@
-//
-//  NetworkClient.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 22.10.25.
-//
+// MARK: - Netzwerk-Grundbaustein / Networking Foundation
+// Liefert einen testbaren HTTP-Client samt Request-Builder / Provides a testable HTTP client plus request builder.
 
 import Foundation
 
 // MARK: - Protocol
 
-/// Abstraktion für den HTTP-Client (leicht mockbar).
+/// Abstraktion für den HTTP-Client / HTTP client abstraction for easy mocking.
 public protocol NetworkClientProtocol {
-    /// Führt eine Request aus und liefert Rohdaten + HTTP-Antwort.
+    /// Führt eine Request aus und liefert Rohdaten + HTTP-Antwort /
+    /// Executes a request and returns raw data with the HTTP response.
     func request(_ request: URLRequest) async throws -> (Data, HTTPURLResponse)
 }
 
 // MARK: - Client
 
-/// Standard-Implementation auf Basis von URLSession.
+/// Standard-Implementation auf Basis von URLSession /
+/// Standard implementation built on URLSession.
 public final class NetworkClient: NetworkClientProtocol {
 
     private let session: URLSession
 
-    /// Erstellt einen Client mit eigener URLSession (15 s Timeout).
-    /// - Parameter session: Für Tests injizierbar; default: ephemerale Session.
+    /// Erstellt einen Client mit eigener URLSession / Builds a client with its own URLSession.
+    /// - Parameter session: Für Tests injizierbar; default: ephemerale Session /
+    ///   Injectable session for tests; default uses an ephemeral configuration.
     public init(session: URLSession? = nil) {
+        // Ermöglicht Dependency Injection, fällt sonst auf Standardkonfiguration zurück /
+        // Allows dependency injection, otherwise falls back to a default configuration
         if let session {
             self.session = session
         } else {
+            // Schlanke Standardkonfiguration für API-Zugriffe / Lightweight default configuration for API calls
             let cfg = URLSessionConfiguration.ephemeral
             cfg.timeoutIntervalForRequest = 15
             cfg.timeoutIntervalForResource = 15
@@ -41,7 +43,8 @@ public final class NetworkClient: NetworkClientProtocol {
         }
     }
 
-    /// Führt eine Request aus, prüft Statuscode und liefert Daten + Response.
+    /// Führt eine Request aus, prüft Statuscode und liefert Daten + Response /
+    /// Executes a request, validates the status code, and returns data plus response.
     public func request(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
         #if DEBUG
         let start = DispatchTime.now()
@@ -89,7 +92,7 @@ public final class NetworkClient: NetworkClientProtocol {
 
 // MARK: - URLRequestBuilder
 
-/// Kleiner Helper für konsistente Requests (Base-URL + QueryItems).
+/// Kleiner Helper für konsistente Requests / Small helper for consistent request creation.
 public struct URLRequestBuilder {
     public enum HTTPMethod: String { case GET, POST, PUT, PATCH, DELETE }
 
@@ -122,12 +125,12 @@ public struct URLRequestBuilder {
     }
 
     public func build() throws -> URLRequest {
-        // URLComponents NICHT über optional chaining mutieren – sonst overlapping access.
+        // URLComponents niemals per optional chaining mutieren / Avoid mutating URLComponents via optional chaining
         guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
             throw NetworkError.invalidURL
         }
 
-        // Pfad sicher zusammensetzen
+        // Pfad sicher zusammensetzen / Compose the path safely
         if !path.isEmpty {
             let basePath = components.path
             if basePath.isEmpty {
@@ -141,7 +144,8 @@ public struct URLRequestBuilder {
             }
         }
 
-        // Query-Items deduplizieren (letzter gewinnt), stabil sortieren für deterministische Tests
+        // Query-Items deduplizieren und deterministisch sortieren /
+        // Deduplicate query items and keep deterministic ordering
         if !queryItems.isEmpty {
             var merged: [String: URLQueryItem] = [:]
             for item in queryItems { merged[item.name] = item }
@@ -162,7 +166,7 @@ public struct URLRequestBuilder {
 
 // MARK: - Helpers
 
-/// Wrapper, damit `Encodable` in `JSONEncoder` ohne Generic-Zirkus funktioniert.
+/// Wrapper für beliebige Encodables / Wrapper enabling encoding of arbitrary `Encodable` values.
 private struct AnyEncodable: Encodable {
     private let _encode: (Encoder) throws -> Void
     init<T: Encodable>(_ value: T) { _encode = value.encode }

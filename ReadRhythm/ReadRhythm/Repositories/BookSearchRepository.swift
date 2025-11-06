@@ -1,16 +1,14 @@
-//
-//  BookSearchRepository.swift
-//  ReadRhythm
-//
-//  Created by Vu Minh Khoi Ha on 23.10.25.
-//
+// MARK: - Buchsuche-Repository / Book Search Repository
+// Koordiniert API-Aufrufe, Caches und SwiftData für Discover /
+// Coordinates API calls, caches, and SwiftData for the Discover feature.
 
 import Foundation
 import SwiftData
 
-/// Protokoll für die Suche nach Büchern über Remote-API (Google Books) mit optionalem Cache.
+/// Protokoll für die Suche nach Büchern (Remote + Cache) /
+/// Protocol for book searches combining remote calls and caching.
 protocol BookSearchRepositoryProtocol {
-    /// Führt eine Suche aus und nutzt Cache-Fallbacks (Memory → FeedCache → API).
+    /// Führt eine Suche aus mit Cache-Fallbacks / Performs a search with cache fallbacks (memory → feed cache → API).
     func search(
         query: String?,
         category: DiscoverCategory?,
@@ -18,14 +16,12 @@ protocol BookSearchRepositoryProtocol {
     ) async throws -> [RemoteBook]
 }
 
-/// Repository, das API, In-Memory-Cache und SwiftData-Feed-Cache koordiniert.
-/// Implementiert eine Stale-While-Revalidate-Strategie (SWR).
-///
-/// Wichtig:
-/// - Verwendet denselben SwiftData-Container wie der Rest der App
-///   (PersistenceController.shared), damit Discover-Feed, gespeicherte Bücher
-///   und Library-Ansicht alle gegen dieselbe `default.store` gehen.
-/// - Dadurch vermeiden wir `no such table: ZBOOKENTITY`.
+/// Koordiniert API, In-Memory-Cache und SwiftData-Feed-Cache /
+/// Coordinates the API, in-memory cache, and SwiftData feed cache.
+/// Implementiert Stale-While-Revalidate für Discover /
+/// Implements a stale-while-revalidate strategy for Discover.
+/// Nutzt denselben SwiftData-Container wie der Rest der App /
+/// Uses the same SwiftData container as the rest of the app to avoid schema drift.
 @MainActor
 final class BookSearchRepository: BookSearchRepositoryProtocol {
 
@@ -48,12 +44,10 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
         self.feedCache = feedCache
     }
 
-    /// Bequemer Default-Initializer für die App-Laufzeit.
-    ///
-    /// WICHTIG:
-    /// Wir geben hier explizit `PersistenceController.shared` an den FeedCache weiter,
-    /// damit BookSearchRepository, DiscoverFeedCacheRepository und der Rest der App
-    /// garantiert im GLEICHEN SwiftData-Container laufen.
+    /// Bequemer Default-Initializer für die App-Laufzeit /
+    /// Convenience initializer for the app runtime.
+    /// Nutzt explizit `PersistenceController.shared`, um Container zu teilen /
+    /// Explicitly uses `PersistenceController.shared` to keep containers aligned.
     convenience init() {
         self.init(
             apiClient: BooksAPIClient(network: NetworkClient()),
@@ -68,13 +62,13 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
         maxResults: Int = 20
     ) async throws -> [RemoteBook] {
 
-        // Trim and validate query
+        // Trim and validate query / Anfrage bereinigen und validieren
         let trimmed = (query ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         guard trimmed.isEmpty == false else { return [] }
 
         let key = CacheKey(query: trimmed, categoryID: category?.id ?? "none")
 
-        // 1️⃣ Memory Cache
+        // 1️⃣ Memory Cache / In-Memory-Cache zuerst prüfen
         if let entry = memoryCache[key], Date().timeIntervalSince(entry.timestamp) < memoryTTL {
             #if DEBUG
             print("💾 [BookSearchRepository] Memory-Hit for \(key)")
@@ -82,7 +76,7 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
             return entry.items
         }
 
-        // 2️⃣ FeedCache (SwiftData)
+        // 2️⃣ FeedCache (SwiftData) / Persistenter Discover-Cache
         if let cachedItems = try? feedCache.fetch(categoryID: key.categoryID, query: key.query),
            let first = cachedItems.first,
            Date().timeIntervalSince(first.fetchedAt) < feedTTL {
@@ -104,7 +98,7 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
             return books
         }
 
-        // 3️⃣ API Call (Network)
+        // 3️⃣ API Call (Network) / Netzwerkanfrage
         #if DEBUG
         print("🌐 [BookSearchRepository] Fetching remote data for \(key)")
         #endif
@@ -123,17 +117,19 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
         }
         #endif
 
-        // 4️⃣ Write-through Cache (Memory + FeedCache)
+        // 4️⃣ Write-through Cache (Memory + FeedCache) / Ergebnisse zurückschreiben
         memoryCache[key] = CacheEntry(timestamp: .now, items: remote)
         try? feedCache.replace(categoryID: key.categoryID, query: key.query, with: remote, category: category)
 
         return remote
     }
 
-    // MARK: - Lightweight DTOs for decoding Google Books response (MVP-scope)
+    // MARK: - Lightweight DTOs / Leichte DTOs
 
-    /// Decodiert das rohe JSON der Google Books API und mappt es in RemoteBook-Modelle.
-    /// Bricht NICHT ab, wenn einzelne Volumes unvollständig sind.
+    /// Decodiert das rohe JSON der Google Books API /
+    /// Decodes raw JSON from the Google Books API.
+    /// Überspringt unvollständige Volumes, statt zu scheitern /
+    /// Skips incomplete volumes instead of failing hard.
     private func mapRemoteBooks(from data: Data) throws -> [RemoteBook] {
         let books = try BooksDecoder.decodeSearchList(from: data)
 

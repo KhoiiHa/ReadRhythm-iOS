@@ -1,3 +1,6 @@
+// MARK: - App-Einstiegspunkt / App Entry Point
+// Kapselt das Scene-Setup und hängt den zentralen PersistenceController an /
+// Encapsulates the scene setup and attaches the shared persistence controller.
 import SwiftUI
 import SwiftData
 
@@ -5,16 +8,18 @@ enum AppAppearance: String, CaseIterable {
     case system, light, dark
 }
 
-/// Gemeinsamer SwiftData-Einstieg für die App.
-/// Wir nutzen ab jetzt einen einzigen persistenten Container (`PersistenceController.shared`)
-/// der ALLE @Model-Typen kennt (BookEntity, ReadingSessionEntity, ReadingGoalEntity, DiscoverFeedItem usw.).
-/// Dadurch teilen sich Discover (Speichern aus API) und Library (Anzeige via @Query)
-/// denselben Store und wir vermeiden den "no such table: ZBOOKENTITY"-Crash.
+/// Zentraler SwiftData-Zugriffspunkt für alle Feature-Module /
+/// Central SwiftData access point for all feature modules.
+/// Ein einziger Container liefert konsistente Daten für Discover & Library /
+/// A single container keeps Discover & Library in sync.
 @main
 struct ReadRhythmApp: App {
 
+    // Verwaltet globale UI-Präferenzen / Manages global UI preferences
     @StateObject private var settings = AppSettingsService.shared
     @AppStorage("themeMode") private var themeRaw: String = AppThemeMode.system.rawValue
+    // Übersetzt die gespeicherte Theme-Wahl in eine tatsächliche Appearance /
+    // Translates the stored theme choice into an actual appearance option
     private var resolvedAppearance: AppAppearance {
         (AppThemeMode(rawValue: themeRaw) ?? .system).asAppearance
     }
@@ -25,10 +30,8 @@ struct ReadRhythmApp: App {
                 .environmentObject(settings)
                 .applyPreferredColorScheme(resolvedAppearance)
         }
-        // WICHTIG:
-        // Statt einen eigenen Container lokal zu bauen (makeSafeContainer / default.store-Recovery)
-        // hängen wir hier die zentrale PersistenceController.shared an.
-        // -> Alle Screens & Repositories laufen auf demselben ModelContainer.
+        // Zentralisiert den ModelContainer für jede Szene /
+        // Centralizes the model container for every scene instance.
         .modelContainer(PersistenceController.shared)
     }
 }
