@@ -7,6 +7,9 @@
 ![QA](https://img.shields.io/badge/Tests-Core_Stable-success)
 ![Status](https://img.shields.io/badge/Phase-Code_Freeze_✅-blueviolet)
 
+> Eine minimalistische Reading-App, die Fortschritt sichtbar macht –  
+> gebaut mit SwiftUI, SwiftData & Swift Charts für Fokus statt Overload.
+
 > *„Track your reading habits, visualize your progress, and rediscover the joy of mindful reading.“*  
 > Developed as part of my iOS Portfolio Project · SwiftUI · MVVM · SwiftData · Swift Charts
 
@@ -131,7 +134,7 @@ and power reusable components across the UI.
 **DE:**  
 - Aufbau einer Stale-While-Revalidate-Suche zeigte, wie Repository-Muster Netzwerk & Persistenz vereint.  
 - Aggregationslogik im StatsService entlastet ViewModels und erhöht Testbarkeit.  
-- Konsequent eingesetzte Design Tokens halten Light/Dark-Mode konsistent.  
+- Design Tokens halten Light/Dark-Mode konsistent.  
 - Text-to-Speech & SwiftData-Tests zeigten Integration von AVFoundation + Persistence-Lifecycles.  
 
 **EN:**  
@@ -145,10 +148,10 @@ and power reusable components across the UI.
 ## 🧪 Teststrategie & Qualitätssicherung
 
 **Getestete Kernmodule:**  
-- LocalSessionRepository: validiert Idempotenz  
-- StatsService: aggregiert Lesezeit deterministisch  
-- SpeechService: testet Start/Stop-Lifecycle  
-- AppFormatter: prüft lokalisierte Texte & VoiceOver-Kompatibilität  
+- LocalSessionRepository → validiert Idempotenz  
+- StatsService → aggregiert Lesezeit deterministisch  
+- SpeechService → testet Start/Stop-Lifecycle  
+- AppFormatter → prüft lokalisierte Texte & VoiceOver-Kompatibilität  
 
 > Fokus: deterministische Tests, CI-ready Stabilität, klar getrennt von UI-Smokes.  
 > Alles Produktive läuft grün; visuelle Tests dienen als Showcase.
@@ -181,6 +184,15 @@ and power reusable components across the UI.
 
 ---
 
+## 💼 Recruiter Highlights
+
+- Saubere MVVM-Architektur mit klaren Repository- & Service-Layern  
+- Unit-Tests für Stats, Speech & Session mit deterministischem Verhalten  
+- Design Tokens, i18n & Accessibility konsistent umgesetzt  
+- Projekt ist Code-Freeze-ready und vollständig dokumentiert für Open Source
+
+---
+
 ## 💡 Setup
 
 1. Repository klonen  
@@ -202,7 +214,7 @@ Google Books API powers the discovery feed via a lightweight NetworkClient wrapp
 
 ## 💬 Autor
 
-** Minh Khoi Ha**  
+**Minh Khoi Ha**  
 📍 iOS Developer · Product Strategist · Portfolio-Projekt *ReadRhythm*  
 📧 Kontakt auf Anfrage  
 
