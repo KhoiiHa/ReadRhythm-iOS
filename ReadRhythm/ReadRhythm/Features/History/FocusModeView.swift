@@ -75,6 +75,7 @@ struct FocusModeView: View {
                 .padding(AppSpace.md)
                 .frame(maxWidth: .infinity)
                 .cardBackground()
+                .applyFocusAccentCard()   // 🔹 dezente Farbkante links
                 .shadow(
                     color: AppShadow.card.color,
                     radius: AppShadow.card.radius,
@@ -99,6 +100,7 @@ struct FocusModeView: View {
                 .padding(AppSpace.lg)
                 .frame(maxWidth: .infinity)
                 .cardBackground()
+                .applyFocusAccentCard()   // 🔹 Accent-Streifen
                 .shadow(
                     color: AppShadow.card.color,
                     radius: AppShadow.card.radius,
@@ -132,6 +134,7 @@ struct FocusModeView: View {
             .padding(.horizontal, AppSpace.lg)
             .padding(.vertical, AppSpace.md)
             .cardBackground()
+            .applyFocusAccentCard()   // 🔹 Accent-Streifen
             .shadow(
                 color: AppShadow.card.color,
                 radius: AppShadow.card.radius,
@@ -168,10 +171,15 @@ struct FocusModeView: View {
                         systemImage: "play.circle.fill"
                     )
                     .font(AppFont.bodyStandard())
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.9)
                     .fontWeight(.semibold)
+                    .fixedSize(horizontal: true, vertical: false) // 🔹 nicht umbrechen
+                    .labelStyle(.iconLeading)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(vm.isRunning)
+                .frame(maxWidth: .infinity) // 🔹 jede Taste gleich breit
                 .accessibilityIdentifier("Focus.StartResume")
 
                 // Pause
@@ -184,9 +192,14 @@ struct FocusModeView: View {
                 } label: {
                     Label(LocalizedStringKey("focus.action.pause"), systemImage: "pause.circle")
                         .font(AppFont.bodyStandard())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.9)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .labelStyle(.iconLeading)
                 }
                 .buttonStyle(.bordered)
                 .disabled(!vm.isRunning)
+                .frame(maxWidth: .infinity)
                 .accessibilityIdentifier("Focus.Pause")
 
                 // Finish & Save
@@ -202,8 +215,13 @@ struct FocusModeView: View {
                 } label: {
                     Label(LocalizedStringKey("focus.action.finish"), systemImage: "checkmark.circle")
                         .font(AppFont.bodyStandard())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.9)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .labelStyle(.iconLeading)
                 }
                 .buttonStyle(.bordered)
+                .frame(maxWidth: .infinity)
                 .accessibilityIdentifier("Focus.Finish")
 
                 // Stop / Reset (destructive, no save)
@@ -219,8 +237,13 @@ struct FocusModeView: View {
                 } label: {
                     Label(LocalizedStringKey("focus.action.stop"), systemImage: "stop.circle")
                         .font(AppFont.bodyStandard())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.9)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .labelStyle(.iconLeading)
                 }
                 .buttonStyle(.bordered)
+                .frame(maxWidth: .infinity)
                 .accessibilityIdentifier("Focus.Stop")
             }
 
@@ -237,6 +260,35 @@ struct FocusModeView: View {
         }
         .accessibilityIdentifier("Focus.Screen")
     }
+}
+
+// MARK: - Focus Mode Styling Helpers
+private extension View {
+    /// Wendet einen dezenten farbigen Streifen links auf Fokus-Karten an.
+    @ViewBuilder
+    func applyFocusAccentCard() -> some View {
+        self
+            .overlay(alignment: .leading) {
+                Rectangle()
+                    .fill(Color.accentColor.opacity(0.18))
+                    .frame(width: 5)
+                    .padding(.vertical, AppSpace.sm)
+            }
+    }
+}
+
+// MARK: - Custom Label Style (Icon leading)
+struct IconLeadingLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: 6) {
+            configuration.icon
+            configuration.title
+        }
+    }
+}
+
+extension LabelStyle where Self == IconLeadingLabelStyle {
+    static var iconLeading: IconLeadingLabelStyle { IconLeadingLabelStyle() }
 }
 
 // MARK: - Book Picker Sheet

@@ -27,6 +27,19 @@ struct StatsView: View {
         )
     }
 
+    private var rangeSubtitleKey: LocalizedStringKey {
+        switch range {
+        case .week:
+            return "rr.stats.range.week.subtitle"
+        case .month:
+            return "rr.stats.range.month.subtitle"
+        case .year:
+            return "rr.stats.range.year.subtitle"
+        case .all:
+            return "rr.stats.range.all.subtitle"
+        }
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: AppSpace.lg) {
@@ -87,10 +100,17 @@ struct StatsView: View {
 
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: AppSpace.md) {
-            Text("rr.stats.title")
-                .font(AppFont.headingM())
-                .foregroundStyle(AppColors.Semantic.textPrimary)
-                .accessibilityIdentifier("stats.header.title")
+            VStack(alignment: .leading, spacing: AppSpace._4) {
+                Text("rr.stats.title")
+                    .font(AppFont.headingM())
+                    .foregroundStyle(AppColors.Semantic.textPrimary)
+                    .accessibilityIdentifier("stats.header.title")
+
+                Text(rangeSubtitleKey)
+                    .font(AppFont.caption1())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
+                    .accessibilityIdentifier("stats.header.subtitle")
+            }
 
             Picker("", selection: $range) {
                 ForEach(StatsRange.allCases) { range in
@@ -110,12 +130,14 @@ struct StatsView: View {
             HStack(spacing: AppSpace.md) {
                 summaryTile(
                     value: "\(viewModel.totalMinutes)",
-                    labelKey: "rr.stats.minutes.total"
+                    labelKey: "rr.stats.minutes.total",
+                    systemImage: "clock"
                 )
 
                 summaryTile(
                     value: "\(viewModel.currentStreak)",
-                    labelKey: "rr.stats.streak.days"
+                    labelKey: "rr.stats.streak.days",
+                    systemImage: "flame"
                 )
 
                 Spacer(minLength: 0)
@@ -124,21 +146,32 @@ struct StatsView: View {
         .accessibilityIdentifier("stats.header")
     }
 
-    private func summaryTile(value: String, labelKey: LocalizedStringKey) -> some View {
-        VStack(alignment: .leading, spacing: AppSpace.xs) {
+    private func summaryTile(
+        value: String,
+        labelKey: LocalizedStringKey,
+        systemImage: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: AppSpace._4) {
+            Image(systemName: systemImage)
+                .font(.caption)
+                .foregroundStyle(AppColors.Semantic.tintPrimary.opacity(0.8))
+
             Text(value)
-                .font(AppFont.headingM())
+                .font(AppFont.headingS())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
+
             Text(labelKey)
                 .font(AppFont.caption2())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
         }
         .padding(AppSpace.md)
-        .background(AppColors.Semantic.bgCard)
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.m)
-                .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous)
+                .fill(AppColors.Semantic.bgCard)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous)
+                        .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
+                )
         )
         .accessibilityElement(children: .combine)
     }

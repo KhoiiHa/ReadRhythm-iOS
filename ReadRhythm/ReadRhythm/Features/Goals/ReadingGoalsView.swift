@@ -39,17 +39,47 @@ struct ReadingGoalsView: View {
                         initialBook: nil
                     )
                 } label: {
-                    Label(LocalizedStringKey("focus.title"), systemImage: "timer")
-                        .font(AppFont.bodyStandard())
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .cardBackground()
-                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppRadius.l)
-                                .stroke(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
-                        )
-                        .accessibilityIdentifier("Goals.FocusLink.Label")
+                    HStack(spacing: AppSpace.sm) {
+                        Image(systemName: "timer")
+                            .imageScale(.medium)
+                            .padding(8)
+                            .background(
+                                Circle()
+                                    .fill(AppColors.Semantic.tintPrimary.opacity(0.12))
+                            )
+                            .foregroundStyle(AppColors.Semantic.tintPrimary)
+
+                        VStack(alignment: .leading, spacing: AppSpace.xs) {
+                            Text(LocalizedStringKey("focus.title"))
+                                .font(AppFont.bodyStandard())
+                                .foregroundStyle(AppColors.Semantic.textPrimary)
+
+                            Text(NSLocalizedString("goals.focus.subtitle", comment: "Untertitel für Lese-Fokus Karte"))
+                                .font(AppFont.caption2())
+                                .foregroundStyle(AppColors.Semantic.textSecondary)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(AppFont.caption2())
+                            .foregroundStyle(AppColors.Semantic.textSecondary)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .cardBackground()
+                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppRadius.l)
+                            .stroke(AppColors.Semantic.tintPrimary.opacity(0.15), lineWidth: 1)
+                    )
+                    .shadow(
+                        color: AppColors.Semantic.shadowColor.opacity(0.08),
+                        radius: 12,
+                        x: 0,
+                        y: 4
+                    )
+                    .accessibilityIdentifier("Goals.FocusLink.Label")
                 }
                 .accessibilityIdentifier("Goals.FocusLink")
 
@@ -63,18 +93,31 @@ struct ReadingGoalsView: View {
                         .rotationEffect(.degrees(-90))
                         .animation(.spring(response: 0.6, dampingFraction: 0.8), value: viewModel.progress)
 
-                    VStack(spacing: 4) {
-                        Text(progressPercent(viewModel.progress))
-                            .font(AppFont.titleLarge)
-                            .foregroundStyle(AppColors.Semantic.textPrimary)
-                            .accessibilityIdentifier("Goals.ProgressPercent")
-
+                    VStack(spacing: AppSpace.xs) {
                         if let goal = viewModel.activeGoal {
+                            Text(NSLocalizedString("goals.progress.title.hasGoal", comment: "Titel über dem Ring, wenn ein Ziel existiert"))
+                                .font(AppFont.caption2())
+                                .foregroundStyle(AppColors.Semantic.textSecondary)
+
+                            Text(progressPercent(viewModel.progress))
+                                .font(AppFont.titleLarge)
+                                .foregroundStyle(AppColors.Semantic.textPrimary)
+                                .accessibilityIdentifier("Goals.ProgressPercent")
+
                             Text(String(format: NSLocalizedString("goals.target.minutes", comment: "Ziel-Minuten"), goal.targetMinutes))
                                 .font(AppFont.caption2())
                                 .foregroundStyle(AppColors.Semantic.textSecondary)
                                 .accessibilityIdentifier("Goals.TargetLabel")
                         } else {
+                            Text(NSLocalizedString("goals.progress.title.noGoal", comment: "Titel über dem Ring, wenn kein Ziel existiert"))
+                                .font(AppFont.caption2())
+                                .foregroundStyle(AppColors.Semantic.textSecondary)
+
+                            Text(progressPercent(viewModel.progress))
+                                .font(AppFont.titleLarge)
+                                .foregroundStyle(AppColors.Semantic.textPrimary)
+                                .accessibilityIdentifier("Goals.ProgressPercent")
+
                             Text(NSLocalizedString("goals.cta.set", comment: "Ziel festlegen"))
                                 .font(AppFont.caption2())
                                 .foregroundStyle(AppColors.Semantic.textSecondary)
@@ -99,7 +142,7 @@ struct ReadingGoalsView: View {
                             .accessibilityIdentifier("Goals.CelebrationBadge")
                     }
                 }
-                .frame(width: 220, height: 220)
+                .frame(width: 240, height: 240)
                 .padding(.top, AppSpace.xl)
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel(NSLocalizedString("goals.accessibility.progress", comment: "Fortschritt"))
@@ -111,31 +154,66 @@ struct ReadingGoalsView: View {
                 .shadow(color: AppColors.Semantic.shadowColor, radius: 6, x: 0, y: 3)
                 #endif
 
-                // MARK: Streak
-                HStack(spacing: AppSpace.sm) {
+                // "Ziel bearbeiten" Button (direkt nach dem Ring)
+                Button {
+                    viewModel.startEditing()
+                } label: {
                     Label {
-                        Text("\(viewModel.streakCount)")
-                            .font(AppFont.headingS())
-                        Text(NSLocalizedString("goals.streak.days", comment: "Tage in Folge"))
-                            .font(AppFont.bodyStandard())
-                            .foregroundStyle(AppColors.Semantic.textSecondary)
-                    } icon: {
-                        Image(systemName: "flame.fill")
-                    }
-                    .accessibilityIdentifier("Goals.StreakBadge")
-
-                    Spacer()
-
-                    // CTA
-                    Button {
-                        viewModel.startEditing()
-                    } label: {
                         Text(NSLocalizedString("goals.edit.title", comment: "Ziel bearbeiten"))
+                            .font(AppFont.bodyStandard())
+                    } icon: {
+                        Image(systemName: "slider.horizontal.3")
                     }
-                    .buttonStyle(.borderedProminent)
-                    .accessibilityIdentifier("Goals.Edit.Open")
                 }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .frame(maxWidth: .infinity)
+                .padding(.top, AppSpace.lg)
                 .padding(.horizontal, AppSpace.lg)
+                .accessibilityIdentifier("Goals.Edit.Open")
+
+                // MARK: Streak
+                VStack(alignment: .leading, spacing: AppSpace.sm) {
+                    HStack(spacing: AppSpace.sm) {
+                        Image(systemName: "flame.fill")
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(
+                                AppColors.Semantic.tintPrimary,
+                                AppColors.Semantic.tintPrimary.opacity(0.18)
+                            )
+                            .padding(8)
+                            .background(
+                                Circle()
+                                    .fill(AppColors.Semantic.tintPrimary.opacity(0.10))
+                            )
+                            .imageScale(.medium)
+
+                        VStack(alignment: .leading, spacing: AppSpace.xs) {
+                            Text("\(viewModel.streakCount)")
+                                .font(AppFont.headingS())
+                            Text(NSLocalizedString("goals.streak.days", comment: "Tage in Folge"))
+                                .font(AppFont.bodyStandard())
+                                .foregroundStyle(AppColors.Semantic.textSecondary)
+                        }
+                    }
+
+                    Text(NSLocalizedString("goals.streak.subtitle", comment: "Untertitel/Beschreibung für die Streak-Kachel"))
+                        .font(AppFont.caption2())
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                }
+                .padding(AppSpace.lg)
+                .background(
+                    RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                        .fill(AppColors.Semantic.bgCard.opacity(0.96))
+                        .shadow(
+                            color: AppColors.Semantic.shadowColor.opacity(0.10),
+                            radius: 12,
+                            x: 0,
+                            y: 6
+                        )
+                )
+                .padding(.horizontal, AppSpace.lg)
+                .accessibilityIdentifier("Goals.StreakBadge")
 
                 // Optional: kleine Metrik-Karte
                 metricTile(minutes: viewModel.totalMinutes)
@@ -210,7 +288,7 @@ struct ReadingGoalsView: View {
 }
 
 // MARK: - DEBUG Case-Study Harness
-#if DEBUG
+//#if DEBUG
 // MARK: - Case-Study Harness (Preview-only, ohne Produktions-VM/SwiftData)
 private struct GoalsPreviewVM {
     var progress: Double
@@ -247,18 +325,31 @@ private struct ReadingGoalsCaseStudy: View {
                         .rotationEffect(.degrees(-90))
                         .animation(.spring(response: 0.6, dampingFraction: 0.8), value: vm.progress)
 
-                    VStack(spacing: 4) {
-                        Text(previewProgressPercent(vm.progress))
-                            .font(AppFont.titleLarge)
-                            .foregroundStyle(AppColors.Semantic.textPrimary)
-                            .accessibilityIdentifier("Goals.ProgressPercent")
-
+                    VStack(spacing: AppSpace.xs) {
                         if let target = vm.targetMinutes {
+                            Text(NSLocalizedString("goals.progress.title.hasGoal", comment: "Titel über dem Ring, wenn ein Ziel existiert"))
+                                .font(AppFont.caption2())
+                                .foregroundStyle(AppColors.Semantic.textSecondary)
+
+                            Text(previewProgressPercent(vm.progress))
+                                .font(AppFont.titleLarge)
+                                .foregroundStyle(AppColors.Semantic.textPrimary)
+                                .accessibilityIdentifier("Goals.ProgressPercent")
+
                             Text(String(format: NSLocalizedString("goals.target.minutes", comment: "Ziel-Minuten"), target))
                                 .font(AppFont.caption2())
                                 .foregroundStyle(AppColors.Semantic.textSecondary)
                                 .accessibilityIdentifier("Goals.TargetLabel")
                         } else {
+                            Text(NSLocalizedString("goals.progress.title.noGoal", comment: "Titel über dem Ring, wenn kein Ziel existiert"))
+                                .font(AppFont.caption2())
+                                .foregroundStyle(AppColors.Semantic.textSecondary)
+
+                            Text(previewProgressPercent(vm.progress))
+                                .font(AppFont.titleLarge)
+                                .foregroundStyle(AppColors.Semantic.textPrimary)
+                                .accessibilityIdentifier("Goals.ProgressPercent")
+
                             Text(NSLocalizedString("goals.cta.set", comment: "Ziel festlegen"))
                                 .font(AppFont.caption2())
                                 .foregroundStyle(AppColors.Semantic.textSecondary)
@@ -372,4 +463,4 @@ private struct ReadingGoalsCaseStudy: View {
             .preferredColorScheme(.dark)
     }
 }
-#endif
+

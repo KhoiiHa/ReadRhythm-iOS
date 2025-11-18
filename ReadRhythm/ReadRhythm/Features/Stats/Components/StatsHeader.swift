@@ -17,12 +17,33 @@ struct StatsHeader: View {
     let streakDays: Int
     var onRangeChanged: (StatsRange) -> Void = { _ in }
 
+    // Subtitle key based on selected range
+    private var rangeSubtitleKey: LocalizedStringKey {
+        switch selectedRange {
+        case .week:
+            return "rr.stats.range.week.subtitle"
+        case .month:
+            return "rr.stats.range.month.subtitle"
+        case .year:
+            return "rr.stats.range.year.subtitle"
+        case .all:
+            return "rr.stats.range.all.subtitle"
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpace._16) {
-            Text("rr.stats.title")
-                .font(AppFont.headingM())
-                .foregroundStyle(AppColors.Semantic.textPrimary)
-                .accessibilityIdentifier("stats.header.title")
+            VStack(alignment: .leading, spacing: AppSpace._4) {
+                Text("rr.stats.title")
+                    .font(AppFont.headingM())
+                    .foregroundStyle(AppColors.Semantic.textPrimary)
+                    .accessibilityIdentifier("stats.header.title")
+
+                Text(rangeSubtitleKey)
+                    .font(AppFont.caption1())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
+                    .accessibilityIdentifier("stats.header.subtitle")
+            }
 
             // Range Picker
             Picker("", selection: $selectedRange) {
@@ -41,11 +62,13 @@ struct StatsHeader: View {
             HStack(spacing: AppSpace._16) {
                 summaryTile(
                     value: "\(totalMinutes)",
-                    labelKey: "rr.stats.minutes.total"
+                    labelKey: "rr.stats.minutes.total",
+                    systemImage: "clock"
                 )
                 summaryTile(
                     value: "\(streakDays)",
-                    labelKey: "rr.stats.streak.days"
+                    labelKey: "rr.stats.streak.days",
+                    systemImage: "flame"
                 )
                 Spacer(minLength: 0)
             }
@@ -56,11 +79,20 @@ struct StatsHeader: View {
     }
 
     // MARK: - Subviews
-    private func summaryTile(value: String, labelKey: LocalizedStringKey) -> some View {
+    private func summaryTile(
+        value: String,
+        labelKey: LocalizedStringKey,
+        systemImage: String
+    ) -> some View {
         VStack(alignment: .leading, spacing: AppSpace._4) {
+            Image(systemName: systemImage)
+                .font(.caption)
+                .foregroundStyle(AppColors.Semantic.tintPrimary.opacity(0.8))
+
             Text(value)
                 .font(AppFont.headingS())
                 .foregroundStyle(AppColors.Semantic.textPrimary)
+
             Text(labelKey)
                 .font(AppFont.caption2())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
@@ -68,11 +100,11 @@ struct StatsHeader: View {
         .padding(AppSpace._12)
         .background(
             RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous)
-                .fill(AppColors.Semantic.bgScreen)
+                .fill(AppColors.Semantic.bgCard)
                 .overlay(
                     RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous)
                         .stroke(
-                            AppColors.Semantic.tintPrimary.opacity(0.18),
+                            AppColors.Semantic.chipBg.opacity(0.6),
                             lineWidth: 1
                         )
                 )

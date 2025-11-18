@@ -54,7 +54,7 @@ struct StatsChart: View {
 
             // Ziel-Linie
             RuleMark(y: .value("Goal", goalMinutes))
-                .lineStyle(StrokeStyle(lineWidth: AppStroke.chartGoal, dash: [4]))
+                .lineStyle(StrokeStyle(lineWidth: AppStroke.chartGoal, lineCap: .round))
                 .foregroundStyle(AppColors.Semantic.tintPrimary.opacity(0.85))
                 .annotation(position: .topLeading, alignment: .leading) {
                     Text("\(goalMinutes)")
@@ -66,20 +66,18 @@ struct StatsChart: View {
         .chartYAxis {
             AxisMarks(position: .leading) {
                 AxisGridLine()
-                    .foregroundStyle(AppColors.Semantic.chartAxis.opacity(0.35))
-                AxisTick()
-                    .foregroundStyle(AppColors.Semantic.chartAxis)
+                    .foregroundStyle(AppColors.Semantic.chartAxis.opacity(0.22))
                 AxisValueLabel()
+                    .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
             }
         }
         .chartXAxis {
             AxisMarks(values: .stride(by: .day)) {
-                AxisGridLine()
-                    .foregroundStyle(AppColors.Semantic.chartAxis.opacity(0.2))
                 AxisTick()
                     .foregroundStyle(AppColors.Semantic.chartAxis)
                 AxisValueLabel(format: .dateTime.day().weekday(.narrow))
+                    .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
             }
         }

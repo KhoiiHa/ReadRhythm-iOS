@@ -204,6 +204,12 @@
 "rr.stats.range.year" = "Jahr";
 "rr.stats.range.all" = "Gesamt";
 
+// Stats Range Subtitles
+"rr.stats.range.week.subtitle" = "Deine Lesewoche im Überblick";
+"rr.stats.range.month.subtitle" = "Dein Lesemonat im Überblick";
+"rr.stats.range.year.subtitle" = "Dein Lesejahr im Überblick";
+"rr.stats.range.all.subtitle" = "Dein gesamter Lesefortschritt";
+
 // Stats Empty State
 "rr.stats.empty.title" = "Noch keine Daten";
 "rr.stats.empty.subtitle" = "Starte mit dem Tracking deiner Lesesessions, um hier Fortschritt zu sehen.";
@@ -218,6 +224,10 @@
 "goals.metric.readThisPeriod" = "Gelesen in dieser Periode";
 "goals.metric.minutes" = "Minuten";
 "goals.celebration.reached" = "Ziel erreicht 🎉";
+
+"goals.focus.subtitle" = "Fokussierte Lesesessions mit Timer.";
+"goals.progress.title.noGoal" = "Starte mit deinem ersten Ziel.";
+"goals.streak.subtitle" = "Halte deine Serie am Laufen.";
 
 
 "goals.edit.title" = "Ziel bearbeiten";
