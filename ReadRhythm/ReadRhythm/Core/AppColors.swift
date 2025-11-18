@@ -102,6 +102,8 @@ enum AppColors {
                 return UIColor.black.withAlphaComponent(alpha)
             })
         }
+        // Alias für Bestandscode
+        static var shadow: Color { shadowColor }
     }
 
     // MARK: - Aliases / Alias-Zugriffe

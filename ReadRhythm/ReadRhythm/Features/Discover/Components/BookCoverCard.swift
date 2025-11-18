@@ -12,12 +12,13 @@ struct BookCoverCard: View {
     let author: String?
     let coverURL: URL?
     let coverAssetName: String?
+    let isFavorite: Bool
 
-    /// Wird aufgerufen, wenn der Nutzer auf "+" tippt.
-    var onAddToLibrary: (() -> Void)?
+    /// Wird aufgerufen, wenn der Nutzer auf das Herz-Icon tippt.
+    var onToggleFavorite: (() -> Void)?
 
     // Breiteres Verhältnis für Behance-Style-Cards 
-    private let coverSize = CGSize(width: 140, height: 190)
+    private let coverSize = CGSize(width: 132, height: 198)
 
     private var coverView: some View {
         Group {
@@ -62,7 +63,7 @@ struct BookCoverCard: View {
                 .foregroundStyle(AppColors.Semantic.textPrimary)
                 .accessibilityIdentifier("bookcard.title")
 
-            if let onAddToLibrary = onAddToLibrary {
+            if let onToggleFavorite = onToggleFavorite {
                 HStack(alignment: .firstTextBaseline, spacing: AppSpace._4) {
                     Text(author ?? String(localized: "book.unknownAuthor"))
                         .font(AppFont.caption2())
@@ -73,19 +74,29 @@ struct BookCoverCard: View {
                     Spacer(minLength: AppSpace._4)
 
                     Button(action: {
-                        onAddToLibrary()
+                        onToggleFavorite()
                     }) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 14, weight: .semibold))
-                            .padding(8)
+                        Image(systemName: isFavorite ? "heart.fill" : "heart")
+                            .font(.system(size: 13, weight: .semibold))
+                            .padding(7)
                             .background(
                                 Circle()
-                                    .fill(AppColors.Semantic.tintPrimary)
+                                    .fill(
+                                        isFavorite
+                                        ? AppColors.Semantic.tintPrimary.opacity(0.20)
+                                        : AppColors.Semantic.tintPrimary.opacity(0.10)
+                                    )
                             )
-                            .foregroundStyle(AppColors.Semantic.bgCard)
+                            .foregroundStyle(
+                                isFavorite
+                                ? AppColors.Semantic.tintPrimary
+                                : AppColors.Semantic.tintPrimary.opacity(0.9)
+                            )
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel(Text("book.addToLibrary"))
+                    .accessibilityLabel(
+                        Text(isFavorite ? "book.removeFromFavorites" : "book.addToFavorites")
+                    )
                     .accessibilityIdentifier("bookcard.addButton")
                 }
             } else {
@@ -96,7 +107,8 @@ struct BookCoverCard: View {
                     .accessibilityIdentifier("bookcard.author")
             }
         }
-        .padding(AppSpace._8)
+        .padding(.horizontal, AppSpace._8)
+        .padding(.vertical, AppSpace._12)
     }
 
     var body: some View {
@@ -105,11 +117,11 @@ struct BookCoverCard: View {
             infoSection
         }
         .background(
-            RoundedRectangle(cornerRadius: AppRadius.l)
+            RoundedRectangle(cornerRadius: AppRadius.xl)
                 .fill(AppColors.Semantic.bgCard)
                 .shadow(
-                    color: AppColors.Semantic.shadowColor.opacity(0.22),
-                    radius: 8,
+                    color: AppColors.Semantic.shadowColor.opacity(0.12),
+                    radius: 12,
                     x: 0,
                     y: 4
                 )

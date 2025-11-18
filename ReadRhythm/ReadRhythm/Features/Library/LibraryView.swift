@@ -31,9 +31,9 @@ struct LibraryView: View {
                         }
                         .listRowInsets(
                             EdgeInsets(
-                                top: AppSpace._8,
+                                top: AppSpace._12,
                                 leading: AppSpace._16,
-                                bottom: AppSpace._8,
+                                bottom: AppSpace._12,
                                 trailing: AppSpace._16
                             )
                         )
@@ -60,6 +60,8 @@ struct LibraryView: View {
                 .listStyle(.plain)
                 .listRowSeparator(.hidden)
                 .scrollContentBackground(.hidden)
+                .scrollIndicators(.hidden)
+                .animation(.easeInOut(duration: 0.2), value: books.count)
                 .background(AppColors.Semantic.bgScreen)
             }
         }

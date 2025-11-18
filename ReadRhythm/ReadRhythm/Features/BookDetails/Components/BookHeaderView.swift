@@ -21,7 +21,9 @@ struct BookHeaderView: View {
                 title: title,
                 author: author,
                 coverURL: nil,
-                coverAssetName: nil
+                coverAssetName: nil,
+                isFavorite: false,
+                onToggleFavorite: nil
             )
             .frame(width: 120, height: 168)
             .accessibilityIdentifier("book.header.cover")

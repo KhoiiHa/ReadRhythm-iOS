@@ -25,6 +25,9 @@ final class DiscoverViewModel: ObservableObject {
 
     @Published var toastText: String? = nil            // "Hinzugefügt", "Schon vorhanden", etc.
 
+    /// Gemerkte (favorisierte) RemoteBooks in der Entdecken-Ansicht – in-memory State
+    @Published var favoriteResultIDs: Set<String> = []
+
     private var toastDismissTask: Task<Void, Never>? = nil
 
     // MARK: - Dependencies
@@ -199,6 +202,26 @@ final class DiscoverViewModel: ObservableObject {
         } catch {
             return .failure(error)
         }
+    }
+
+    // MARK: - Favoriten (Herz-Icon)
+
+    /// Merkt sich, ob ein RemoteBook in der Discover-Liste "geliked" wurde.
+    /// Aktuell nur in-memory; kein Persistenz-Backend nötig für die UI.
+    func toggleFavorite(for remote: RemoteBook) {
+        let id = remote.id
+        if favoriteResultIDs.contains(id) {
+            favoriteResultIDs.remove(id)
+        } else {
+            favoriteResultIDs.insert(id)
+            // Beim Favorisieren automatisch in die Bibliothek speichern
+            _ = addToLibrary(from: remote)
+        }
+    }
+
+    /// Liefert zurück, ob das übergebene RemoteBook gerade als Favorit markiert ist.
+    func isFavorite(_ remote: RemoteBook) -> Bool {
+        favoriteResultIDs.contains(remote.id)
     }
 
     // MARK: - In Bibliothek speichern

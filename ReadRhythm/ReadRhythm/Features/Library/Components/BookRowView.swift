@@ -13,6 +13,7 @@ import SwiftData
 /// dazu Titel & Autor.
 struct BookRowView: View {
     let book: BookEntity
+    @State private var isPressed = false
 
     // MARK: - Derived
 
@@ -50,9 +51,25 @@ struct BookRowView: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous)
-                .fill(AppColors.Semantic.bgCard)
-                .shadow(color: AppShadow.card.color, radius: AppShadow.card.radius, x: AppShadow.card.x, y: AppShadow.card.y)
+            RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            AppColors.Semantic.bgCard.opacity(0.96),
+                            AppColors.Semantic.bgCard.opacity(1.0)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .shadow(
+                    color: AppColors.Semantic.shadow.opacity(0.12),
+                    radius: 8,
+                    x: 0,
+                    y: 4
+                )
+                .scaleEffect(isPressed ? 0.97 : 1.0)
+                .animation(.easeOut(duration: 0.15), value: isPressed)
             HStack(spacing: 12) {
                 // <-- kleines Cover
                 LibraryRowCoverArtwork(
@@ -61,7 +78,7 @@ struct BookRowView: View {
                 )
                 .accessibilityHidden(true)
 
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(book.title)
                         .font(AppFont.headingM())
                         .foregroundStyle(AppColors.Semantic.textPrimary)
@@ -81,17 +98,15 @@ struct BookRowView: View {
                     if isRemoteImported {
                         Text("Google Books")
                             .font(AppFont.caption2())
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
+                            .fontWeight(.medium)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
                             .background(
                                 Capsule()
-                                    .fill(AppColors.Brand.primary.opacity(0.1))
-                                    .overlay(
-                                        Capsule()
-                                            .stroke(AppColors.Brand.primary.opacity(0.6), lineWidth: AppStroke.cardBorder)
-                                    )
+                                    .fill(AppColors.Brand.primary.opacity(0.08))
                             )
                             .foregroundStyle(AppColors.Brand.primary)
+                            .padding(.top, 4)
                             .accessibilityIdentifier("library.row.badge.google.\(book.persistentModelID.hashValue)")
                     }
                 }
@@ -103,6 +118,12 @@ struct BookRowView: View {
         }
         .contentShape(RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous))
         .hoverEffect(.highlight)
+        .onTapGesture {
+            isPressed = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                isPressed = false
+            }
+        }
         .accessibilityLabel(Text("\(book.title), \(authorText)"))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("library.row.\(book.persistentModelID.hashValue)")

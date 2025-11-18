@@ -72,7 +72,7 @@ enum DiscoverCategory: String, CaseIterable, Identifiable {
             return "book.closed"
         case .fictionRomance:
             // Emotionale Geschichten, Nähe, Beziehungen
-            return "book.heart"
+            return "book.closed.fill"
         case .creativity:
             // Ausdruck, Gestaltung, eigene Stimme
             return "paintpalette"

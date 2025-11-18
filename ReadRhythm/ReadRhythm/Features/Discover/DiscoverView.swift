@@ -51,15 +51,14 @@ struct DiscoverView: View {
                         .font(AppFont.caption2())
                         .foregroundStyle(AppColors.Semantic.textSecondary)
                 } else if !viewModel.results.isEmpty {
-                    VStack(alignment: .leading, spacing: AppSpace._12) {
+                    sectionCard {
                         DiscoverSectionHeader(
                             titleKey: "discover.section.results",
                             showSeeAll: false
                         )
                         resultsList(viewModel.results)
                     }
-                    .padding(.top, AppSpace._16)
-                    .padding(.horizontal, AppSpace._4)
+                    .padding(.top, AppSpace._8)
                 } else if !viewModel.isLoading && viewModel.results.isEmpty && hasActiveFilter {
                     // Keine Treffer für aktive Suche / Kategorie
                     noResultsForCategory
@@ -127,6 +126,7 @@ struct DiscoverView: View {
             .padding(.horizontal, AppSpace._16)
             .padding(.vertical, AppSpace._16)
         }
+        .padding(.top, AppSpace._24)
         .background(AppColors.Semantic.bgScreen)
         .navigationTitle(Text(LocalizedStringKey("rr.tab.discover")))
         .tint(AppColors.Semantic.tintPrimary)
@@ -269,11 +269,12 @@ struct DiscoverView: View {
                         author: book.authorsDisplay,
                         coverURL: book.thumbnailURL,
                         coverAssetName: nil,
-                        onAddToLibrary: {
+                        isFavorite: viewModel.isFavorite(book),
+                        onToggleFavorite: {
                             #if os(iOS)
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             #endif
-                            viewModel.addToLibrary(from: book)
+                            viewModel.toggleFavorite(for: book)
                         }
                     )
                     .frame(maxWidth: .infinity, alignment: .top)
@@ -299,7 +300,8 @@ struct DiscoverView: View {
                             author: book.author,
                             coverURL: nil,
                             coverAssetName: nil,
-                            onAddToLibrary: nil
+                            isFavorite: false,
+                            onToggleFavorite: nil
                         )
                         .contentShape(Rectangle())
                     }
@@ -361,13 +363,13 @@ struct DiscoverView: View {
         }
         .padding(AppSpace._16)
         .background(
-            RoundedRectangle(cornerRadius: AppRadius.l)
+            RoundedRectangle(cornerRadius: AppRadius.xl)
                 .fill(AppColors.Semantic.bgCard)
                 .shadow(
-                    color: AppColors.Semantic.shadowColor.opacity(0.18),
-                    radius: 10,
+                    color: AppColors.Semantic.shadowColor.opacity(0.10),
+                    radius: 14,
                     x: 0,
-                    y: 6
+                    y: 4
                 )
         )
     }

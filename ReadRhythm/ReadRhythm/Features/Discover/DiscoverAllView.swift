@@ -345,7 +345,8 @@ struct DiscoverAllView: View {
                         author: book.authorsDisplay,
                         coverURL: book.thumbnailURL,
                         coverAssetName: nil,
-                        onAddToLibrary: {
+                        isFavorite: false,
+                        onToggleFavorite: {
                             #if os(iOS)
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             #endif
@@ -380,7 +381,8 @@ struct DiscoverAllView: View {
                         author: book.author,
                         coverURL: nil,
                         coverAssetName: nil,
-                        onAddToLibrary: nil
+                        isFavorite: true,
+                        onToggleFavorite: nil
                     )
                     .contentShape(Rectangle())
                 }

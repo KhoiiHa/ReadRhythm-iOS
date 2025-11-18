@@ -47,12 +47,19 @@ struct DiscoverFilterView: View {
     private var header: some View {
         HStack {
             Text("Filter")
-                .font(.headline)
+                .font(AppFont.headingS())
+                .foregroundStyle(AppColors.Semantic.textPrimary)
+
             Spacer()
-            Button("Fertig") {
+
+            Button {
                 isPresented = false
+            } label: {
+                Text("Fertig")
+                    .font(AppFont.bodyStandard().weight(.semibold))
             }
-            .font(.headline)
+            .buttonStyle(.borderless)
+            .tint(AppColors.Semantic.tintPrimary)
         }
     }
 
@@ -60,16 +67,22 @@ struct DiscoverFilterView: View {
     private var activeCategorySection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Aktive Kategorie")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+                .font(AppFont.caption1())
+                .foregroundStyle(AppColors.Semantic.textSecondary)
 
             HStack(spacing: 8) {
                 if let cat = viewModel.selectedCategory {
                     Image(systemName: cat.systemImage)
+                        .foregroundStyle(AppColors.Semantic.tintPrimary)
                     Text(cat.displayName)
+                        .font(AppFont.bodyStandard())
+                        .foregroundStyle(AppColors.Semantic.textPrimary)
                 } else {
                     Image(systemName: "line.3.horizontal.decrease.circle")
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
                     Text("Keine Kategorie")
+                        .font(AppFont.bodyStandard())
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
                 }
                 Spacer()
             }
@@ -78,7 +91,7 @@ struct DiscoverFilterView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color(.systemGray6))
+                    .fill(AppColors.Semantic.bgCard)
             )
         }
     }
@@ -87,8 +100,8 @@ struct DiscoverFilterView: View {
     private var categoriesGridSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Kategorien")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+                .font(AppFont.caption1())
+                .foregroundStyle(AppColors.Semantic.textSecondary)
 
             LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
                 ForEach(allCategories) { cat in
@@ -101,18 +114,26 @@ struct DiscoverFilterView: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: cat.systemImage)
+                                .foregroundStyle(
+                                    isActive
+                                    ? AppColors.Semantic.bgScreen
+                                    : AppColors.Semantic.textPrimary
+                                )
                             Text(cat.displayName)
+                                .font(AppFont.caption2())
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.8)
                         }
                         .padding(.horizontal, 10)
                         .padding(.vertical, 8)
                         .frame(maxWidth: .infinity)
-                        .foregroundColor(isActive ? .white : .primary)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(isActive ? Color(red: 0.56, green: 0.16, blue: 0.16) // rot angelehnt
-                                               : Color(.systemGray6))
+                                .fill(
+                                    isActive
+                                    ? AppColors.Semantic.tintPrimary
+                                    : AppColors.Semantic.bgCard
+                                )
                         )
                     }
                 }
@@ -129,14 +150,14 @@ struct DiscoverFilterView: View {
                 Image(systemName: "arrow.counterclockwise")
                 Text("Filter zurücksetzen")
             }
-            .font(.headline)
+            .font(AppFont.bodyStandard().weight(.semibold))
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
             .background(
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(Color(red: 0.73, green: 0.36, blue: 0.36)) // behance-rot-ish
+                    .fill(AppColors.Semantic.tintPrimary)
             )
-            .foregroundColor(.white)
+            .foregroundStyle(AppColors.Semantic.bgScreen)
         }
         .padding(.horizontal, 4)
     }
