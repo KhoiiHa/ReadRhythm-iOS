@@ -13,7 +13,6 @@ import SwiftData
 /// dazu Titel & Autor.
 struct BookRowView: View {
     let book: BookEntity
-    @State private var isPressed = false
 
     // MARK: - Derived
 
@@ -68,8 +67,6 @@ struct BookRowView: View {
                     x: 0,
                     y: 4
                 )
-                .scaleEffect(isPressed ? 0.97 : 1.0)
-                .animation(.easeOut(duration: 0.15), value: isPressed)
             HStack(spacing: 12) {
                 // <-- kleines Cover
                 LibraryRowCoverArtwork(
@@ -117,13 +114,6 @@ struct BookRowView: View {
             .padding(.horizontal, 16)
         }
         .contentShape(RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous))
-        .hoverEffect(.highlight)
-        .onTapGesture {
-            isPressed = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-                isPressed = false
-            }
-        }
         .accessibilityLabel(Text("\(book.title), \(authorText)"))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("library.row.\(book.persistentModelID.hashValue)")
