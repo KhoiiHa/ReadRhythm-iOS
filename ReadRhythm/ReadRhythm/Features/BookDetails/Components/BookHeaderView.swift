@@ -46,7 +46,7 @@ struct BookHeaderView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.vertical, AppSpace._8)
+        .padding(.vertical, AppSpace._12)
         .accessibilityElement(children: .combine)
     }
 }

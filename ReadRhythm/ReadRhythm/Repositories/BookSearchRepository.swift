@@ -76,7 +76,9 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
             return entry.items
         }
 
-        // 2️⃣ FeedCache (SwiftData) / Persistenter Discover-Cache
+        // 2️⃣ FeedCache (SwiftData) / Persistenter Discover-Cache – aktuell deaktiviert,
+        // um vollständige Metadaten aus der API in Discover-Details zu erhalten.
+        /*
         if let cachedItems = try? feedCache.fetch(categoryID: key.categoryID, query: key.query),
            let first = cachedItems.first,
            Date().timeIntervalSince(first.fetchedAt) < feedTTL {
@@ -97,6 +99,7 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
             memoryCache[key] = CacheEntry(timestamp: .now, items: books)
             return books
         }
+        */
 
         // 3️⃣ API Call (Network) / Netzwerkanfrage
         #if DEBUG
