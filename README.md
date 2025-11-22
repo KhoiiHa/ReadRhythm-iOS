@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://res.cloudinary.com/dpaehynl2/image/upload/v1763816743/ReadRhythm_AppIcon_512_pdlw4f.png" width="200" alt="ReadRhythm Logo"/>
+</p>
+
 # 📚 ReadRhythm – SwiftUI Reading & Listening Tracker
 
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-Framework-blue?logo=swift&logoColor=white)
