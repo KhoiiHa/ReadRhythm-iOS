@@ -7,6 +7,7 @@ import SwiftData
 
 /// Protokoll für die Suche nach Büchern (Remote + Cache) /
 /// Protocol for book searches combining remote calls and caching.
+@MainActor
 protocol BookSearchRepositoryProtocol {
     /// Führt eine Suche aus mit Cache-Fallbacks / Performs a search with cache fallbacks (memory → feed cache → API).
     func search(

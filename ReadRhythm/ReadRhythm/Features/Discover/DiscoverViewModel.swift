@@ -6,7 +6,7 @@ import SwiftUI
 @MainActor
 final class DiscoverViewModel: ObservableObject {
 
-    enum AddToLibraryResult {
+    enum AddToLibraryResult: Equatable {
         case added
         case alreadyExists
         case failure
@@ -29,10 +29,11 @@ final class DiscoverViewModel: ObservableObject {
     @Published var favoriteResultIDs: Set<String> = []
 
     private var toastDismissTask: Task<Void, Never>? = nil
+    private var searchTask: Task<Void, Never>? = nil
 
     // MARK: - Dependencies
 
-    private let bookSearchRepository = BookSearchRepository()
+    private let bookSearchRepository: BookSearchRepositoryProtocol
     private var repository: any BookRepository
 
     /// Initializer
@@ -41,8 +42,12 @@ final class DiscoverViewModel: ObservableObject {
     /// Warum: Der Zugriff auf den SwiftData-ModelContext ist @MainActor-isoliert.
     /// Wie: DiscoverView kümmert sich darum, beim Erzeugen oder in onAppear
     ///      ein korrekt angebundenes Repository zu übergeben.
-    init(repository: any BookRepository) {
+    init(
+        repository: any BookRepository,
+        bookSearchRepository: BookSearchRepositoryProtocol = BookSearchRepository()
+    ) {
         self.repository = repository
+        self.bookSearchRepository = bookSearchRepository
     }
 
     func updateRepository(_ repository: any BookRepository) {
@@ -125,10 +130,14 @@ final class DiscoverViewModel: ObservableObject {
     /// Baut anhand von `searchQuery` oder der gesetzten `selectedCategory`
     /// den finalen Query-String und ruft dann die API.
     func applySearch() {
+        searchTask?.cancel()
+        searchTask = nil
+
         let trimmed = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
 
+        let category = selectedCategory
         let effectiveQuery: String
-        if let cat = selectedCategory {
+        if let cat = category {
             // feste Kategorie --> eigener Query-String
             effectiveQuery = categoryQuery(for: cat)
         } else if !trimmed.isEmpty {
@@ -152,10 +161,15 @@ final class DiscoverViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        Task {
-            let fetchResult = await repositoryFetch(query: effectiveQuery)
+        searchTask = Task { [weak self] in
+            guard let self else { return }
+            let fetchResult = await self.repositoryFetch(query: effectiveQuery, category: category)
+
+            guard Task.isCancelled == false else { return }
 
             await MainActor.run {
+                guard Task.isCancelled == false else { return }
+
                 self.isLoading = false
                 switch fetchResult {
                 case .success(let books):
@@ -191,11 +205,11 @@ final class DiscoverViewModel: ObservableObject {
     }
 
     /// Wrappt den eigentlichen Netzwerkaufruf ans Repository.
-    private func repositoryFetch(query: String) async -> Result<[RemoteBook], Error> {
+    private func repositoryFetch(query: String, category: DiscoverCategory?) async -> Result<[RemoteBook], Error> {
         do {
             let books = try await bookSearchRepository.search(
                 query: query,
-                category: selectedCategory,
+                category: category,
                 maxResults: 20
             )
             return .success(books)
