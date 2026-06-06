@@ -17,7 +17,7 @@ final class ReadRhythmUITests: XCTestCase {
         assertTabExists(in: tabBar, identifier: "tab.library", fallbackLabel: "Bibliothek")
         assertTabExists(in: tabBar, identifier: "tab.discover", fallbackLabel: "Entdecken")
         assertTabExists(in: tabBar, identifier: "tab.stats", fallbackLabel: "Statistiken")
-        assertTabExists(in: tabBar, identifier: "tab.profile", fallbackLabel: "Profil")
+        assertTabExists(in: tabBar, identifier: "tab.more", fallbackLabel: "More")
     }
 
     // MARK: - Focus Mode
@@ -81,7 +81,7 @@ final class ReadRhythmUITests: XCTestCase {
 
         let initialHistoryCount = historyRowCount(in: app)
 
-        tapTab(app, identifier: "tab.profile", fallbackLabel: "Profil")
+        openProfileFromMore(in: app)
 
         let audiobookLink = app.buttons["Profile.AudiobookLightLink"]
         waitForExistence(of: audiobookLink)
@@ -147,7 +147,7 @@ final class ReadRhythmUITests: XCTestCase {
     func testProfileView_MetricsVisibleAndLinksNavigable() throws {
         let app = launchApp()
 
-        tapTab(app, identifier: "tab.profile", fallbackLabel: "Profil")
+        openProfileFromMore(in: app)
 
         let metricsContainer = app.otherElements["Profile.Metrics"]
         waitForExistence(of: metricsContainer)
@@ -221,6 +221,19 @@ final class ReadRhythmUITests: XCTestCase {
     }
 
     @MainActor
+    private func openProfileFromMore(in app: XCUIApplication) {
+        tapTab(app, identifier: "tab.more", fallbackLabel: "More")
+
+        if app.otherElements["Profile.Metrics"].exists {
+            return
+        }
+
+        let profileLink = app.buttons["Profil"]
+        waitForExistence(of: profileLink)
+        profileLink.tap()
+    }
+
+    @MainActor
     private func assertTabExists(in tabBar: XCUIElement, identifier: String, fallbackLabel: String) {
         var tabButton = tabBar.buttons.matching(identifier: identifier).firstMatch
         if !tabButton.exists {
@@ -239,7 +252,7 @@ final class ReadRhythmUITests: XCTestCase {
 
     @MainActor
     private func historyRowCount(in app: XCUIApplication) -> Int {
-        tapTab(app, identifier: "tab.profile", fallbackLabel: "Profil")
+        openProfileFromMore(in: app)
 
         let historyLink = app.buttons["Profile.HistoryLink"]
         waitForExistence(of: historyLink)
