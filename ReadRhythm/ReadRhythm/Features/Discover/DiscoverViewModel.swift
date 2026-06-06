@@ -44,10 +44,10 @@ final class DiscoverViewModel: ObservableObject {
     ///      ein korrekt angebundenes Repository zu übergeben.
     init(
         repository: any BookRepository,
-        bookSearchRepository: BookSearchRepositoryProtocol = BookSearchRepository()
+        bookSearchRepository: BookSearchRepositoryProtocol? = nil
     ) {
         self.repository = repository
-        self.bookSearchRepository = bookSearchRepository
+        self.bookSearchRepository = bookSearchRepository ?? BookSearchRepository()
     }
 
     func updateRepository(_ repository: any BookRepository) {

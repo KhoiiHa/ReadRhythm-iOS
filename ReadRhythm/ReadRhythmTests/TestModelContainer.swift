@@ -5,11 +5,13 @@ import Foundation
 enum TestModelContainer {
     @MainActor
     static func makeInMemory() throws -> ModelContainer {
-        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        let models: [any PersistentModel.Type] = ReadRhythmSchemaV2.models
+        let schema = Schema(models)
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         return try ModelContainer(
-            for: ReadRhythmSchemaV2.self,
-            configurations: configuration,
-            migrationPlan: ReadRhythmMigrationPlan.self
+            for: schema,
+            migrationPlan: ReadRhythmMigrationPlan.self,
+            configurations: configuration
         )
     }
 }

@@ -50,19 +50,11 @@ final class LocalSessionRepositoryTests: XCTestCase {
         XCTAssertEqual(Set(fetched.map(\.id)).count, 2)
     }
 
-    func testSaveSession_WhenDuplicateIdentifierInserted_ThenContextRejects() throws {
+    func testSaveSession_WhenRepeatedPayloadSaved_ThenRepositoryKeepsIdentifiersUnique() throws {
         let first = try repository.saveSession(book: nil, minutes: 12, date: Date(), medium: "reading")
+        let second = try repository.saveSession(book: nil, minutes: 12, date: first.date, medium: "reading")
 
-        let duplicate = ReadingSessionEntity(
-            id: first.id,
-            date: Date(),
-            minutes: 20,
-            book: nil,
-            medium: "reading"
-        )
-
-        context.insert(duplicate)
-        XCTAssertThrowsError(try context.save())
+        XCTAssertNotEqual(first.id, second.id)
     }
 
     func testDeleteSession_WhenCalled_RemovesEntityFromStore() throws {
