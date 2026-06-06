@@ -8,8 +8,8 @@
 ![SwiftData](https://img.shields.io/badge/SwiftData-Ready-orange)
 ![MVVM](https://img.shields.io/badge/Architecture-MVVM-green)
 ![iOS17](https://img.shields.io/badge/Target-iOS_17+-lightgrey)
-![QA](https://img.shields.io/badge/Tests-Core_Stable-success)
-![Status](https://img.shields.io/badge/Phase-Code_Freeze_✅-blueviolet)
+![QA](https://img.shields.io/badge/Tests-Core_Coverage-success)
+![Status](https://img.shields.io/badge/Phase-MVP_Hardening-blueviolet)
 
 > Eine minimalistische Reading-App, die Fortschritt sichtbar macht –  
 > gebaut mit SwiftUI, SwiftData & Swift Charts für Fokus statt Overload.
@@ -45,12 +45,12 @@ SwiftData-backed lists with swipe deletion and add sheet; dedicated view models 
 
 ### ✨ Discover & Empfehlungen / Discover & Recommendations
 - Kombination aus Kategorie-Chips, Suchfeld und API-Ergebnissen  
-- Repository orchestriert Google-Books-Requests mit Feed-/Memory-Cache  
-- SwiftData persistiert Suchergebnisse für Offline-Zugriff  
+- Repository orchestriert Google-Books-Requests mit Memory-Cache
+- SwiftData persistiert gespeicherte Bücher für lokale Nutzung
 
 **EN:**  
-Discover mixes category chips, search, and remote results; a repository coordinates memory/feed caches  
-with Google Books and persists selections to SwiftData.
+Discover mixes category chips, search, and remote results; a repository coordinates Google Books requests
+with a memory cache and persists saved selections to SwiftData.
 
 ---
 
@@ -109,7 +109,7 @@ DataService serves as a central CRUD and persistence fallback layer.
 
 ### 🌐 Networking
 - Gekapselte Netzwerkschicht mit Memory-Cache, URLSession & DTO-Mapping  
-- „Stale-While-Revalidate“-Strategie für Suchergebnisse  
+- Memory-Cache für wiederholte Suchanfragen
 - Testbare API-Schicht mit klarer Fehlerpropagierung  
 
 ---
@@ -136,13 +136,13 @@ and power reusable components across the UI.
 ## 🧠 Learnings & Challenges
 
 **DE:**  
-- Aufbau einer Stale-While-Revalidate-Suche zeigte, wie Repository-Muster Netzwerk & Persistenz vereint.  
+- Aufbau einer repository-basierten Suche zeigte, wie Netzwerk, Mapping und lokale Speicherung zusammenspielen.
 - Aggregationslogik im StatsService entlastet ViewModels und erhöht Testbarkeit.  
 - Design Tokens halten Light/Dark-Mode konsistent.  
 - Text-to-Speech & SwiftData-Tests zeigten Integration von AVFoundation + Persistence-Lifecycles.  
 
 **EN:**  
-- Implementing stale-while-revalidate search unified networking and persistence layers.  
+- Implementing repository-based search connected networking, DTO mapping, and local persistence.
 - StatsService aggregation logic proved how services offload logic from view models.  
 - Design tokens kept UI modes consistent and prevented duplication.  
 - TTS and SwiftData tests demonstrated reliable coordination between speech and data lifecycles.
@@ -156,9 +156,10 @@ and power reusable components across the UI.
 - StatsService → aggregiert Lesezeit deterministisch  
 - SpeechService → testet Start/Stop-Lifecycle  
 - AppFormatter → prüft lokalisierte Texte & VoiceOver-Kompatibilität  
+- ReadingGoalsViewModel → erstellt und aktualisiert aktive Ziele robust
 
-> Fokus: deterministische Tests, CI-ready Stabilität, klar getrennt von UI-Smokes.  
-> Alles Produktive läuft grün; visuelle Tests dienen als Showcase.
+> Fokus: deterministische Kernlogik, In-Memory-SwiftData-Tests und UI-Smokes für zentrale Flows.
+> Hinweis: Testausführung erfolgt über Xcode/Xcodebuild; lokale Toolchain-Konfiguration kann vorausgesetzt sein.
 
 ---
 
@@ -169,12 +170,14 @@ and power reusable components across the UI.
 - DiscoverViewModel-Dependencies explizit injizieren, um Tests zu vereinfachen.  
 - Fehlerhandling verbessern (kein `try!`, klare Propagierung).  
 - Debounce- oder Cancel-Logik für Suchfeld einführen.  
+- Persistenten Discover-Feed-Cache als echten Offline-Fallback reaktivieren oder README/UI klar darauf verzichten lassen.
 
 **EN:**  
 - Consolidate DataService & LocalBookRepository to eliminate duplication.  
 - Inject DiscoverViewModel dependencies explicitly to ease testing.  
 - Replace `try!` with safe error propagation.  
 - Add debouncing or cancellation to search task.
+- Reactivate the persistent Discover feed cache as a real offline fallback or keep the product copy focused on saved books.
 
 ---
 
@@ -191,9 +194,9 @@ and power reusable components across the UI.
 ## 💼 Recruiter Highlights
 
 - Saubere MVVM-Architektur mit klaren Repository- & Service-Layern  
-- Unit-Tests für Stats, Speech & Session mit deterministischem Verhalten  
+- Unit-Tests für Stats, Speech, Goals und Session-Persistenz mit deterministischem Verhalten
 - Design Tokens, i18n & Accessibility konsistent umgesetzt  
-- Projekt ist Code-Freeze-ready und vollständig dokumentiert für Open Source
+- MVP-Hardening mit klaren, kleinen und testbaren Verbesserungen dokumentiert
 
 ---
 
@@ -202,7 +205,8 @@ and power reusable components across the UI.
 1. Repository klonen  
 2. Öffne `ReadRhythm.xcodeproj` in **Xcode 16+**  
 3. Zielgerät: **iOS 17+**  
-4. Build & Run → Demo-Daten werden automatisch geladen  
+4. Build & Run
+5. Optional: In Debug-Builds können Demo-Daten über Settings zurückgesetzt werden
 
 ---
 
