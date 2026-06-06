@@ -51,22 +51,29 @@ final class ReadingGoalsViewModel: ObservableObject {
         return min(max(value, 5), 600)
     }
 
-    /// Persists the new target on the active goal and recomputes progress.
-    /// Returns true on success; false if no active goal is available.
+    /// Persists the new target on the active goal or creates one if none exists yet.
     @discardableResult
     func saveGoal(targetMinutes: Int, period: GoalPeriod? = nil) -> Bool {
-        guard let goal = activeGoal else {
-            #if DEBUG
-            DebugLogger.log("[Goals] saveGoal – no active goal to update")
-            #endif
-            return false
-        }
         let newValue = validateTarget(targetMinutes)
-        goal.targetMinutes = newValue
-        if let p = period { goal.period = p }
+        let goal: ReadingGoalEntity
+
+        if let existingGoal = activeGoal {
+            goal = existingGoal
+            goal.targetMinutes = newValue
+            if let p = period { goal.period = p }
+        } else {
+            goal = ReadingGoalEntity(
+                period: period ?? .daily,
+                targetMinutes: newValue,
+                targetBooks: nil,
+                isActive: true
+            )
+            context.insert(goal)
+        }
+
         do {
             try context.save()
-            // reflect in UI
+            activeGoal = goal
             isEditing = false
             calculateProgress()
             #if DEBUG
@@ -77,6 +84,9 @@ final class ReadingGoalsViewModel: ObservableObject {
             #if DEBUG
             DebugLogger.log("⚠️ [Goals] saveGoal error: \(error)")
             #endif
+            context.rollback()
+            loadActiveGoal()
+            calculateProgress()
             return false
         }
     }
@@ -90,7 +100,12 @@ final class ReadingGoalsViewModel: ObservableObject {
     }
 
     func calculateProgress() {
-        guard let goal = activeGoal else { return }
+        guard let goal = activeGoal else {
+            totalMinutes = 0
+            progress = 0
+            streakCount = 0
+            return
+        }
         #if DEBUG
         DebugLogger.log("[Goals] calculateProgress for period=\(goal.period) target=\(goal.targetMinutes)")
         #endif
