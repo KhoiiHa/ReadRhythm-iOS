@@ -39,6 +39,34 @@ final class LocalSessionRepositoryTests: XCTestCase {
         XCTAssertEqual(fetched.first?.minutes, 25)
     }
 
+    func testSaveSession_WhenMinutesZero_ThenThrowsAndDoesNotPersist() throws {
+        XCTAssertThrowsError(
+            try repository.saveSession(
+                book: nil,
+                minutes: 0,
+                date: Date(),
+                medium: "reading"
+            )
+        )
+
+        let fetched = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+        XCTAssertTrue(fetched.isEmpty)
+    }
+
+    func testSaveSession_WhenMinutesNegative_ThenThrowsAndDoesNotPersist() throws {
+        XCTAssertThrowsError(
+            try repository.saveSession(
+                book: nil,
+                minutes: -5,
+                date: Date(),
+                medium: "reading"
+            )
+        )
+
+        let fetched = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+        XCTAssertTrue(fetched.isEmpty)
+    }
+
     func testSaveSession_WhenSamePayloadTwice_ThenProducesUniqueIdentifiers() throws {
         let first = try repository.saveSession(book: nil, minutes: 10, date: Date(), medium: "reading")
         let second = try repository.saveSession(book: nil, minutes: 10, date: Date(), medium: "reading")

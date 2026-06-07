@@ -35,7 +35,9 @@ final class LocalSessionRepository: SessionRepository {
         date: Date,
         medium: String
     ) throws -> ReadingSessionEntity {
-        precondition(minutes > 0, "Session minutes must be positive")
+        guard minutes > 0 else {
+            throw DataServiceError.invalidInput(description: "Session minutes must be positive")
+        }
 
         // ReadingSessionEntity bekommt in Phase 9 / 10 ein optionales `book`
         // und ein `medium`-Feld. Falls `book` nil ist, speichern wir
@@ -114,7 +116,9 @@ extension LocalSessionRepository {
         date: Date = Date(),
         book: BookEntity? = nil
     ) throws -> ReadingSessionEntity {
-        precondition(minutes > 0, "Session minutes must be positive")
+        guard minutes > 0 else {
+            throw DataServiceError.invalidInput(description: "Session minutes must be positive")
+        }
 
         let debugSession = ReadingSessionEntity(
             date: date,
