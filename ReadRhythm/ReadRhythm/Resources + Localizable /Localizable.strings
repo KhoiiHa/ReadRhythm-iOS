@@ -21,7 +21,7 @@
 "book.detail.sessions" = "Sessions";
 "book.detail.minutes" = "Gesamtminuten";
 "book.detail.sessions.header" = "Lesesessions";
-"book.detail.sessions.empty" = "Noch keine Sessions. Lege deine erste an.";
+"book.detail.sessions.empty" = "Noch keine Aktivität für dieses Buch. Speichere deine erste Lese- oder Hörsession.";
 
 // Add Session
 "session.add.cta" = "Session hinzufügen";
@@ -30,7 +30,7 @@
 "session.add.date" = "Datum & Uhrzeit";
 "session.add.minutes" = "Minuten";
 "session.add.minutes.placeholder" = "z. B. 25";
-"session.add.hint" = "Ein fokussierter Sprint von 15–30 Minuten funktioniert oft am besten.";
+"session.add.hint" = "Speichere echte Lesezeit. Kurze Sessions von 15–30 Minuten halten deinen Fortschritt realistisch.";
 "session.add.validation.minutes" = "Bitte gib eine positive Minutenanzahl ein.";
 "session.add.error" = "Lesesession konnte nicht hinzugefügt werden.";
 "session.error.title" = "Etwas ist schiefgelaufen";
@@ -46,7 +46,7 @@
 "common.ok" = "OK";
 
 // Stats
-"rr.stats.title" = "Lese-Statistiken";
+"rr.stats.title" = "Lese- & Hörstatistiken";
 "rr.stats.minutes" = "Minuten";
 "rr.stats.minutes.total" = "Min. gesamt";
 "rr.stats.day" = "Tag";
@@ -203,14 +203,14 @@
 "rr.stats.range.all" = "Gesamt";
 
 // Stats Range Subtitles
-"rr.stats.range.week.subtitle" = "Deine Lesewoche im Überblick";
-"rr.stats.range.month.subtitle" = "Dein Lesemonat im Überblick";
-"rr.stats.range.year.subtitle" = "Dein Lesejahr im Überblick";
-"rr.stats.range.all.subtitle" = "Dein gesamter Lesefortschritt";
+"rr.stats.range.week.subtitle" = "Deine Lese- und Hörwoche im Überblick";
+"rr.stats.range.month.subtitle" = "Dein Lese- und Hörmonat im Überblick";
+"rr.stats.range.year.subtitle" = "Dein Lese- und Hörjahr im Überblick";
+"rr.stats.range.all.subtitle" = "Dein gesamter Lese- und Hörfortschritt";
 
 // Stats Empty State
-"rr.stats.empty.title" = "Noch keine Statistik";
-"rr.stats.empty.subtitle" = "Speichere deine erste Lese- oder Hörsession. Danach zeigt dir ReadRhythm hier Trends und Gesamtminuten.";
+"rr.stats.empty.title" = "Noch keine Aktivität";
+"rr.stats.empty.subtitle" = "Speichere deine erste Lese- oder Hörsession. Danach zeigt ReadRhythm hier Trends, Serien und Gesamtminuten.";
 
 // Goals
 "goals.title" = "Lesziele";
@@ -219,11 +219,11 @@
 "goals.target.minutes" = "%d Minuten Ziel";
 "goals.accessibility.progress" = "Fortschritt";
 "goals.streak.days" = "Tage in Folge";
-"goals.metric.readThisPeriod" = "Gelesen in dieser Periode";
+"goals.metric.readThisPeriod" = "Aktivität in dieser Periode";
 "goals.metric.minutes" = "Minuten";
 "goals.celebration.reached" = "Ziel erreicht 🎉";
 "goals.empty.title" = "Noch kein aktives Ziel";
-"goals.empty.subtitle" = "Lege ein realistisches Minuten-Ziel fest. Danach zeigt dir der Ring sofort, wie nah du dran bist.";
+"goals.empty.subtitle" = "Lege ein realistisches Minutenziel fest. Danach zeigt dir der Ring, wie nah du deinem Lese- und Hörziel bist.";
 
 "goals.focus.subtitle" = "Fokussierte Lesesessions mit Timer.";
 "goals.progress.title.noGoal" = "Starte mit deinem ersten Ziel.";
@@ -241,7 +241,7 @@
 "history.today" = "Heute";
 "history.yesterday" = "Gestern";
 "history.empty.title" = "Noch keine Sessions";
-"history.empty.subtitle" = "Starte den Lese-Fokus oder speichere eine Hörsession. Deine letzten Aktivitäten erscheinen dann hier.";
+"history.empty.subtitle" = "Starte den Lese-Fokus oder speichere eine Hörsession. Danach erscheinen deine Aktivitäten chronologisch hier.";
 "history.unknownBook" = "Unbekanntes Buch";
 
 "history.medium.reading" = "gelesen";
@@ -334,5 +334,5 @@
 "detail.addToLibrary" = "Zur Bibliothek hinzufügen";
 
 "library.empty.title" = "Deine Bibliothek ist noch leer";
-"library.empty.subtitle" = "Füge dein erstes Buch hinzu – manuell oder direkt aus der Discover-Suche.";
+"library.empty.subtitle" = "Füge dein erstes Buch hinzu - manuell oder direkt aus der Suche.";
 "library.empty.add" = "Buch hinzufügen";
