@@ -111,7 +111,7 @@ final class StatsViewModel: ObservableObject {
 
     // MARK: - Debug helpers
     #if DEBUG
-    /// Wird von der StatsView (nur im DEBUG-UI) aufgerufen, um schnell Testdaten einzuspielen.
+    /// Interner Debug-Helfer, um schnell Testdaten einzuspielen.
     /// Wichtig: Die View selbst spricht NICHT mehr direkt mit SwiftData,
     /// sondern geht über das Repository und lässt das ViewModel sich selbst neu berechnen.
     func seedDebugMinutes() {

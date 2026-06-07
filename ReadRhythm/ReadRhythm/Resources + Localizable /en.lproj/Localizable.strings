@@ -21,6 +21,8 @@
 // Book detail navigation & fallback (EN)
 "book.detail.title" = "Book";
 "book.unknownAuthor" = "Unknown author";
+"book.detail.sessions.empty" = "No activity for this book yet. Save your first reading or listening session.";
+"book.detail.session.row.accessibility" = "%d minutes of activity on %@";
 
 // Tabs
 "rr.tab.library" = "Library";
@@ -39,3 +41,34 @@
 "discover.filter.activeCategory" = "Active category";
 "discover.filter.categories" = "Categories";
 "discover.filter.reset" = "Reset filter";
+
+// Stats
+"rr.stats.title" = "Reading & Listening Stats";
+"rr.stats.range.week" = "Week";
+"rr.stats.range.month" = "Month";
+"rr.stats.range.year" = "Year";
+"rr.stats.range.all" = "All";
+"rr.stats.range.week.subtitle" = "Your reading and listening week at a glance";
+"rr.stats.range.month.subtitle" = "Your reading and listening month at a glance";
+"rr.stats.range.year.subtitle" = "Your reading and listening year at a glance";
+"rr.stats.range.all.subtitle" = "Your complete reading and listening progress";
+"rr.stats.empty.title" = "No activity yet";
+"rr.stats.empty.subtitle" = "Save your first reading or listening session. ReadRhythm will then show trends, streaks, and total minutes here.";
+"stats.chart.accessibility" = "Stats chart. Highest value: %d minutes on %@.";
+"stats.chart.accessibility.value" = "Total: %d minutes. Daily goal: %d minutes.";
+"stats.chart.accessibility.empty" = "Stats chart without activity.";
+
+// Goals
+"goals.empty.title" = "No active goal yet";
+"goals.empty.subtitle" = "Set a realistic minute goal. The ring will then show how close you are to your reading and listening goal.";
+"goals.accessibility.progress.value.withGoal" = "%@ reached. %d of %d minutes.";
+"goals.accessibility.progress.value.noGoal" = "%@ reached. %d minutes of activity, no goal set yet.";
+
+// History
+"history.empty.title" = "No sessions yet";
+"history.empty.subtitle" = "Start Reading Focus or save a listening session. Your activity will then appear here chronologically.";
+
+// Library
+"library.empty.title" = "Your library is still empty";
+"library.empty.subtitle" = "Add your first book - manually or directly from search.";
+"library.empty.add" = "Add book";

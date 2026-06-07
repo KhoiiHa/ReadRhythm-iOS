@@ -13,9 +13,9 @@ final class ReadingSessionEntity {
     /// Medium der Session: "reading" (Lesen) oder "listening" (Audio)
     var medium: String
 
-    /// Zugehöriges Buch (optional)
-    /// Cascade Delete: Wenn ein Buch gelöscht wird, verschwinden seine Sessions.
-    @Relationship(deleteRule: .cascade) var book: BookEntity?
+    /// Zugehöriges Buch (optional).
+    /// Session-Löschung darf das Buch nicht mitlöschen; Book-Cleanup läuft im LocalBookRepository.
+    @Relationship(deleteRule: .nullify) var book: BookEntity?
 
     init(
         id: UUID = UUID(),

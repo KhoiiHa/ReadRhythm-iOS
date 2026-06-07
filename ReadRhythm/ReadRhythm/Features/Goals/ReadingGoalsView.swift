@@ -146,7 +146,7 @@ struct ReadingGoalsView: View {
                 .padding(.top, AppSpace.xl)
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel(NSLocalizedString("goals.accessibility.progress", comment: "Fortschritt"))
-                .accessibilityValue(progressPercent(viewModel.progress))
+                .accessibilityValue(progressAccessibilityValue)
                 .accessibilityIdentifier("Goals.ProgressRing")
                 #if DEBUG
                 .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 3)
@@ -171,6 +171,11 @@ struct ReadingGoalsView: View {
                 .padding(.top, AppSpace.lg)
                 .padding(.horizontal, AppSpace.lg)
                 .accessibilityIdentifier("Goals.Edit.Open")
+
+                if viewModel.activeGoal == nil {
+                    noGoalHint
+                        .padding(.horizontal, AppSpace.lg)
+                }
 
                 // MARK: Streak
                 VStack(alignment: .leading, spacing: AppSpace.sm) {
@@ -261,6 +266,69 @@ struct ReadingGoalsView: View {
         return NumberFormatter.localizedString(from: NSNumber(value: clamped * 100), number: .percent)
     }
 
+    private var progressAccessibilityValue: String {
+        if let goal = viewModel.activeGoal {
+            return String(
+                format: NSLocalizedString(
+                    "goals.accessibility.progress.value.withGoal",
+                    comment: "VoiceOver value for goal progress with percentage, current minutes and target minutes"
+                ),
+                progressPercent(viewModel.progress),
+                viewModel.totalMinutes,
+                goal.targetMinutes
+            )
+        }
+
+        return String(
+            format: NSLocalizedString(
+                "goals.accessibility.progress.value.noGoal",
+                comment: "VoiceOver value for goal progress without an active target"
+            ),
+            progressPercent(viewModel.progress),
+            viewModel.totalMinutes
+        )
+    }
+
+    private var noGoalHint: some View {
+        HStack(alignment: .top, spacing: AppSpace.md) {
+            Image(systemName: "target")
+                .imageScale(.medium)
+                .foregroundStyle(AppColors.Semantic.tintPrimary)
+                .padding(8)
+                .background(
+                    Circle()
+                        .fill(AppColors.Semantic.tintPrimary.opacity(0.12))
+                )
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: AppSpace.xs) {
+                Text(LocalizedStringKey("goals.empty.title"))
+                    .font(AppFont.bodyStandard())
+                    .foregroundStyle(AppColors.Semantic.textPrimary)
+
+                Text(LocalizedStringKey("goals.empty.subtitle"))
+                    .font(AppFont.caption2())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(AppSpace.lg)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                .fill(AppColors.Semantic.bgCard.opacity(0.96))
+                .shadow(
+                    color: AppColors.Semantic.shadowColor.opacity(0.10),
+                    radius: 10,
+                    x: 0,
+                    y: 5
+                )
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("Goals.EmptyHint")
+    }
 
     @ViewBuilder
     private func metricTile(minutes: Int) -> some View {
@@ -463,4 +531,3 @@ private struct ReadingGoalsCaseStudy: View {
             .preferredColorScheme(.dark)
     }
 }
-

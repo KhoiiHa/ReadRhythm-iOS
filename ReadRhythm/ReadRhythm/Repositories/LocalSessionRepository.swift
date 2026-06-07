@@ -35,7 +35,9 @@ final class LocalSessionRepository: SessionRepository {
         date: Date,
         medium: String
     ) throws -> ReadingSessionEntity {
-        precondition(minutes > 0, "Session minutes must be positive")
+        guard minutes > 0 else {
+            throw DataServiceError.invalidInput(description: "Session minutes must be positive")
+        }
 
         // ReadingSessionEntity bekommt in Phase 9 / 10 ein optionales `book`
         // und ein `medium`-Feld. Falls `book` nil ist, speichern wir
@@ -100,8 +102,8 @@ final class LocalSessionRepository: SessionRepository {
 #if DEBUG
 extension LocalSessionRepository {
     /// Fügt eine künstliche Session für Debug/Testzwecke hinzu.
-    /// Wichtig: Diese Funktion wird NUR von Debug-UI (z. B. StatsView) aufgerufen,
-    /// damit die View nie direkt mit SwiftData spricht.
+    /// Wichtig: Diese Funktion bleibt intern für Entwicklung und Tests,
+    /// damit Debug-Daten nicht direkt über SwiftData geschrieben werden.
     /// - Parameters:
     ///   - minutes: Anzahl der Minuten, die zur Session gezählt werden sollen (>0)
     ///   - medium: "reading" oder "listening"
@@ -114,7 +116,9 @@ extension LocalSessionRepository {
         date: Date = Date(),
         book: BookEntity? = nil
     ) throws -> ReadingSessionEntity {
-        precondition(minutes > 0, "Session minutes must be positive")
+        guard minutes > 0 else {
+            throw DataServiceError.invalidInput(description: "Session minutes must be positive")
+        }
 
         let debugSession = ReadingSessionEntity(
             date: date,

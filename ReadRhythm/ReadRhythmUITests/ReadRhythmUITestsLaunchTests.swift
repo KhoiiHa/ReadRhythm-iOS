@@ -22,7 +22,7 @@ final class ReadRhythmUITestsLaunchTests: XCTestCase {
             ("tab.library", "Bibliothek"),
             ("tab.discover", "Entdecken"),
             ("tab.stats", "Statistiken"),
-            ("tab.profile", "Profil")
+            ("tab.more", "More")
         ]
 
         for tab in tabs {

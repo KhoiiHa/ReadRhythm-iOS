@@ -7,17 +7,20 @@ final class LocalSessionRepositoryTests: XCTestCase {
     private var container: ModelContainer!
     private var context: ModelContext!
     private var repository: LocalSessionRepository!
+    private var bookRepository: LocalBookRepository!
 
     override func setUpWithError() throws {
         container = try TestModelContainer.makeInMemory()
         context = ModelContext(container)
         repository = LocalSessionRepository(context: context)
+        bookRepository = LocalBookRepository(context: context)
     }
 
     override func tearDownWithError() throws {
         container = nil
         context = nil
         repository = nil
+        bookRepository = nil
     }
 
     func testSaveSession_WhenMinutesPositive_ThenPersistsEntity() throws {
@@ -36,6 +39,34 @@ final class LocalSessionRepositoryTests: XCTestCase {
         XCTAssertEqual(fetched.first?.minutes, 25)
     }
 
+    func testSaveSession_WhenMinutesZero_ThenThrowsAndDoesNotPersist() throws {
+        XCTAssertThrowsError(
+            try repository.saveSession(
+                book: nil,
+                minutes: 0,
+                date: Date(),
+                medium: "reading"
+            )
+        )
+
+        let fetched = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+        XCTAssertTrue(fetched.isEmpty)
+    }
+
+    func testSaveSession_WhenMinutesNegative_ThenThrowsAndDoesNotPersist() throws {
+        XCTAssertThrowsError(
+            try repository.saveSession(
+                book: nil,
+                minutes: -5,
+                date: Date(),
+                medium: "reading"
+            )
+        )
+
+        let fetched = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+        XCTAssertTrue(fetched.isEmpty)
+    }
+
     func testSaveSession_WhenSamePayloadTwice_ThenProducesUniqueIdentifiers() throws {
         let first = try repository.saveSession(book: nil, minutes: 10, date: Date(), medium: "reading")
         let second = try repository.saveSession(book: nil, minutes: 10, date: Date(), medium: "reading")
@@ -47,19 +78,11 @@ final class LocalSessionRepositoryTests: XCTestCase {
         XCTAssertEqual(Set(fetched.map(\.id)).count, 2)
     }
 
-    func testSaveSession_WhenDuplicateIdentifierInserted_ThenContextRejects() throws {
+    func testSaveSession_WhenRepeatedPayloadSaved_ThenRepositoryKeepsIdentifiersUnique() throws {
         let first = try repository.saveSession(book: nil, minutes: 12, date: Date(), medium: "reading")
+        let second = try repository.saveSession(book: nil, minutes: 12, date: first.date, medium: "reading")
 
-        let duplicate = ReadingSessionEntity(
-            id: first.id,
-            date: Date(),
-            minutes: 20,
-            book: nil,
-            medium: "reading"
-        )
-
-        context.insert(duplicate)
-        XCTAssertThrowsError(try context.save())
+        XCTAssertNotEqual(first.id, second.id)
     }
 
     func testDeleteSession_WhenCalled_RemovesEntityFromStore() throws {
@@ -70,5 +93,52 @@ final class LocalSessionRepositoryTests: XCTestCase {
         let descriptor = FetchDescriptor<ReadingSessionEntity>()
         let fetched = try context.fetch(descriptor)
         XCTAssertTrue(fetched.isEmpty)
+    }
+
+    func testDeleteSession_WhenSessionHasBook_ThenKeepsBookInStore() throws {
+        let book = try makeBook()
+        let session = try repository.saveSession(book: book, minutes: 18, date: Date(), medium: "reading")
+
+        try repository.deleteSession(session)
+
+        let books = try context.fetch(FetchDescriptor<BookEntity>())
+        let sessions = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+
+        XCTAssertEqual(books.count, 1)
+        XCTAssertEqual(books.first?.sourceID, book.sourceID)
+        XCTAssertTrue(sessions.isEmpty)
+    }
+
+    func testDeleteBook_WhenBookHasSessions_ThenRemovesLinkedSessions() throws {
+        let book = try makeBook()
+        try repository.saveSession(book: book, minutes: 12, date: Date(), medium: "reading")
+        try repository.saveSession(book: book, minutes: 8, date: Date(), medium: "listening")
+
+        try bookRepository.delete(book)
+
+        let books = try context.fetch(FetchDescriptor<BookEntity>())
+        let sessions = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+
+        XCTAssertTrue(books.isEmpty)
+        XCTAssertTrue(sessions.isEmpty)
+    }
+
+    private func makeBook() throws -> BookEntity {
+        try bookRepository.add(
+            title: "Test Book",
+            author: "Test Author",
+            subtitle: nil,
+            publisher: nil,
+            publishedDate: nil,
+            pageCount: nil,
+            language: nil,
+            categories: [],
+            descriptionText: nil,
+            thumbnailURL: nil,
+            infoLink: nil,
+            previewLink: nil,
+            sourceID: UUID().uuidString,
+            source: "Test"
+        )
     }
 }

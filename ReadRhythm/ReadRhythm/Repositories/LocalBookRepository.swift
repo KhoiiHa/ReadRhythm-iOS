@@ -121,6 +121,17 @@ final class LocalBookRepository: BookRepository {
     /// Buch löschen inkl. Save() /
     /// Deletes a book and persists the change.
     func delete(_ book: BookEntity) throws {
+        let bookID = book.persistentModelID
+        let sessionsDescriptor = FetchDescriptor<ReadingSessionEntity>(
+            predicate: #Predicate { session in
+                session.book?.persistentModelID == bookID
+            }
+        )
+        let linkedSessions = try context.fetch(sessionsDescriptor)
+        for session in linkedSessions {
+            context.delete(session)
+        }
+
         context.delete(book)
         do {
             try context.save()
@@ -131,6 +142,7 @@ final class LocalBookRepository: BookRepository {
             #if DEBUG
             print("[LocalBookRepository] ❌ Delete save failed:", error)
             #endif
+            context.rollback()
             throw error
         }
     }

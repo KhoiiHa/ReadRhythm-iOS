@@ -143,108 +143,116 @@ struct FocusModeView: View {
             )
 
             // Controls
-            HStack(spacing: AppSpace.md) {
+            VStack(spacing: AppSpace.sm) {
+                HStack(spacing: AppSpace.md) {
 
-                // Start / Resume
-                Button {
-                    #if DEBUG
-                    DebugLogger.log("[Focus] Start/Resume pressed, duration=\(vm.durationMinutes)")
-                    #endif
-                    if vm.isRunning {
-                        // already running, no-op
-                    } else if vm.remainingSeconds == vm.durationMinutes * 60 {
-                        // fresh start
-                        vm.startSession()
-                    } else {
-                        // paused; resume
-                        vm.resumeSession()
+                    // Start / Resume
+                    Button {
+                        #if DEBUG
+                        DebugLogger.log("[Focus] Start/Resume pressed, duration=\(vm.durationMinutes)")
+                        #endif
+                        if vm.isRunning {
+                            // already running, no-op
+                        } else if vm.remainingSeconds == vm.durationMinutes * 60 {
+                            // fresh start
+                            vm.startSession()
+                        } else {
+                            // paused; resume
+                            vm.resumeSession()
+                        }
+                        triggerHaptic(.success)
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            timerAnimationToggle.toggle()
+                        }
+                    } label: {
+                        Label(
+                            vm.isRunning
+                            ? LocalizedStringKey("focus.action.running")
+                            : LocalizedStringKey("focus.action.start"),
+                            systemImage: "play.circle.fill"
+                        )
+                        .font(AppFont.bodyStandard())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.9)
+                        .fontWeight(.semibold)
+                        .labelStyle(.iconLeading)
                     }
-                    triggerHaptic(.success)
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        timerAnimationToggle.toggle()
-                    }
-                } label: {
-                    Label(
+                    .buttonStyle(.borderedProminent)
+                    .disabled(vm.isRunning)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .accessibilityLabel(
                         vm.isRunning
-                        ? LocalizedStringKey("focus.action.running")
-                        : LocalizedStringKey("focus.action.start"),
-                        systemImage: "play.circle.fill"
+                        ? Text(LocalizedStringKey("focus.action.running"))
+                        : Text(LocalizedStringKey("focus.action.start"))
                     )
-                    .font(AppFont.bodyStandard())
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.9)
-                    .fontWeight(.semibold)
-                    .fixedSize(horizontal: true, vertical: false) // 🔹 nicht umbrechen
-                    .labelStyle(.iconLeading)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(vm.isRunning)
-                .frame(maxWidth: .infinity) // 🔹 jede Taste gleich breit
-                .accessibilityIdentifier("Focus.StartResume")
+                    .accessibilityIdentifier("Focus.StartResume")
 
-                // Pause
-                Button {
-                    #if DEBUG
-                    DebugLogger.log("[Focus] Pause pressed")
-                    #endif
-                    vm.pauseSession()
-                    triggerHaptic(.light)
-                } label: {
-                    Label(LocalizedStringKey("focus.action.pause"), systemImage: "pause.circle")
-                        .font(AppFont.bodyStandard())
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.9)
-                        .fixedSize(horizontal: true, vertical: false)
-                        .labelStyle(.iconLeading)
-                }
-                .buttonStyle(.bordered)
-                .disabled(!vm.isRunning)
-                .frame(maxWidth: .infinity)
-                .accessibilityIdentifier("Focus.Pause")
-
-                // Finish & Save
-                Button {
-                    #if DEBUG
-                    DebugLogger.log("[Focus] Finish pressed")
-                    #endif
-                    vm.stopSessionAndSave()
-                    triggerHaptic(.success)
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        timerAnimationToggle.toggle()
+                    // Pause
+                    Button {
+                        #if DEBUG
+                        DebugLogger.log("[Focus] Pause pressed")
+                        #endif
+                        vm.pauseSession()
+                        triggerHaptic(.light)
+                    } label: {
+                        Label(LocalizedStringKey("focus.action.pause"), systemImage: "pause.circle")
+                            .font(AppFont.bodyStandard())
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.9)
+                            .labelStyle(.iconLeading)
                     }
-                } label: {
-                    Label(LocalizedStringKey("focus.action.finish"), systemImage: "checkmark.circle")
-                        .font(AppFont.bodyStandard())
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.9)
-                        .fixedSize(horizontal: true, vertical: false)
-                        .labelStyle(.iconLeading)
+                    .buttonStyle(.bordered)
+                    .disabled(!vm.isRunning)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .accessibilityLabel(Text(LocalizedStringKey("focus.action.pause")))
+                    .accessibilityIdentifier("Focus.Pause")
                 }
-                .buttonStyle(.bordered)
-                .frame(maxWidth: .infinity)
-                .accessibilityIdentifier("Focus.Finish")
 
-                // Stop / Reset (destructive, no save)
-                Button(role: .destructive) {
-                    #if DEBUG
-                    DebugLogger.log("[Focus] Stop pressed")
-                    #endif
-                    vm.cancelSessionWithoutSave()
-                    triggerHaptic(.warning)
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        timerAnimationToggle.toggle()
+                HStack(spacing: AppSpace.md) {
+                    // Finish & Save
+                    Button {
+                        #if DEBUG
+                        DebugLogger.log("[Focus] Finish pressed")
+                        #endif
+                        vm.stopSessionAndSave()
+                        triggerHaptic(.success)
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            timerAnimationToggle.toggle()
+                        }
+                    } label: {
+                        Label(LocalizedStringKey("focus.action.finish"), systemImage: "checkmark.circle")
+                            .font(AppFont.bodyStandard())
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.9)
+                            .labelStyle(.iconLeading)
                     }
-                } label: {
-                    Label(LocalizedStringKey("focus.action.stop"), systemImage: "stop.circle")
-                        .font(AppFont.bodyStandard())
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.9)
-                        .fixedSize(horizontal: true, vertical: false)
-                        .labelStyle(.iconLeading)
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .accessibilityLabel(Text(LocalizedStringKey("focus.action.finish")))
+                    .accessibilityIdentifier("Focus.Finish")
+
+                    // Stop / Reset (destructive, no save)
+                    Button(role: .destructive) {
+                        #if DEBUG
+                        DebugLogger.log("[Focus] Stop pressed")
+                        #endif
+                        vm.cancelSessionWithoutSave()
+                        triggerHaptic(.warning)
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            timerAnimationToggle.toggle()
+                        }
+                    } label: {
+                        Label(LocalizedStringKey("focus.action.stop"), systemImage: "stop.circle")
+                            .font(AppFont.bodyStandard())
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.9)
+                            .labelStyle(.iconLeading)
+                    }
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .accessibilityLabel(Text(LocalizedStringKey("focus.action.stop")))
+                    .accessibilityIdentifier("Focus.Stop")
                 }
-                .buttonStyle(.bordered)
-                .frame(maxWidth: .infinity)
-                .accessibilityIdentifier("Focus.Stop")
             }
 
             Spacer()

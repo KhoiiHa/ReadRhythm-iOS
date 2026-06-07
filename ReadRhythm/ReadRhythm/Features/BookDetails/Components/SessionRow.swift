@@ -62,6 +62,8 @@ struct SessionRow: View {
         }
         .background(AppColors.Semantic.bgCard)
         .padding(.vertical, AppSpace._8)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(accessibilityLabel))
         .accessibilityIdentifier("bookdetail.session.row")
     }
 
@@ -70,6 +72,15 @@ struct SessionRow: View {
     /// Liefert z. B. „vor 2 Tagen“ / „in 3 Stunden“ basierend auf `date`.
     private func relativeString(for date: Date) -> String {
         RelativeDateTimeFormatter.cached.localizedString(for: date, relativeTo: Date())
+    }
+
+    private var accessibilityLabel: String {
+        let dateText = AppFormatter.shortDateFormatter.string(from: date)
+        let template = NSLocalizedString(
+            "book.detail.session.row.accessibility",
+            comment: "VoiceOver label for a book detail session row: minutes and date"
+        )
+        return String(format: template, minutes, dateText)
     }
 }
 
