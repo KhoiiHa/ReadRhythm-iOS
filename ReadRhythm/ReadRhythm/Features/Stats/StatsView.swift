@@ -44,17 +44,6 @@ struct StatsView: View {
         ScrollView {
             VStack(spacing: AppSpace.lg) {
                 statsCard
-
-#if DEBUG
-                // Seed-Knopf für schnelle visuelle Prüfung
-                Button(String(localized: "rr.stats.debug.seed")) {
-                    viewModel.seedDebugMinutes()
-                }
-                .accessibilityIdentifier("rr-stats-debug-seed")
-                .buttonStyle(.bordered)
-                .tint(AppColors.Semantic.tintPrimary)
-                .padding(.top, AppSpace.sm)
-#endif
             }
             .padding(.horizontal, AppSpace.lg)
             .padding(.vertical, AppSpace.lg)

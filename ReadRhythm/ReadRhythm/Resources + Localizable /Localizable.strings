@@ -50,7 +50,6 @@
 "rr.stats.minutes" = "Minuten";
 "rr.stats.minutes.total" = "Min. gesamt";
 "rr.stats.day" = "Tag";
-"rr.stats.debug.seed" = "Debug-Minuten einspielen";
 "rr.stats.streak.days" = "Tage in Folge";
 
 // Tabs
@@ -69,7 +68,6 @@
 "settings.theme.light" = "Hell";
 "settings.theme.dark" = "Dunkel";
 "settings.preview.section" = "Vorschau";
-"settings.debug.resetData" = "Demo-Daten zurücksetzen";
 
 // Discover
 "discover.search.placeholder" = "Bücher suchen…";

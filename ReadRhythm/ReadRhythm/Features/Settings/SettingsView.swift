@@ -13,7 +13,6 @@ import SwiftUI
 /// - Wie: Picker bindet an `settings.themeMode`; Root (MainTabView/ReadRhythmApp) liest `.preferredColorScheme`.
 struct SettingsView: View {
     @EnvironmentObject private var settings: AppSettingsService
-    @Environment(\.modelContext) private var context
 
     var body: some View {
         Form {
@@ -80,28 +79,6 @@ struct SettingsView: View {
                     .font(AppFont.caption2())
                     .foregroundStyle(AppColors.Semantic.textSecondary)
             }
-
-            // MARK: - Debug
-
-#if DEBUG
-            Section {
-                Button(role: .destructive) {
-                    DataService.resetDemoData(context)
-                } label: {
-                    Label {
-                        Text(String(localized: "settings.debug.resetData"))
-                            .font(AppFont.bodyStandard())
-                    } icon: {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                }
-                .accessibilityIdentifier("settings.debug.resetData")
-            } header: {
-                Text("Debug")
-                    .font(AppFont.caption2())
-                    .foregroundStyle(AppColors.Semantic.textSecondary)
-            }
-#endif
         }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
