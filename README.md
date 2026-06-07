@@ -57,10 +57,10 @@ with a memory cache and persists saved selections to SwiftData.
 ### 📊 Statistiken & Insights / Stats & Insights
 - Swift Charts visualisieren tägliche Lesezeit, Streaks & Gesamtwerte  
 - StatsService aggregiert Sitzungen über Zeiträume  
-- Debug-Seeding & deterministische Tests  
+- Deterministische Tests für Statistiklogik
 
 **EN:**  
-Swift Charts visualize daily minutes, streaks, and totals; repository and StatsService aggregate sessions and support debug seeding.
+Swift Charts visualize daily minutes, streaks, and totals; repository and StatsService aggregate sessions with deterministic test coverage.
 
 ---
 
@@ -77,7 +77,7 @@ Progress ring with haptics and editing sheet; focus timer auto-saves reading ses
 ### ⚙️ Settings & Theming
 - Globaler Settings-Service steuert Theme & Sprache  
 - SwiftData-Container + EnvironmentObjects  
-- i18n-kompatible Texte, Debug-Reset für Demo-Daten  
+- i18n-kompatible Texte und klare App-Konfiguration
 
 ---
 
@@ -206,7 +206,6 @@ and power reusable components across the UI.
 2. Öffne `ReadRhythm.xcodeproj` in **Xcode 16+**  
 3. Zielgerät: **iOS 17+**  
 4. Build & Run
-5. Optional: In Debug-Builds können Demo-Daten über Settings zurückgesetzt werden
 
 ---
 
