@@ -72,6 +72,7 @@ struct StatsView: View {
                 StatsChart(data: chartData, goalMinutes: 30)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(chartAccessibilitySummary)
+                    .accessibilityValue(chartAccessibilityValue)
                     .animation(.easeInOut(duration: 0.2), value: chartData)
             }
         }
@@ -206,5 +207,16 @@ struct StatsView: View {
                 comment: "VoiceOver summary when there's no data in the stats chart"
             )
         }
+    }
+
+    private var chartAccessibilityValue: String {
+        String(
+            format: NSLocalizedString(
+                "stats.chart.accessibility.value",
+                comment: "VoiceOver value for stats chart: total minutes and daily goal"
+            ),
+            viewModel.totalMinutes,
+            30
+        )
     }
 }

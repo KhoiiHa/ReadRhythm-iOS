@@ -39,6 +39,7 @@
 "session.a11y.minutes" = "Dauer in Minuten:";
 "session.date" = "Datum";
 "session.add.minutes.hint" = "Gib die Anzahl der Minuten für diese Lesesitzung ein.";
+"book.detail.session.row.accessibility" = "%d Minuten Aktivität am %@";
 
 // Common
 "common.save" = "Speichern";
@@ -211,6 +212,9 @@
 // Stats Empty State
 "rr.stats.empty.title" = "Noch keine Aktivität";
 "rr.stats.empty.subtitle" = "Speichere deine erste Lese- oder Hörsession. Danach zeigt ReadRhythm hier Trends, Serien und Gesamtminuten.";
+"stats.chart.accessibility" = "Statistikdiagramm. Höchster Wert: %d Minuten am %@.";
+"stats.chart.accessibility.value" = "Gesamt: %d Minuten. Tagesziel: %d Minuten.";
+"stats.chart.accessibility.empty" = "Statistikdiagramm ohne Aktivität.";
 
 // Goals
 "goals.title" = "Lesziele";
@@ -218,6 +222,8 @@
 "goals.cta.set" = "Ziel festlegen";
 "goals.target.minutes" = "%d Minuten Ziel";
 "goals.accessibility.progress" = "Fortschritt";
+"goals.accessibility.progress.value.withGoal" = "%@ erreicht. %d von %d Minuten.";
+"goals.accessibility.progress.value.noGoal" = "%@ erreicht. %d Minuten Aktivität, noch kein Ziel festgelegt.";
 "goals.streak.days" = "Tage in Folge";
 "goals.metric.readThisPeriod" = "Aktivität in dieser Periode";
 "goals.metric.minutes" = "Minuten";

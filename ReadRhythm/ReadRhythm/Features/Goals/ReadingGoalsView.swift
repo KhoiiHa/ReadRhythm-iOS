@@ -146,7 +146,7 @@ struct ReadingGoalsView: View {
                 .padding(.top, AppSpace.xl)
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel(NSLocalizedString("goals.accessibility.progress", comment: "Fortschritt"))
-                .accessibilityValue(progressPercent(viewModel.progress))
+                .accessibilityValue(progressAccessibilityValue)
                 .accessibilityIdentifier("Goals.ProgressRing")
                 #if DEBUG
                 .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 3)
@@ -266,6 +266,28 @@ struct ReadingGoalsView: View {
         return NumberFormatter.localizedString(from: NSNumber(value: clamped * 100), number: .percent)
     }
 
+    private var progressAccessibilityValue: String {
+        if let goal = viewModel.activeGoal {
+            return String(
+                format: NSLocalizedString(
+                    "goals.accessibility.progress.value.withGoal",
+                    comment: "VoiceOver value for goal progress with percentage, current minutes and target minutes"
+                ),
+                progressPercent(viewModel.progress),
+                viewModel.totalMinutes,
+                goal.targetMinutes
+            )
+        }
+
+        return String(
+            format: NSLocalizedString(
+                "goals.accessibility.progress.value.noGoal",
+                comment: "VoiceOver value for goal progress without an active target"
+            ),
+            progressPercent(viewModel.progress),
+            viewModel.totalMinutes
+        )
+    }
 
     private var noGoalHint: some View {
         HStack(alignment: .top, spacing: AppSpace.md) {
