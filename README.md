@@ -152,7 +152,7 @@ and power reusable components across the UI.
 ## 🧪 Teststrategie & Qualitätssicherung
 
 **Getestete Kernmodule:**  
-- LocalSessionRepository → validiert Idempotenz  
+- LocalSessionRepository → validiert Session-Persistenz, Eingaben und Idempotenz
 - StatsService → aggregiert Lesezeit deterministisch  
 - SpeechService → testet Start/Stop-Lifecycle  
 - AppFormatter → prüft lokalisierte Texte & VoiceOver-Kompatibilität  
