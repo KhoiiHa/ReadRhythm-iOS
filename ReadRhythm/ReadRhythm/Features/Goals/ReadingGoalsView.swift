@@ -172,6 +172,11 @@ struct ReadingGoalsView: View {
                 .padding(.horizontal, AppSpace.lg)
                 .accessibilityIdentifier("Goals.Edit.Open")
 
+                if viewModel.activeGoal == nil {
+                    noGoalHint
+                        .padding(.horizontal, AppSpace.lg)
+                }
+
                 // MARK: Streak
                 VStack(alignment: .leading, spacing: AppSpace.sm) {
                     HStack(spacing: AppSpace.sm) {
@@ -261,6 +266,47 @@ struct ReadingGoalsView: View {
         return NumberFormatter.localizedString(from: NSNumber(value: clamped * 100), number: .percent)
     }
 
+
+    private var noGoalHint: some View {
+        HStack(alignment: .top, spacing: AppSpace.md) {
+            Image(systemName: "target")
+                .imageScale(.medium)
+                .foregroundStyle(AppColors.Semantic.tintPrimary)
+                .padding(8)
+                .background(
+                    Circle()
+                        .fill(AppColors.Semantic.tintPrimary.opacity(0.12))
+                )
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: AppSpace.xs) {
+                Text(LocalizedStringKey("goals.empty.title"))
+                    .font(AppFont.bodyStandard())
+                    .foregroundStyle(AppColors.Semantic.textPrimary)
+
+                Text(LocalizedStringKey("goals.empty.subtitle"))
+                    .font(AppFont.caption2())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(AppSpace.lg)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                .fill(AppColors.Semantic.bgCard.opacity(0.96))
+                .shadow(
+                    color: AppColors.Semantic.shadowColor.opacity(0.10),
+                    radius: 10,
+                    x: 0,
+                    y: 5
+                )
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("Goals.EmptyHint")
+    }
 
     @ViewBuilder
     private func metricTile(minutes: Int) -> some View {
@@ -463,4 +509,3 @@ private struct ReadingGoalsCaseStudy: View {
             .preferredColorScheme(.dark)
     }
 }
-

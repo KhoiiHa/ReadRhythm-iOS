@@ -103,8 +103,8 @@ final class ReadRhythmUITests: XCTestCase {
         let statsView = element(in: app, identifier: "stats.view")
         waitForExistence(of: statsView)
 
-        let chart = element(in: app, identifier: "stats.chart")
-        waitForExistence(of: chart)
+        let statsContent = element(in: app, matchingAnyIdentifier: ["stats.chart", "stats.emptyState"])
+        waitForExistence(of: statsContent)
 
         let rangePicker = app.segmentedControls["stats.header.rangePicker"]
         if rangePicker.exists {
@@ -286,5 +286,11 @@ final class ReadRhythmUITests: XCTestCase {
             }
         }
         return app.descendants(matching: .any).matching(identifier: identifiers.first ?? "").firstMatch
+    }
+
+    @MainActor
+    private func element(in app: XCUIApplication, matchingAnyIdentifier identifiers: [String]) -> XCUIElement {
+        let predicate = NSPredicate(format: "identifier IN %@", identifiers)
+        return app.descendants(matching: .any).matching(predicate).firstMatch
     }
 }

@@ -211,8 +211,8 @@
 "rr.stats.range.all.subtitle" = "Dein gesamter Lesefortschritt";
 
 // Stats Empty State
-"rr.stats.empty.title" = "Noch keine Daten";
-"rr.stats.empty.subtitle" = "Starte mit dem Tracking deiner Lesesessions, um hier Fortschritt zu sehen.";
+"rr.stats.empty.title" = "Noch keine Statistik";
+"rr.stats.empty.subtitle" = "Speichere deine erste Lese- oder Hörsession. Danach zeigt dir ReadRhythm hier Trends und Gesamtminuten.";
 
 // Goals
 "goals.title" = "Lesziele";
@@ -224,6 +224,8 @@
 "goals.metric.readThisPeriod" = "Gelesen in dieser Periode";
 "goals.metric.minutes" = "Minuten";
 "goals.celebration.reached" = "Ziel erreicht 🎉";
+"goals.empty.title" = "Noch kein aktives Ziel";
+"goals.empty.subtitle" = "Lege ein realistisches Minuten-Ziel fest. Danach zeigt dir der Ring sofort, wie nah du dran bist.";
 
 "goals.focus.subtitle" = "Fokussierte Lesesessions mit Timer.";
 "goals.progress.title.noGoal" = "Starte mit deinem ersten Ziel.";
@@ -240,8 +242,8 @@
 "history.title" = "Lesehistorie";
 "history.today" = "Heute";
 "history.yesterday" = "Gestern";
-"history.empty.title" = "Noch keine Einträge";
-"history.empty.subtitle" = "Sobald du Sessions speicherst, erscheint hier deine Historie.";
+"history.empty.title" = "Noch keine Sessions";
+"history.empty.subtitle" = "Starte den Lese-Fokus oder speichere eine Hörsession. Deine letzten Aktivitäten erscheinen dann hier.";
 "history.unknownBook" = "Unbekanntes Buch";
 
 "history.medium.reading" = "gelesen";
