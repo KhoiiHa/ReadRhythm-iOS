@@ -15,11 +15,11 @@ concurrency:
 jobs:
   unit-tests:
     name: ReadRhythm Unit Tests
-    runs-on: macos-15
+    runs-on: macos-26
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Print Xcode version
         run: xcodebuild -version
@@ -27,18 +27,18 @@ jobs:
       - name: Resolve simulator
         run: |
           set -euo pipefail
-          simulator_name="$(
+          simulator_id="$(
             xcrun simctl list devices available |
-            awk -F '[()]' '/iPhone/ { gsub(/^ +| +$/, "", $1); print $1; exit }'
+            awk -F '[()]' '/iPhone/ { print $2; exit }'
           )"
 
-          if [ -z "$simulator_name" ]; then
+          if [ -z "$simulator_id" ]; then
             echo "No available iPhone simulator found." >&2
             exit 1
           fi
 
-          echo "SIMULATOR_NAME=$simulator_name" >> "$GITHUB_ENV"
-          echo "Using simulator: $simulator_name"
+          echo "SIMULATOR_ID=$simulator_id" >> "$GITHUB_ENV"
+          echo "Using simulator id: $simulator_id"
 
       - name: Run unit tests
         run: |
@@ -46,5 +46,5 @@ jobs:
           xcodebuild test \
             -project ReadRhythm/ReadRhythm.xcodeproj \
             -scheme ReadRhythm \
-            -destination "platform=iOS Simulator,name=${SIMULATOR_NAME},OS=latest" \
+            -destination "id=${SIMULATOR_ID}" \
             -only-testing:ReadRhythmTests
