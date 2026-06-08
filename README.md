@@ -12,6 +12,7 @@
   <img src="https://img.shields.io/badge/SwiftData-Ready-orange" />
   <img src="https://img.shields.io/badge/Architecture-MVVM-green" />
   <img src="https://img.shields.io/badge/Target-iOS_17+-lightgrey" />
+  <img src="https://github.com/KhoiiHa/ReadRhythm-iOS/actions/workflows/ios-unit-tests.yml/badge.svg" />
   <img src="https://img.shields.io/badge/Tests-Core_Stable-success" />
   <img src="https://img.shields.io/badge/Phase-MVP_Hardening-blueviolet" />
 </p>
@@ -158,6 +159,25 @@ Consistent spacing, shadows and components across the app.
 
 > Fokus: deterministische Kernlogik, In-Memory-SwiftData-Tests und UI-Smokes für zentrale Flows.
 > Hinweis: Testausführung erfolgt über Xcode/Xcodebuild; lokale Toolchain-Konfiguration kann vorausgesetzt sein.
+
+**GitHub Actions:**
+- Pull Requests nach `main` führen automatisch die Unit-Test-Suite aus.
+- Pushes auf `main` validieren den gemergten Stand erneut.
+- UI-Tests bleiben bewusst lokal/gezielt, da Simulator-UI-Flows in CI langsamer und fragiler sind.
+
+```bash
+SIMULATOR_ID="$(
+  xcrun simctl list devices available |
+  awk -F '[()]' '/iPhone/ { print $2; exit }'
+)"
+
+xcodebuild test \
+  -project ReadRhythm/ReadRhythm.xcodeproj \
+  -scheme ReadRhythm \
+  -destination "id=${SIMULATOR_ID}" \
+  -parallel-testing-enabled NO \
+  -only-testing:ReadRhythmTests
+```
 
 ---
 
