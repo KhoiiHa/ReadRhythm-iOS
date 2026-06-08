@@ -41,10 +41,12 @@ jobs:
           echo "Using simulator id: $simulator_id"
 
       - name: Run unit tests
+        timeout-minutes: 15
         run: |
           set -euo pipefail
           xcodebuild test \
             -project ReadRhythm/ReadRhythm.xcodeproj \
             -scheme ReadRhythm \
             -destination "id=${SIMULATOR_ID}" \
+            -parallel-testing-enabled NO \
             -only-testing:ReadRhythmTests
