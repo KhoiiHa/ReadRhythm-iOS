@@ -1,0 +1,52 @@
+name: iOS Unit Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ios-unit-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    name: ReadRhythm Unit Tests
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Print Xcode version
+        run: xcodebuild -version
+
+      - name: Resolve simulator
+        run: |
+          set -euo pipefail
+          simulator_id="$(
+            xcrun simctl list devices available |
+            awk -F '[()]' '/iPhone/ { print $2; exit }'
+          )"
+
+          if [ -z "$simulator_id" ]; then
+            echo "No available iPhone simulator found." >&2
+            exit 1
+          fi
+
+          echo "SIMULATOR_ID=$simulator_id" >> "$GITHUB_ENV"
+          echo "Using simulator id: $simulator_id"
+
+      - name: Run unit tests
+        timeout-minutes: 15
+        run: |
+          set -euo pipefail
+          xcodebuild test \
+            -project ReadRhythm/ReadRhythm.xcodeproj \
+            -scheme ReadRhythm \
+            -destination "id=${SIMULATOR_ID}" \
+            -parallel-testing-enabled NO \
+            -only-testing:ReadRhythmTests
