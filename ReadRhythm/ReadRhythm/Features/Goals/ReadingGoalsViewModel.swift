@@ -101,9 +101,9 @@ final class ReadingGoalsViewModel: ObservableObject {
 
     func calculateProgress() {
         guard let goal = activeGoal else {
-            totalMinutes = 0
+            totalMinutes = statsService.minutes(on: .now, in: context)
             progress = 0
-            streakCount = 0
+            streakCount = Self.computeStreak(using: statsService, context: context)
             return
         }
         #if DEBUG
