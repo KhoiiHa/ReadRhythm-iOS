@@ -317,6 +317,7 @@
 "toast.added" = "Zur Bibliothek hinzugefügt";
  "toast.duplicate" = "Bereits in deiner Bibliothek";
  "toast.deleted" = "Aus Bibliothek entfernt";
+ "toast.sessionSaved" = "Session gespeichert";
  "toast.error"   = "Aktion fehlgeschlagen";
 
 // Detail (shared, DE)

@@ -58,8 +58,10 @@ struct BookDetailView: View {
         }
         .sheet(isPresented: $viewModel.showAddSessionSheet) {
             AddSessionView { minutes, date in
-                viewModel.addSession(for: book, minutes: minutes, date: date)
-                loadReadingStats()
+                let didSave = viewModel.addSession(for: book, minutes: minutes, date: date)
+                if didSave {
+                    loadReadingStats()
+                }
             }
         }
         .alert(
@@ -79,6 +81,30 @@ struct BookDetailView: View {
         } message: {
             if let errorMessageKey = viewModel.errorMessageKey {
                 Text(errorMessageKey)
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if let key = viewModel.toastMessageKey {
+                Text(LocalizedStringKey(key))
+                    .font(AppFont.caption2())
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule()
+                            .fill(AppColors.Semantic.bgCard)
+                            .overlay(
+                                Capsule()
+                                    .stroke(
+                                        AppColors.Semantic.chipBg.opacity(0.6),
+                                        lineWidth: AppStroke.cardBorder
+                                    )
+                            )
+                    )
+                    .foregroundStyle(AppColors.Semantic.chipFg)
+                    .padding(.bottom, 24)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.easeInOut(duration: 0.2), value: viewModel.toastMessageKey)
+                    .accessibilityIdentifier("bookdetail.toast.\(key)")
             }
         }
     }

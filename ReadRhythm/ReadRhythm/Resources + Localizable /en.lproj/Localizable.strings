@@ -43,6 +43,9 @@
 "common.done" = "Done";
 "common.ok" = "OK";
 
+// Toasts
+"toast.sessionSaved" = "Session saved";
+
 // Tabs
 "rr.tab.library" = "Library";
 "rr.tab.discover" = "Discover";
