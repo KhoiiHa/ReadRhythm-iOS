@@ -126,13 +126,15 @@ final class ReadRhythmTests: XCTestCase {
         let date = Date(timeIntervalSince1970: 1_800)
 
         viewModel.bind(context: context)
-        viewModel.addSession(for: book, minutes: 25, date: date)
+        let didSave = viewModel.addSession(for: book, minutes: 25, date: date)
 
         let sessions = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+        XCTAssertTrue(didSave)
         XCTAssertEqual(sessions.count, 1)
         XCTAssertEqual(sessions.first?.book?.sourceID, book.sourceID)
         XCTAssertEqual(sessions.first?.minutes, 25)
         XCTAssertEqual(sessions.first?.medium, "reading")
+        XCTAssertEqual(viewModel.toastMessageKey, "toast.sessionSaved")
         XCTAssertNil(viewModel.errorMessageKey)
     }
 
@@ -141,10 +143,12 @@ final class ReadRhythmTests: XCTestCase {
         let viewModel = BookDetailViewModel()
 
         viewModel.bind(context: context)
-        viewModel.addSession(for: book, minutes: 0, date: Date())
+        let didSave = viewModel.addSession(for: book, minutes: 0, date: Date())
 
         let sessions = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+        XCTAssertFalse(didSave)
         XCTAssertTrue(sessions.isEmpty)
+        XCTAssertNil(viewModel.toastMessageKey)
         XCTAssertNotNil(viewModel.errorMessageKey)
     }
 

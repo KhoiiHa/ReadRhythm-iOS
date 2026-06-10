@@ -20,6 +20,7 @@ final class BookDetailViewModel: ObservableObject {
     // MARK: - UI State
     @Published var showAddSessionSheet: Bool = false
     @Published var errorMessageKey: LocalizedStringKey?
+    @Published var toastMessageKey: String?
 
     // MARK: - Setup
     func bind(context: ModelContext) {
@@ -31,15 +32,31 @@ final class BookDetailViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Toast Helper
+
+    private func showToast(_ key: String, duration: UInt64 = 1_500_000_000) {
+        toastMessageKey = key
+
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: duration)
+            await MainActor.run {
+                if self?.toastMessageKey == key {
+                    self?.toastMessageKey = nil
+                }
+            }
+        }
+    }
+
     // MARK: - Actions
-    func addSession(for book: BookEntity, minutes: Int, date: Date) {
+    @discardableResult
+    func addSession(for book: BookEntity, minutes: Int, date: Date) -> Bool {
         guard let repo = sessionRepo else {
             errorMessageKey = "session.add.error"
-            return
+            return false
         }
         guard minutes > 0 else {
             errorMessageKey = "session.add.validation.minutes"
-            return
+            return false
         }
         do {
             _ = try repo.saveSession(
@@ -51,11 +68,14 @@ final class BookDetailViewModel: ObservableObject {
             #if DEBUG
             print("[BookDetailVM] +Session: \(minutes)m @\(date) for \(book.title)")
             #endif
+            showToast("toast.sessionSaved")
+            return true
         } catch {
             #if DEBUG
             print("[BookDetailVM] Add session failed: \(error.localizedDescription)")
             #endif
             errorMessageKey = "session.add.error"
+            return false
         }
     }
 }
