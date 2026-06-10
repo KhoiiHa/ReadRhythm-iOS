@@ -42,6 +42,33 @@ final class ReadRhythmTests: XCTestCase {
         XCTAssertEqual(viewModel.activeGoal?.period, .weekly)
     }
 
+    func testGoalsProgress_WhenNoActiveGoalButSessionExists_ThenShowsActivityWithoutProgress() throws {
+        let repository = LocalSessionRepository(context: context)
+        try repository.saveSession(book: nil, minutes: 25, date: Date(), medium: "reading")
+
+        let viewModel = ReadingGoalsViewModel(context: context, statsService: .shared)
+        viewModel.calculateProgress()
+
+        XCTAssertNil(viewModel.activeGoal)
+        XCTAssertEqual(viewModel.totalMinutes, 25)
+        XCTAssertEqual(viewModel.progress, 0)
+        XCTAssertEqual(viewModel.streakCount, 1)
+    }
+
+    func testGoalsProgress_WhenDailyGoalExists_ThenUsesSavedSessionMinutes() throws {
+        let repository = LocalSessionRepository(context: context)
+        let viewModel = ReadingGoalsViewModel(context: context, statsService: .shared)
+
+        XCTAssertTrue(viewModel.saveGoal(targetMinutes: 50, period: .daily))
+        try repository.saveSession(book: nil, minutes: 25, date: Date(), medium: "reading")
+
+        viewModel.calculateProgress()
+
+        XCTAssertEqual(viewModel.totalMinutes, 25)
+        XCTAssertEqual(viewModel.progress, 0.5, accuracy: 0.001)
+        XCTAssertEqual(viewModel.streakCount, 1)
+    }
+
     func testDiscoverSearch_WhenRepositoryInjected_ThenUsesInjectedResults() async throws {
         let remote = makeRemoteBook(id: "remote-1", title: "Injected Result")
         let searchRepository = StubBookSearchRepository(result: .success([remote]))
