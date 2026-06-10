@@ -22,6 +22,7 @@ struct BookDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.openURL) private var openURL
 
+    @StateObject private var viewModel = BookDetailViewModel()
     @State private var readingStats = BookReadingStats()
     @State private var readingContent: ReadingContent? = nil
     @State private var showFullDescription: Bool = false
@@ -52,7 +53,33 @@ struct BookDetailView: View {
             }
         }
         .onAppear {
+            viewModel.bind(context: modelContext)
             loadReadingStats()
+        }
+        .sheet(isPresented: $viewModel.showAddSessionSheet) {
+            AddSessionView { minutes, date in
+                viewModel.addSession(for: book, minutes: minutes, date: date)
+                loadReadingStats()
+            }
+        }
+        .alert(
+            Text("session.error.title"),
+            isPresented: Binding(
+                get: { viewModel.errorMessageKey != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        viewModel.errorMessageKey = nil
+                    }
+                }
+            )
+        ) {
+            Button("common.ok", role: .cancel) {
+                viewModel.errorMessageKey = nil
+            }
+        } message: {
+            if let errorMessageKey = viewModel.errorMessageKey {
+                Text(errorMessageKey)
+            }
         }
     }
 
@@ -170,6 +197,17 @@ struct BookDetailView: View {
 
             infoRow(icon: "globe", text: Text(LocalizedStringKey(sourceLabelKey)))
                 .accessibilityIdentifier("detail.source")
+
+            Button {
+                viewModel.showAddSessionSheet = true
+            } label: {
+                Label(LocalizedStringKey("session.add.cta"), systemImage: "plus.circle.fill")
+                    .font(AppFont.bodyStandard(.semibold))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .buttonBorderShape(.roundedRectangle(radius: AppRadius.s))
+            .accessibilityIdentifier("bookdetail.addSession")
 
             if let addedText = addedOnText {
                 infoRow(icon: "calendar", text: Text(addedText))

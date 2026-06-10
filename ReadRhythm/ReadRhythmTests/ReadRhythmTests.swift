@@ -120,6 +120,34 @@ final class ReadRhythmTests: XCTestCase {
         XCTAssertEqual(viewModel.toastText, "toast.duplicate")
     }
 
+    func testBookDetailAddSession_WhenMinutesPositive_ThenPersistsLinkedSession() throws {
+        let book = try makeLocalBook()
+        let viewModel = BookDetailViewModel()
+        let date = Date(timeIntervalSince1970: 1_800)
+
+        viewModel.bind(context: context)
+        viewModel.addSession(for: book, minutes: 25, date: date)
+
+        let sessions = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+        XCTAssertEqual(sessions.count, 1)
+        XCTAssertEqual(sessions.first?.book?.sourceID, book.sourceID)
+        XCTAssertEqual(sessions.first?.minutes, 25)
+        XCTAssertEqual(sessions.first?.medium, "reading")
+        XCTAssertNil(viewModel.errorMessageKey)
+    }
+
+    func testBookDetailAddSession_WhenMinutesInvalid_ThenDoesNotPersist() throws {
+        let book = try makeLocalBook()
+        let viewModel = BookDetailViewModel()
+
+        viewModel.bind(context: context)
+        viewModel.addSession(for: book, minutes: 0, date: Date())
+
+        let sessions = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+        XCTAssertTrue(sessions.isEmpty)
+        XCTAssertNotNil(viewModel.errorMessageKey)
+    }
+
     private func makeRemoteBook(id: String, title: String) -> RemoteBook {
         RemoteBook(
             id: id,
@@ -135,6 +163,25 @@ final class ReadRhythmTests: XCTestCase {
             description: nil,
             thumbnailURL: nil,
             previewLink: nil
+        )
+    }
+
+    private func makeLocalBook() throws -> BookEntity {
+        try LocalBookRepository(context: context).add(
+            title: "Detail Flow Book",
+            author: "Test Author",
+            subtitle: nil,
+            publisher: nil,
+            publishedDate: nil,
+            pageCount: nil,
+            language: nil,
+            categories: [],
+            descriptionText: nil,
+            thumbnailURL: nil,
+            infoLink: nil,
+            previewLink: nil,
+            sourceID: UUID().uuidString,
+            source: "Test"
         )
     }
 

@@ -42,7 +42,12 @@ final class BookDetailViewModel: ObservableObject {
             return
         }
         do {
-            _ = try repo.addSession(for: book, minutes: minutes, date: date)
+            _ = try repo.saveSession(
+                book: book,
+                minutes: minutes,
+                date: date,
+                medium: "reading"
+            )
             #if DEBUG
             print("[BookDetailVM] +Session: \(minutes)m @\(date) for \(book.title)")
             #endif
