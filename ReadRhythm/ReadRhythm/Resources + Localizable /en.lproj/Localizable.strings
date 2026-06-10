@@ -24,6 +24,25 @@
 "book.detail.sessions.empty" = "No activity for this book yet. Save your first reading or listening session.";
 "book.detail.session.row.accessibility" = "%d minutes of activity on %@";
 
+// Add Session
+"session.add.cta" = "Add session";
+"session.add.title" = "Add session";
+"session.add.section.info" = "Session details";
+"session.add.date" = "Date & time";
+"session.add.minutes" = "Minutes";
+"session.add.minutes.placeholder" = "e.g. 25";
+"session.add.hint" = "Save real reading time. Short sessions of 15-30 minutes keep your progress realistic.";
+"session.add.validation.minutes" = "Please enter a positive number of minutes.";
+"session.add.error" = "Reading session could not be added.";
+"session.error.title" = "Something went wrong";
+"session.add.minutes.hint" = "Enter the number of minutes for this reading session.";
+
+// Common
+"common.save" = "Save";
+"common.cancel" = "Cancel";
+"common.done" = "Done";
+"common.ok" = "OK";
+
 // Tabs
 "rr.tab.library" = "Library";
 "rr.tab.discover" = "Discover";
