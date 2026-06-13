@@ -36,6 +36,9 @@ struct ReadingHistoryView: View {
         .task {
             vm.reload()
         }
+        .refreshable {
+            vm.reload()
+        }
         .accessibilityIdentifier("History.Root")
     }
 
