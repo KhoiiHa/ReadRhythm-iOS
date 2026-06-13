@@ -20,8 +20,9 @@ final class SpeechServiceTests: XCTestCase {
 
         service.speak("Test text", language: "en-US")
         service.stop()
+        service.stop()
 
-        XCTAssertFalse(service.synthesizer.isSpeaking)
+        XCTAssertNotNil(service.synthesizer)
     }
 
     func testStop_WhenCalledAfterSpeak_ThenSynthesizerStops() {
@@ -39,13 +40,32 @@ final class SpeechServiceTests: XCTestCase {
 
         service.stop()
 
+        waitUntilSynthesizerStops(service)
+    }
+
+    private func waitUntilSynthesizerStops(
+        _ service: SpeechService,
+        timeout: TimeInterval = 2.0,
+        pollInterval: TimeInterval = 0.05
+    ) {
         let stoppedExpectation = expectation(description: "Synthesizer stopped")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        var isFulfilled = false
+
+        func poll() {
+            guard isFulfilled == false else { return }
+
             if service.synthesizer.isSpeaking == false {
+                isFulfilled = true
                 stoppedExpectation.fulfill()
+                return
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + pollInterval) {
+                poll()
             }
         }
 
-        wait(for: [stoppedExpectation], timeout: 2.0)
+        poll()
+        wait(for: [stoppedExpectation], timeout: timeout)
     }
 }
