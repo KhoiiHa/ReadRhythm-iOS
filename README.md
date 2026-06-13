@@ -41,14 +41,29 @@ Die Case Study beinhaltet Architektur, UX, technische Entscheidungen und persön
 
 ---
 
+## ✅ Aktueller Projektstatus · Current Status
+
+**DE:**
+ReadRhythm befindet sich nach mehreren gezielten Hardening-Blöcken auf einem stabilen Portfolio-Stand:
+Session-Speicherung, History, Stats, Goals und Speech-Tests sind über Unit-Tests abgesichert.
+GitHub Actions führt die Unit-Test-Suite automatisch für Pull Requests und `main`-Pushes aus.
+
+**EN:**
+ReadRhythm is currently in a hardened portfolio-ready state:
+session persistence, history, stats, goals, and speech tests are covered by focused unit tests.
+GitHub Actions runs the unit test suite automatically for pull requests and pushes to `main`.
+
+---
+
 ## ✨ Hauptfeatures · Key Features
 
 ### 📚 Bibliothek / Library
 - SwiftData-basierte Listen (`@Query`)
 - Add-Sheet, Swipe-Actions, Toast-Feedback
 - ViewModels kapseln CRUD-Logik
+- Book Detail ermöglicht das Speichern neuer Sessions mit sichtbarem Feedback
 
-**EN:** SwiftData-backed lists with add sheet, swipe actions and clean MVVM separation.
+**EN:** SwiftData-backed lists with add sheet, swipe actions, session logging from book details, and clean MVVM separation.
 
 ---
 
@@ -67,9 +82,21 @@ with a memory cache and persists saved selections to SwiftData.
 - Swift Charts visualisieren tägliche Lesezeit, Streaks & Gesamtwerte  
 - StatsService aggregiert Sitzungen über Zeiträume  
 - Deterministische Tests für Statistiklogik
+- Pull-to-refresh aktualisiert sichtbare Statistikdaten nach neuen Sessions
 
 **EN:**  
-Swift Charts visualize daily minutes, streaks, and totals; repository and StatsService aggregate sessions with deterministic test coverage.
+Swift Charts visualize daily minutes, streaks, and totals; repository and StatsService aggregate sessions with deterministic test coverage and refreshable UI state.
+
+---
+
+### 🕘 Historie / History
+- Chronologische Session-Liste mit Tagesgruppen
+- Reading- und Listening-Sessions werden über passende Icons getrennt
+- Pull-to-refresh lädt gespeicherte Aktivitäten erneut
+- ViewModel formatiert Row-Texte und Accessibility-Labels zentral
+
+**EN:**
+Chronological session history grouped by day, with refresh support and centralized formatting for row text and accessibility labels.
 
 ---
 
@@ -77,6 +104,9 @@ Swift Charts visualize daily minutes, streaks, and totals; repository and StatsS
 - Progress Ring mit Haptics
 - Fokus-Timer speichert Sessions automatisch
 - Klarer, reduzierter „Deep Work“-Flow
+- Aktivität bleibt sichtbar, auch wenn noch kein aktives Ziel gesetzt ist
+
+**EN:** Focus mode stores sessions, goals show progress clearly, and current activity remains visible even without an active goal.
 
 ---
 
@@ -100,11 +130,12 @@ Based on **MVVM** with a shared SwiftData container. Repositories abstract CRUD 
 
 ### 🧠 Repository & Services
 - Lokale Repositories (Book, Session) abstrahieren SwiftData-Zugriffe
+- LocalSessionRepository validiert Minuten und verhindert ungültige Sessions
 - NetworkClient & GoogleBooksClient kapseln Remote-Requests
 - DataService dient als zentraler CRUD- und Fallback-Layer
 
 **EN:**
-Local repositories abstract SwiftData access; network clients wrap Google Books APIs;
+Local repositories abstract SwiftData access and validate session persistence; network clients wrap Google Books APIs;
 DataService serves as a central CRUD and persistence fallback layer.
 
 ---
@@ -138,13 +169,15 @@ Consistent spacing, shadows and components across the app.
 - Aufbau einer repository-basierten Suche zeigte, wie Netzwerk, Mapping und lokale Speicherung zusammenspielen.
 - Aggregationslogik im StatsService entlastet ViewModels und erhöht Testbarkeit.
 - Design Tokens halten Light/Dark-Mode konsistent.
-- Text-to-Speech & SwiftData-Tests zeigten Integration von AVFoundation + Persistence-Lifecycles.
+- Text-to-Speech & SwiftData-Tests zeigten, wo Simulator-Timing, AVFoundation und Persistence-Lifecycles bewusst stabilisiert werden müssen.
+- Kleine, reviewbare PRs halten MVP-Hardening nachvollziehbar und revertierbar.
 
 **EN:**
 - Implementing repository-based search connected networking, DTO mapping, and local persistence.
 - StatsService aggregation logic proved how services offload logic from view models.
 - Design tokens kept UI modes consistent and prevented duplication.
-- TTS and SwiftData tests demonstrated reliable coordination between speech and data lifecycles.
+- TTS and SwiftData tests showed where simulator timing, AVFoundation, and persistence lifecycles need explicit stabilization.
+- Small reviewable pull requests kept MVP hardening explainable and reversible.
 
 ---
 
@@ -153,9 +186,11 @@ Consistent spacing, shadows and components across the app.
 **Getestete Kernmodule:**
 - LocalSessionRepository → validiert Session-Persistenz, Eingaben und Idempotenz
 - StatsService → aggregiert Lesezeit deterministisch
-- SpeechService → testet Start/Stop-Lifecycle
+- StatsViewModel & ReadingHistoryViewModel → sichern Sichtbarkeit gespeicherter Sessions
+- SpeechService → testet Start/Stop-Lifecycle mit simulatorrobuster Warte-Logik
 - AppFormatter → prüft lokalisierte Texte & VoiceOver-Kompatibilität
 - ReadingGoalsViewModel → erstellt und aktualisiert aktive Ziele robust
+- BookDetailViewModel → speichert Sessions mit Erfolg-/Fehlerfeedback
 
 > Fokus: deterministische Kernlogik, In-Memory-SwiftData-Tests und UI-Smokes für zentrale Flows.
 > Hinweis: Testausführung erfolgt über Xcode/Xcodebuild; lokale Toolchain-Konfiguration kann vorausgesetzt sein.
@@ -163,6 +198,7 @@ Consistent spacing, shadows and components across the app.
 **GitHub Actions:**
 - Pull Requests nach `main` führen automatisch die Unit-Test-Suite aus.
 - Pushes auf `main` validieren den gemergten Stand erneut.
+- Der Workflow wählt dynamisch einen verfügbaren iPhone-Simulator auf dem Runner aus.
 - UI-Tests bleiben bewusst lokal/gezielt, da Simulator-UI-Flows in CI langsamer und fragiler sind.
 
 ```bash
@@ -189,6 +225,7 @@ xcodebuild test \
 - Fehlerhandling verbessern (kein `try!`, klare Propagierung).
 - Debounce- oder Cancel-Logik für Suchfeld einführen.  
 - Persistenten Discover-Feed-Cache als echten Offline-Fallback reaktivieren oder README/UI klar darauf verzichten lassen.
+- Optional: UI-Tests weiter reduzieren oder gezielt stabilisieren, damit CI dauerhaft schnell bleibt.
 
 **EN:**
 - Consolidate DataService & LocalBookRepository to eliminate duplication.
@@ -196,6 +233,7 @@ xcodebuild test \
 - Replace `try!` with safe error propagation.
 - Add debouncing or cancellation to search task.
 - Reactivate the persistent Discover feed cache as a real offline fallback or keep the product copy focused on saved books.
+- Optionally reduce or stabilize UI tests further so CI remains fast and reliable.
 
 ---
 
@@ -207,16 +245,18 @@ xcodebuild test \
 - Google Books API
 - MVVM + Repository Pattern
 - Unit Tests (deterministische Kernlogik)
+- GitHub Actions CI
 
 ---
 
 ## 💼 Recruiter Highlights
 
 - Saubere MVVM-Architektur mit klaren Repository- & Service-Layern
-- Unit-Tests für Stats, Speech, Goals und Session-Persistenz mit deterministischem Verhalten
+- Unit-Tests für Session-Persistenz, Book Detail, Stats, History, Speech und Goals
+- GitHub Actions validiert Pull Requests und `main` automatisch
 - Design Tokens, i18n & Accessibility konsistent umgesetzt  
 - MVP-Hardening mit klaren, kleinen und testbaren Verbesserungen dokumentiert
-- Ready für Store- & Portfolio-Präsentation
+- Portfolio-ready als SwiftUI/SwiftData-Projekt mit nachvollziehbaren Produktentscheidungen
 
 ---
 
