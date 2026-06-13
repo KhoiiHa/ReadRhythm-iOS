@@ -34,12 +34,7 @@ struct StatsEmptyState: View {
         }
         .padding(.vertical, AppSpace._24)
         .padding(.horizontal, AppSpace._16)
-        .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: AppRadius.l)
-                .fill(AppColors.Semantic.bgCard)
-                .shadow(color: AppColors.Semantic.shadowColor.opacity(0.15), radius: 3, x: 0, y: 1)
-        )
+        .frame(maxWidth: .infinity, minHeight: 220)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("stats.emptyState")
     }

@@ -55,6 +55,9 @@ struct StatsView: View {
             apply(range: range)
             viewModel.refreshFromRepositoryContext()
         }
+        .refreshable {
+            viewModel.refreshFromRepositoryContext()
+        }
         .navigationTitle(Text("rr.stats.title"))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("stats.view")
