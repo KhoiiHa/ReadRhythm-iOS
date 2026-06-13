@@ -179,6 +179,51 @@ final class ReadRhythmTests: XCTestCase {
         XCTAssertNotNil(viewModel.errorMessageKey)
     }
 
+    func testReadingHistory_WhenSessionsExist_ThenGroupsAndSortsByDate() throws {
+        let repository = LocalSessionRepository(context: context)
+        let book = try makeLocalBook()
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let todayMorning = calendar.date(byAdding: .hour, value: 9, to: today)!
+        let todayEvening = calendar.date(byAdding: .hour, value: 20, to: today)!
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+
+        try repository.saveSession(book: book, minutes: 15, date: yesterday, medium: "reading")
+        try repository.saveSession(book: book, minutes: 20, date: todayMorning, medium: "reading")
+        try repository.saveSession(book: book, minutes: 30, date: todayEvening, medium: "listening")
+
+        let viewModel = ReadingHistoryViewModel(context: context)
+        let displaySections = viewModel.displaySections()
+
+        XCTAssertEqual(displaySections.count, 2)
+        XCTAssertTrue(calendar.isDate(displaySections[0].date, inSameDayAs: today))
+        XCTAssertTrue(calendar.isDate(displaySections[1].date, inSameDayAs: yesterday))
+        XCTAssertEqual(displaySections[0].rows.map(\.subtitleText), ["Detail Flow Book", "Detail Flow Book"])
+        XCTAssertEqual(displaySections[0].rows.map(\.iconSystemName), ["headphones", "book"])
+        XCTAssertEqual(displaySections[0].rows.map(\.id), viewModel.sections[0].items.map(\.id))
+        XCTAssertEqual(displaySections[1].rows.first?.iconSystemName, "book")
+    }
+
+    func testStatsViewModel_WhenSessionSaved_ThenRefreshShowsAggregatedData() throws {
+        let repository = LocalSessionRepository(context: context)
+        let viewModel = StatsViewModel(
+            sessionRepository: repository,
+            statsService: .shared
+        )
+
+        XCTAssertFalse(viewModel.hasData())
+
+        try repository.saveSession(book: nil, minutes: 25, date: Date(), medium: "reading")
+        viewModel.refreshFromRepositoryContext(days: 7)
+
+        XCTAssertTrue(viewModel.hasData())
+        XCTAssertEqual(viewModel.totalMinutes, 25)
+        XCTAssertEqual(viewModel.totalReadingMinutes, 25)
+        XCTAssertEqual(viewModel.totalListeningMinutes, 0)
+        XCTAssertEqual(viewModel.combinedTotalMinutes, 25)
+        XCTAssertEqual(viewModel.currentStreak, 1)
+    }
+
     private func makeRemoteBook(id: String, title: String) -> RemoteBook {
         RemoteBook(
             id: id,
