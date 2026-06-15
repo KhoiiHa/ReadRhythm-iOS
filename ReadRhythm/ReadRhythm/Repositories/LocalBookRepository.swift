@@ -102,18 +102,14 @@ final class LocalBookRepository: BookRepository {
 
         do {
             try context.save()
-            #if DEBUG
             if let persisted = context.model(for: entity.persistentModelID) as? BookEntity {
-                print("[Save][Book] '\(persisted.title)' pub=\(persisted.publisher ?? "-") year=\(persisted.publishedDate ?? "-") pages=\(persisted.pageCount?.description ?? "-") cats=\(persisted.categories) links=\(persisted.infoLink?.absoluteString ?? "-")")
+                DebugLogger.log("[Save][Book] '\(persisted.title)' pub=\(persisted.publisher ?? "-") year=\(persisted.publishedDate ?? "-") pages=\(persisted.pageCount?.description ?? "-") cats=\(persisted.categories) links=\(persisted.infoLink?.absoluteString ?? "-")")
             } else {
-                print("[LocalBookRepository] ⚠️ Saved book but could not reload via modelID.")
+                DebugLogger.log("[LocalBookRepository] Saved book but could not reload via modelID.")
             }
-            #endif
             return entity
         } catch {
-            #if DEBUG
-            print("[LocalBookRepository] ❌ Save failed:", error)
-            #endif
+            DebugLogger.log("[LocalBookRepository] Save failed: \(error)")
             throw error
         }
     }
@@ -135,13 +131,9 @@ final class LocalBookRepository: BookRepository {
         context.delete(book)
         do {
             try context.save()
-            #if DEBUG
-            print("[LocalBookRepository] 🗑 Deleted book '\(book.title)'")
-            #endif
+            DebugLogger.log("[LocalBookRepository] Deleted book '\(book.title)'")
         } catch {
-            #if DEBUG
-            print("[LocalBookRepository] ❌ Delete save failed:", error)
-            #endif
+            DebugLogger.log("[LocalBookRepository] Delete save failed: \(error)")
             context.rollback()
             throw error
         }

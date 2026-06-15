@@ -35,9 +35,7 @@ final class LibraryViewModel: ObservableObject {
         // Nur einmal binden / Bind only once
         if repository == nil {
             repository = LocalBookRepository(context: context)
-            #if DEBUG
-            print("[LibraryViewModel] Repository bound to ModelContext")
-            #endif
+            DebugLogger.log("[LibraryViewModel] Repository bound to ModelContext")
         }
     }
 
@@ -101,15 +99,11 @@ final class LibraryViewModel: ObservableObject {
                 source: "User Added"
             )
 
-            #if DEBUG
-            print("[LibraryViewModel] Book added: \(cleanedTitle)")
-            #endif
+            DebugLogger.log("[LibraryViewModel] Book added: \(cleanedTitle)")
 
             showToast("toast.added")
         } catch {
-            #if DEBUG
-            print("[LibraryViewModel] Add failed: \(error.localizedDescription)")
-            #endif
+            DebugLogger.log("[LibraryViewModel] Add failed: \(error.localizedDescription)")
             errorMessageKey = "library.add.error"
             showToast("toast.error")
         }
@@ -126,15 +120,11 @@ final class LibraryViewModel: ObservableObject {
             do {
                 try repository.delete(book)
 
-                #if DEBUG
-                print("[LibraryViewModel] Deleted book: \(book.title)")
-                #endif
+                DebugLogger.log("[LibraryViewModel] Deleted book: \(book.title)")
 
                 showToast("toast.deleted")
             } catch {
-                #if DEBUG
-                print("[LibraryViewModel] Delete failed: \(error.localizedDescription)")
-                #endif
+                DebugLogger.log("[LibraryViewModel] Delete failed: \(error.localizedDescription)")
 
                 errorMessageKey = "library.delete.error"
                 showToast("toast.error")

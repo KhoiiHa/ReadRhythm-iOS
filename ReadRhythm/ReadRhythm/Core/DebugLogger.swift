@@ -12,6 +12,7 @@ import Foundation
 enum DebugLogger {
     static func log(_ message: String) {
         #if DEBUG
+        guard NSClassFromString("XCTestCase") == nil else { return }
         print("[DEBUG] \(message)")
         #endif
     }
