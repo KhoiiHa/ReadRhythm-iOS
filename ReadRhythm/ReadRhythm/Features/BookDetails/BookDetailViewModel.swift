@@ -26,9 +26,7 @@ final class BookDetailViewModel: ObservableObject {
     func bind(context: ModelContext) {
         if sessionRepo == nil {
             sessionRepo = LocalSessionRepository(context: context)
-            #if DEBUG
-            print("[BookDetailVM] Repository bound to ModelContext")
-            #endif
+            DebugLogger.log("[BookDetailVM] Repository bound to ModelContext")
         }
     }
 
@@ -65,15 +63,11 @@ final class BookDetailViewModel: ObservableObject {
                 date: date,
                 medium: "reading"
             )
-            #if DEBUG
-            print("[BookDetailVM] +Session: \(minutes)m @\(date) for \(book.title)")
-            #endif
+            DebugLogger.log("[BookDetailVM] +Session: \(minutes)m @\(date) for \(book.title)")
             showToast("toast.sessionSaved")
             return true
         } catch {
-            #if DEBUG
-            print("[BookDetailVM] Add session failed: \(error.localizedDescription)")
-            #endif
+            DebugLogger.log("[BookDetailVM] Add session failed: \(error.localizedDescription)")
             errorMessageKey = "session.add.error"
             return false
         }

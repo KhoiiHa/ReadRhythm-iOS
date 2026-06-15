@@ -80,9 +80,7 @@ final class DiscoverViewModel: ObservableObject {
             }
         }
 
-        #if DEBUG
-        print("🍞 [DiscoverVM] toast =", key)
-        #endif
+        DebugLogger.log("[DiscoverVM] toast=\(key)")
     }
 
     func cancelToast() {
@@ -105,13 +103,9 @@ final class DiscoverViewModel: ObservableObject {
             let fetched = try repository.fetchBooks()
             allBooks = fetched
             filteredBooks = fetched
-            #if DEBUG
-            print("📚 [DiscoverVM] loadBooks fetched \(fetched.count) items from SwiftData")
-            #endif
+            DebugLogger.log("[DiscoverVM] loadBooks fetched \(fetched.count) items from SwiftData")
         } catch {
-            #if DEBUG
-            print("💥 [DiscoverVM] loadBooks failed:", error)
-            #endif
+            DebugLogger.log("[DiscoverVM] loadBooks failed: \(error)")
         }
     }
 
@@ -121,9 +115,7 @@ final class DiscoverViewModel: ObservableObject {
     /// Setzt `selectedCategory` und startet direkt eine Suche.
     func applyFilter(category: DiscoverCategory?) {
         selectedCategory = category
-        #if DEBUG
-        print("🔎 [DiscoverVM] applyFilter -> \(category?.rawValue ?? "nil")")
-        #endif
+        DebugLogger.log("[DiscoverVM] applyFilter -> \(category?.rawValue ?? "nil")")
         applySearch()
     }
 
@@ -145,18 +137,14 @@ final class DiscoverViewModel: ObservableObject {
             effectiveQuery = trimmed
         } else {
             // weder Kategorie noch Text -> keine Remote-Suche
-            #if DEBUG
-            print("🌐 [DiscoverVM] applySearch skipped (no query)")
-            #endif
+            DebugLogger.log("[DiscoverVM] applySearch skipped (no query)")
             results = []
             errorMessage = nil
             isLoading = false
             return
         }
 
-        #if DEBUG
-        print("🌐 [DiscoverVM] applySearch query='\(effectiveQuery)' category=\(selectedCategory?.rawValue ?? "nil")")
-        #endif
+        DebugLogger.log("[DiscoverVM] applySearch query='\(effectiveQuery)' category=\(selectedCategory?.rawValue ?? "nil")")
 
         isLoading = true
         errorMessage = nil
@@ -176,9 +164,7 @@ final class DiscoverViewModel: ObservableObject {
                     self.results = books
                     self.errorMessage = nil
                 case .failure(let err):
-                    #if DEBUG
-                    print("💥 [DiscoverVM] search failed:", err)
-                    #endif
+                    DebugLogger.log("[DiscoverVM] search failed: \(err)")
                     self.results = []
                     self.errorMessage = "error.network.generic"
                 }
@@ -285,16 +271,12 @@ final class DiscoverViewModel: ObservableObject {
         }
 
         if isDuplicate {
-            #if DEBUG
-            print("🔁 [DiscoverVM] duplicate -> \(remote.title)")
-            #endif
+            DebugLogger.log("[DiscoverVM] duplicate -> \(remote.title)")
             showToast("toast.duplicate")
             return .alreadyExists
         }
 
-        #if DEBUG
-        print("[DiscoverVM] addToLibrary -> id=\(remote.id) subtitle=\(remote.subtitle ?? "-") publisher=\(remote.publisher ?? "-") date=\(remote.publishedDate ?? "-") pages=\(remote.pageCount?.description ?? "-") language=\(remote.language ?? "-") cats=\(remote.categories) info=\((remote.infoLink ?? remote.previewLink)?.absoluteString ?? "-") preview=\(remote.previewLink?.absoluteString ?? "-")")
-        #endif
+        DebugLogger.log("[DiscoverVM] addToLibrary -> id=\(remote.id) subtitle=\(remote.subtitle ?? "-") publisher=\(remote.publisher ?? "-") date=\(remote.publishedDate ?? "-") pages=\(remote.pageCount?.description ?? "-") language=\(remote.language ?? "-") cats=\(remote.categories) info=\((remote.infoLink ?? remote.previewLink)?.absoluteString ?? "-") preview=\(remote.previewLink?.absoluteString ?? "-")")
 
         do {
             let saved = try repository.add(
@@ -324,17 +306,13 @@ final class DiscoverViewModel: ObservableObject {
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             #endif
 
-            #if DEBUG
-            print("✅ [DiscoverVM] saved book -> \(saved.title) [sourceID=\(saved.sourceID)]")
-            #endif
+            DebugLogger.log("[DiscoverVM] saved book -> \(saved.title) [sourceID=\(saved.sourceID)]")
             return .added
         } catch {
-            #if DEBUG
-            print("⛔️ [DiscoverVM] save failed:", error)
+            DebugLogger.log("[DiscoverVM] save failed: \(error)")
             if let nserr = error as NSError? {
-                print("⛔️ [DiscoverVM] save failed domain=\(nserr.domain) code=\(nserr.code) userInfo=\(nserr.userInfo)")
+                DebugLogger.log("[DiscoverVM] save failed domain=\(nserr.domain) code=\(nserr.code) userInfo=\(nserr.userInfo)")
             }
-            #endif
             showToast("toast.error")
             return .failure
         }
