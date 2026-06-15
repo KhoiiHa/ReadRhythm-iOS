@@ -336,6 +336,7 @@
 "detail.categories" = "Kategorien";
 "detail.language" = "Sprache";
 "detail.rating" = "Bewertung";
+"detail.rating.accessibility" = "%@ von 5 Sternen, %d Bewertungen";
 "detail.readMore" = "Mehr anzeigen";
 "detail.readLess" = "Weniger anzeigen";
 "detail.addToLibrary" = "Zur Bibliothek hinzufügen";

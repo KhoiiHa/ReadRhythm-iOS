@@ -94,3 +94,204 @@
 "library.empty.title" = "Your library is still empty";
 "library.empty.subtitle" = "Add your first book - manually or directly from search.";
 "library.empty.add" = "Add book";
+
+// Localization parity additions
+"accessibility.history.listening" = "%d minutes listened on %@";
+"accessibility.history.reading" = "%d minutes read on %@";
+
+"achv.title" = "Achievements";
+"achv.headline" = "Your reading achievements";
+"achv.subtitle" = "Milestones that make your progress visible";
+"achv.locked.hint" = "Not unlocked yet";
+"achv.week.150.title" = "150 minutes per week";
+"achv.week.150.subtitle" = "Consistent reading pays off";
+"achv.month.500.title" = "500 minutes this month";
+"achv.month.500.subtitle" = "Strong monthly pace";
+"achv.streak.7.title" = "7-day streak";
+"achv.streak.7.subtitle" = "You read every day - great work!";
+"achv.week.5sessions.title" = "5 sessions per week";
+"achv.week.5sessions.subtitle" = "Consistency wins";
+
+"audio.nav.title" = "Audiobook Light";
+"audio.title" = "Audiobook Light";
+"audio.subtitle" = "Listen to text - minimal, quick, focused";
+"audio.input.label" = "Text to read aloud";
+"audio.action.play" = "Play";
+"audio.action.pause" = "Pause";
+"audio.action.stop" = "Stop";
+"audio.progress.chars" = "Characters";
+"audio.slider.rate" = "Speech rate";
+"audio.slider.pitch" = "Pitch";
+
+"book.detail.sessions" = "Sessions";
+"book.detail.minutes" = "Total minutes";
+"book.detail.sessions.header" = "Reading sessions";
+
+"common.loading" = "Loading ...";
+"common.retry" = "Try again";
+"common.noInternet" = "No internet connection";
+
+"discover.search.placeholder" = "Search books...";
+"discover.seeAll" = "See all";
+"discover.section.recommended" = "Recommended";
+"discover.section.fromLibrary" = "From your library";
+"discover.section.trending" = "Trending";
+"discover.section.results" = "Results";
+"discover.cat.recent" = "Recent";
+"discover.cat.popular" = "Popular";
+"discover.cat.fiction" = "Fiction";
+"discover.cat.nonfiction" = "Non-fiction";
+"discover.all.title" = "All books";
+"discover.all.fromLibrary.title" = "All from your library";
+"discover.all.trending.title" = "All trending";
+"discover.all.title.recent" = "All: Recent";
+"discover.all.title.popular" = "All trending";
+"discover.all.title.fiction" = "All: Fiction";
+"discover.all.title.nonfiction" = "All: Non-fiction";
+"discover.empty.title" = "No books found";
+"discover.empty.subtitle" = "Adjust your search or filters to see more results.";
+"discover.empty.resetFilters" = "Reset filters";
+"discover.empty.noResultsForCategory" = "No books were found for this category.";
+"discover.sort.title" = "Sort";
+"discover.sort.title.short" = "Sort";
+"discover.addToLibrary" = "Add to library";
+"discover.loading" = "Loading books ...";
+"discover.error.generic" = "Something went wrong. Please try again.";
+"discover.category.mindfulness" = "Mindfulness & balance";
+"discover.category.self_help" = "Self-discovery & motivation";
+"discover.category.philosophy" = "Philosophy & the art of living";
+"discover.category.fiction_romance" = "Novels & emotion";
+"discover.category.creativity" = "Creativity & inspiration";
+"discover.category.wellness" = "Health & wellbeing";
+"discover.category.psychology" = "Psychology & everyday life";
+
+"discover.detail.title" = "Book details";
+"discover.detail.about" = "About this book";
+"discover.detail.cta.open" = "Open in library";
+"discover.detail.publisher" = "Publisher";
+"discover.detail.publishedDate" = "Publication date";
+"discover.detail.pageCount" = "Pages";
+"discover.detail.pages" = "%d pages";
+"discover.detail.categories" = "Categories";
+"discover.detail.openGoogleBooks" = "Open in Google Books";
+"discover.detail.authors.accessibility" = "Authors: %@";
+
+"error.network.offline" = "No internet connection. Showing local library.";
+"error.network.invalid_url" = "Invalid network address.";
+"error.network.timeout" = "Request timed out. Please try again later.";
+"error.network.cancelled" = "Request was cancelled.";
+"error.network.no_response" = "No response from the server.";
+"error.network.http" = "Server error. Please try again later.";
+"error.network.transport" = "Network error. Check your connection.";
+"error.network.unknown" = "Unexpected network error.";
+
+"focus.nav.title" = "Focus Mode";
+"focus.title" = "Reading Focus";
+"focus.subtitle" = "Start a focused reading timer";
+"focus.duration" = "Duration (minutes)";
+"focus.action.start" = "Start";
+"focus.action.pause" = "Pause";
+"focus.action.stop" = "Stop";
+"focus.action.finish" = "Finish";
+"focus.action.running" = "Running...";
+"focus.picker.title" = "Active book";
+"focus.picker.choose" = "Choose book";
+"focus.picker.nav" = "Choose book";
+
+"goals.title" = "Reading goals";
+"goals.cta.edit" = "Adjust goal";
+"goals.cta.set" = "Set goal";
+"goals.target.minutes" = "%d minute goal";
+"goals.accessibility.progress" = "Progress";
+"goals.streak.days" = "Days in a row";
+"goals.metric.readThisPeriod" = "Activity in this period";
+"goals.metric.minutes" = "Minutes";
+"goals.celebration.reached" = "Goal reached";
+"goals.focus.subtitle" = "Focused reading sessions with a timer.";
+"goals.progress.title.noGoal" = "Start with your first goal.";
+"goals.streak.subtitle" = "Keep your streak going.";
+"goals.edit.title" = "Edit goal";
+"goals.edit.minutes" = "Minutes";
+"goals.edit.save" = "Save";
+"goals.edit.cancel" = "Cancel";
+
+"history.title" = "Reading history";
+"history.today" = "Today";
+"history.yesterday" = "Yesterday";
+"history.unknownBook" = "Unknown book";
+"history.medium.reading" = "read";
+"history.medium.listening" = "listened";
+"history.row.listening" = "%d minutes listened on %@";
+"history.row.reading" = "%d minutes read on %@";
+
+"insights.nav.title" = "Insights";
+"insights.title" = "Reading insights";
+"insights.section.weekday" = "Minutes by weekday";
+"insights.section.weekday.subtitle" = "Which days are your strongest?";
+"insights.mode.reading" = "Reading";
+"insights.mode.listening" = "Listening";
+"insights.mode.combined" = "Combined";
+"insights.title.reading" = "Reading insights";
+"insights.title.listening" = "Listening insights";
+"insights.title.combined" = "Overall insights";
+"insights.segment.reading" = "Reading";
+"insights.segment.listening" = "Listening";
+"insights.segment.combined" = "Combined";
+"insights.kpi.total" = "Total (min)";
+"insights.kpi.average" = "Average (min/day)";
+"insights.series.reading" = "Reading minutes";
+"insights.series.listening" = "Listening minutes";
+"insights.series.combined" = "Total minutes";
+"insights.average.label" = "Avg. %d min/day";
+"insights.subtitle.range" = "%@ - %@";
+"insights.section.weekday.note" = "Charts coming soon: bar chart with average line and animations.";
+
+"library.title" = "Library";
+"library.add.title" = "Add book";
+"library.add.title.placeholder" = "Title";
+"library.add.author.placeholder" = "Author (optional)";
+"library.error.title" = "Something went wrong";
+"library.add.error" = "Book could not be added.";
+"library.delete.error" = "Book could not be deleted.";
+"library.add.section.info" = "Book information";
+"library.add.hint" = "You can add the author later. Only the title is required.";
+
+"profile.title" = "Profile";
+"profile.greeting" = "Your reading profile";
+"profile.subtitle" = "Overview of your reading habits";
+"profile.cta.insights" = "Show insights";
+"profile.metric.monthMinutes" = "Minutes (this month)";
+"profile.metric.monthSessions" = "Sessions (this month)";
+"profile.metric.avgPerDay" = "Avg. per day";
+"profile.metric.streak" = "Current streak";
+"profile.metric.bestWeekday" = "Strongest weekday";
+"profile.metric.mediumBreakdown" = "Activity by medium";
+
+"reviews.title" = "Reviews";
+"reviews.navtitle" = "Reviews";
+"reviews.badge.verified" = "Verified";
+"reviews.stars.a11y.label" = "Star rating";
+"reviews.empty.title" = "No reviews yet";
+"reviews.empty.subtitle" = "Be the first person to share your reading experience.";
+
+"rr.stats.minutes" = "Minutes";
+"rr.stats.minutes.total" = "Total min";
+"rr.stats.day" = "Day";
+"rr.stats.streak.days" = "Day streak";
+
+"session.error.delete" = "Session could not be deleted.";
+"session.minutes.suffix" = "min";
+"session.a11y.minutes" = "Duration in minutes:";
+"session.date" = "Date";
+
+"settings.appearance.section" = "Appearance";
+"settings.theme.title" = "Theme";
+"settings.theme.system" = "System";
+"settings.theme.light" = "Light";
+"settings.theme.dark" = "Dark";
+"settings.preview.section" = "Preview";
+
+"toast.added" = "Added to library";
+"toast.duplicate" = "Already in your library";
+"toast.deleted" = "Removed from library";
+"toast.error" = "Action failed";
