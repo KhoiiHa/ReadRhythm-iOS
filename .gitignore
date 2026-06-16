@@ -5,12 +5,15 @@
 ## User settings (lokale Developer-Daten, nicht ins Repo)
 xcuserdata/
 *.xcuserstate
+*.xcscmblueprint
 
 ## Build Artefakte
 *.hmap
 *.ipa
 *.dSYM.zip
 *.dSYM
+*.xcactivitylog
+*.xcresult
 
 ## Playgrounds
 timeline.xctimeline
@@ -53,3 +56,6 @@ fastlane/test_output
 # Sonstige
 # -----------------------------
 .DS_Store
+tmp/
+.env
+.env.*
