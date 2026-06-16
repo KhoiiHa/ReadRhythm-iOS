@@ -50,7 +50,7 @@ public final class NetworkClient: NetworkClientProtocol {
         let start = DispatchTime.now()
         let method = request.httpMethod ?? "GET"
         let urlString = request.url?.absoluteString ?? "<nil>"
-        print("🌐 [HTTP] \(method) \(urlString)")
+        DebugLogger.log("🌐 [HTTP] \(method) \(urlString)")
         #endif
 
         do {
@@ -63,21 +63,21 @@ public final class NetworkClient: NetworkClientProtocol {
             guard (200...299).contains(http.statusCode) else {
                 #if DEBUG
                 let ms = durationMillis(since: start)
-                print("⛔️ [HTTP] \(http.statusCode) in \(ms) ms · \(data.count) bytes")
+                DebugLogger.log("⛔️ [HTTP] \(http.statusCode) in \(ms) ms · \(data.count) bytes")
                 #endif
                 throw NetworkError.httpStatus(code: http.statusCode, data: data)
             }
 
             #if DEBUG
             let ms = durationMillis(since: start)
-            print("✅ [HTTP] \(http.statusCode) in \(ms) ms · \(data.count) bytes")
+            DebugLogger.log("✅ [HTTP] \(http.statusCode) in \(ms) ms · \(data.count) bytes")
             #endif
 
             return (data, http)
         } catch {
             if let urlErr = error as? URLError {
                 #if DEBUG
-                print("⚠️  [HTTP] URLError: \(urlErr.code.rawValue) (\(urlErr.code))")
+                DebugLogger.log("⚠️  [HTTP] URLError: \(urlErr.code.rawValue) (\(urlErr.code))")
                 #endif
                 switch urlErr.code {
                 case .timedOut:   throw NetworkError.timeout

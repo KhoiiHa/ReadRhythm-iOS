@@ -163,7 +163,7 @@ public enum BooksDecoder {
         let books = dto.toRemoteBooks()
 
         #if DEBUG
-        print("🧩 [BooksDecoder] decoded \(books.count) items")
+        DebugLogger.log("🧩 [BooksDecoder] decoded \(books.count) items")
         #endif
 
         return books

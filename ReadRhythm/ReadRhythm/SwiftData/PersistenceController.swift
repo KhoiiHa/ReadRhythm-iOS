@@ -18,8 +18,8 @@ enum PersistenceController {
             )
         } catch {
             #if DEBUG
-            print("[ReadRhythm][SwiftData] ❌ Failed to create persistent ModelContainer: \(error)")
-            print("[ReadRhythm][SwiftData] → Falling back to IN-MEMORY container (no persistence).")
+            DebugLogger.log("[ReadRhythm][SwiftData] ❌ Failed to create persistent ModelContainer: \(error)")
+            DebugLogger.log("[ReadRhythm][SwiftData] → Falling back to IN-MEMORY container (no persistence).")
             #endif
             // Fallback: in-memory container, damit die App launchen kann /
             // Fallback: use an in-memory container so the app can still launch.

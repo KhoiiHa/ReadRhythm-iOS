@@ -27,7 +27,7 @@ final class AppSettingsService: ObservableObject {
         didSet {
             defaults.set(themeMode.rawValue, forKey: Keys.themeMode)
             #if DEBUG
-            print("[AppSettings] Theme updated → \(themeMode.rawValue)")
+            DebugLogger.log("[AppSettings] Theme updated → \(themeMode.rawValue)")
             #endif
         }
     }
@@ -37,7 +37,7 @@ final class AppSettingsService: ObservableObject {
         didSet {
             defaults.set(preferredLanguage, forKey: Keys.language)
             #if DEBUG
-            print("[AppSettings] Language updated → \(preferredLanguage)")
+            DebugLogger.log("[AppSettings] Language updated → \(preferredLanguage)")
             #endif
         }
     }

@@ -51,7 +51,7 @@ public enum ReadingGoalDebugSeed {
         let goal = ReadingGoalEntity(period: .monthly, targetMinutes: 600, targetBooks: nil, isActive: true)
         context.insert(goal)
         try? context.save()
-        print("[DEBUG] Seeded default ReadingGoalEntity: \(goal.period) \(goal.targetMinutes)min")
+        DebugLogger.log("Seeded default ReadingGoalEntity: \(goal.period) \(goal.targetMinutes)min")
     }
 }
 #endif

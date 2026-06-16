@@ -135,7 +135,7 @@ struct AddSessionView: View {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         #endif
         #if DEBUG
-        print("📝 [AddSession] save minutes=\(m) date=\(date.ISO8601Format())")
+        DebugLogger.log("📝 [AddSession] save minutes=\(m) date=\(date.ISO8601Format())")
         #endif
         onSave(m, date)
         dismiss()

@@ -21,7 +21,7 @@ final class AppCoordinator: ObservableObject {
     func open(_ tab: Tab) {
         selectedTab = tab
         #if DEBUG
-        print("[AppCoordinator] switched to tab:", tab)
+        DebugLogger.log("[AppCoordinator] switched to tab: \(tab)")
         #endif
     }
 }

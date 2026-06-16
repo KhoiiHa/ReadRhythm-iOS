@@ -69,7 +69,7 @@ struct EditGoalSheet: View {
         .onAppear {
             draft = vm.editTargetMinutes
             #if DEBUG
-            print("[Goals] Edit sheet appeared with draft=\(draft)")
+            DebugLogger.log("[Goals] Edit sheet appeared with draft=\(draft)")
             #endif
         }
     }
