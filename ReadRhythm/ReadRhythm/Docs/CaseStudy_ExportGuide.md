@@ -71,3 +71,15 @@ Alles darüber hinaus ist eher Case-Study-Material als README-Material.
 Die vorhandene `ReadRhythm_CaseStudy.pdf` bleibt ein gültiger Portfolio-Snapshot.
 Wenn neue Screens exportiert werden, sollte die PDF gezielt aktualisiert werden, statt sie
 mit jedem kleinen Hardening-Commit neu zu erzeugen.
+
+## Aktualisierungsentscheidung
+Die PDF muss nicht nach jedem technischen Hardening neu gebaut werden. Eine Aktualisierung lohnt sich
+erst, wenn mindestens einer dieser Punkte zutrifft:
+
+- Der visuelle Hauptflow hat sich sichtbar verändert.
+- Neue Screenshots sollen aktiv in Bewerbungen, LinkedIn oder Portfolio-Seiten verwendet werden.
+- README und PDF widersprechen sich in Kernfeatures, Projektstatus oder Architektur.
+- App-Store- oder TestFlight-Material wird vorbereitet.
+
+Für kleine README-, Test-, CI- oder Logging-Verbesserungen reicht ein kurzer Hinweis im README.
+Der aktuelle technische Stand bleibt dort und im PR-Verlauf nachvollziehbar.

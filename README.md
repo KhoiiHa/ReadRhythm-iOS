@@ -38,6 +38,12 @@ It combines library management, discovery feeds, statistics and a focus mode —
 [ReadRhythm_CaseStudy.pdf](./ReadRhythm_CaseStudy.pdf)
 
 Die Case Study beinhaltet Architektur, UX, technische Entscheidungen und persönliche Learnings.
+Sie ist ein visueller Portfolio-Snapshot; der aktuellste technische Stand wird im README, in den Tests
+und im PR-Verlauf dokumentiert.
+
+**Hinweis:** Seit dem PDF-Export wurde das Projekt gezielt gehärtet: CI, Tests, Persistenz-Edge-Cases,
+Debug-Logging und README-Kontext wurden nachgeschärft. Die PDF bleibt als visuelle Case Study gültig,
+ersetzt aber nicht den aktuellen Projektstatus.
 
 ---
 
@@ -61,6 +67,7 @@ GitHub Actions runs the unit test suite automatically for pull requests and push
 - Eine echte SwiftUI-App mit mehreren verbundenen Produktflows statt isolierter Screens.
 - MVVM mit Repositories/Services, SwiftData-Persistenz und testbarer Kernlogik.
 - Kleine, nachvollziehbare Hardening-Schritte über Pull Requests, CI und gezielte Tests.
+- Saubere Portfolio-Artefakte: README als aktueller Einstieg, PDF als visuelle Case Study.
 
 **Empfohlene Review-Reihenfolge:**
 1. `README.md` für Produktumfang, Architektur und Teststrategie.
@@ -72,6 +79,19 @@ GitHub Actions runs the unit test suite automatically for pull requests and push
 **Scope-Hinweis:**
 ReadRhythm ist bewusst ein Portfolio-/MVP-Hardening-Projekt, keine vollständig veröffentlichte App-Store-App.
 Der Fokus liegt auf sauberer Architektur, Kernflows, Persistenz, Testing und nachvollziehbaren Produktentscheidungen.
+
+---
+
+## 🖼️ Portfolio-Artefakte · Portfolio Assets
+
+- **README:** Aktueller technischer Einstieg mit Features, Architektur, Teststrategie und Setup.
+- **Case Study PDF:** Visueller Snapshot für UX, Produktidee und Designrichtung.
+- **GitHub Actions:** Aktueller Qualitätsnachweis für Pull Requests und `main`.
+- **PR-Historie:** Zeigt die inkrementelle Arbeitsweise mit kleinen, testbaren Änderungen.
+
+Neue Screenshots oder eine aktualisierte PDF sollten erst erstellt werden, wenn gezielt neues
+Portfolio-Material benötigt wird. Für normale Code-/Doku-Hardening-Schritte bleibt der README
+die maßgebliche Quelle für den aktuellen Stand.
 
 ---
 
