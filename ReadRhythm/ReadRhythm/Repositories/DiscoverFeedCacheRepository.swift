@@ -79,7 +79,7 @@ final class DiscoverFeedCacheRepository {
         try context.save()
 
         #if DEBUG
-        print("🧺 [FeedCache] replaced category=\(categoryID) count=\(books.count)")
+        DebugLogger.log("🧺 [FeedCache] replaced category=\(categoryID) count=\(books.count)")
         #endif
     }
 
@@ -94,7 +94,7 @@ final class DiscoverFeedCacheRepository {
         }
         try context.save()
         #if DEBUG
-        print("🧹 [FeedCache] pruned \(stale.count) items older than \(date)")
+        DebugLogger.log("🧹 [FeedCache] pruned \(stale.count) items older than \(date)")
         #endif
     }
 }

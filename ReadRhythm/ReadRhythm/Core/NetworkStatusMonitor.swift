@@ -48,7 +48,7 @@ public final class NetworkStatusMonitor: NetworkStatusProviding {
             #if DEBUG
             let ifaces = self.availableInterfaces.map { "\($0)" }.joined(separator: ",")
             let status = self._isOnline ? "online" : "offline"
-            print("🌐 [NetworkStatus] \(status) · expensive=\(self.isExpensive) · ifaces=[\(ifaces)]")
+            DebugLogger.log("🌐 [NetworkStatus] \(status) · expensive=\(self.isExpensive) · ifaces=[\(ifaces)]")
             #endif
         }
         monitor.start(queue: queue)

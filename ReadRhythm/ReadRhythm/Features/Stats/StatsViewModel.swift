@@ -38,7 +38,7 @@ final class StatsViewModel: ObservableObject {
         didSet {
             #if DEBUG
             if days < 1 && days != Int.max {
-                print("[StatsViewModel] invalid days=\(days) → clamped to 1")
+                DebugLogger.log("[StatsViewModel] invalid days=\(days) → clamped to 1")
             }
             #endif
             if days < 1 && days != Int.max { days = 1 }

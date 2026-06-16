@@ -192,7 +192,7 @@ struct DiscoverView: View {
             Spacer()
             Button {
                 #if DEBUG
-                print("🔬 [DiscoverView] filter tapped")
+                DebugLogger.log("🔬 [DiscoverView] filter tapped")
                 #endif
                 showFilterSheet = true
             } label: {
@@ -395,4 +395,3 @@ struct DiscoverView: View {
         }
     }
 }
-

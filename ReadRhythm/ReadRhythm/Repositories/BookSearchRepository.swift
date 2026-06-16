@@ -72,7 +72,7 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
         // 1️⃣ Memory Cache / In-Memory-Cache zuerst prüfen
         if let entry = memoryCache[key], Date().timeIntervalSince(entry.timestamp) < memoryTTL {
             #if DEBUG
-            print("💾 [BookSearchRepository] Memory-Hit for \(key)")
+            DebugLogger.log("💾 [BookSearchRepository] Memory-Hit for \(key)")
             #endif
             return entry.items
         }
@@ -85,7 +85,7 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
            Date().timeIntervalSince(first.fetchedAt) < feedTTL {
 
             #if DEBUG
-            print("📦 [BookSearchRepository] FeedCache-Hit for \(key)")
+            DebugLogger.log("📦 [BookSearchRepository] FeedCache-Hit for \(key)")
             #endif
 
             let books = cachedItems.map {
@@ -104,20 +104,20 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
 
         // 3️⃣ API Call (Network) / Netzwerkanfrage
         #if DEBUG
-        print("🌐 [BookSearchRepository] Fetching remote data for \(key)")
+        DebugLogger.log("🌐 [BookSearchRepository] Fetching remote data for \(key)")
         #endif
 
         let data = try await apiClient.search(query: trimmed, maxResults: maxResults)
 
         #if DEBUG
-        print("🔎 [BookSearchRepository] API call succeeded, received \(data.count) bytes. Decoding…")
+        DebugLogger.log("🔎 [BookSearchRepository] API call succeeded, received \(data.count) bytes. Decoding…")
         #endif
 
         let remote = try mapRemoteBooks(from: data)
 
         #if DEBUG
         if remote.isEmpty {
-            print("⚠️ [BookSearchRepository] API returned data but no usable books after mapping for \(key)")
+            DebugLogger.log("⚠️ [BookSearchRepository] API returned data but no usable books after mapping for \(key)")
         }
         #endif
 
@@ -138,7 +138,7 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
         let books = try BooksDecoder.decodeSearchList(from: data)
 
         #if DEBUG
-        print("🌐 [BookSearchRepository] decoded \(books.count) usable books from API response")
+        DebugLogger.log("🌐 [BookSearchRepository] decoded \(books.count) usable books from API response")
         #endif
 
         return books

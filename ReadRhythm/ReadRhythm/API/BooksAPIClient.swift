@@ -52,7 +52,7 @@ public final class BooksAPIClient: BooksAPIClientProtocol {
 
         #if DEBUG
         let ms = durationMillis(since: start)
-        print("🔎 [BooksAPI] search(\"\(query)\") in \(ms) ms · \(data.count) bytes")
+        DebugLogger.log("🔎 [BooksAPI] search(\"\(query)\") in \(ms) ms · \(data.count) bytes")
         #endif
 
         return data
@@ -74,7 +74,7 @@ public final class BooksAPIClient: BooksAPIClientProtocol {
 
         #if DEBUG
         let ms = durationMillis(since: start)
-        print("📘 [BooksAPI] detail(\(id)) in \(ms) ms · \(data.count) bytes")
+        DebugLogger.log("📘 [BooksAPI] detail(\(id)) in \(ms) ms · \(data.count) bytes")
         #endif
 
         return data
