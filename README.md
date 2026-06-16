@@ -55,6 +55,26 @@ GitHub Actions runs the unit test suite automatically for pull requests and push
 
 ---
 
+## 🔎 Schnellreview für Recruiter · Quick Review
+
+**Was dieses Projekt zeigen soll:**
+- Eine echte SwiftUI-App mit mehreren verbundenen Produktflows statt isolierter Screens.
+- MVVM mit Repositories/Services, SwiftData-Persistenz und testbarer Kernlogik.
+- Kleine, nachvollziehbare Hardening-Schritte über Pull Requests, CI und gezielte Tests.
+
+**Empfohlene Review-Reihenfolge:**
+1. `README.md` für Produktumfang, Architektur und Teststrategie.
+2. `ReadRhythm_CaseStudy.pdf` für UX-/Architektur-Kontext.
+3. `ReadRhythm/ReadRhythm/Features` für SwiftUI- und ViewModel-Struktur.
+4. `ReadRhythm/ReadRhythmTests` für Persistenz-, Stats-, Goals- und Service-Tests.
+5. GitHub Actions / Pull Requests für Workflow, CI und inkrementelle Verbesserung.
+
+**Scope-Hinweis:**
+ReadRhythm ist bewusst ein Portfolio-/MVP-Hardening-Projekt, keine vollständig veröffentlichte App-Store-App.
+Der Fokus liegt auf sauberer Architektur, Kernflows, Persistenz, Testing und nachvollziehbaren Produktentscheidungen.
+
+---
+
 ## ✨ Hauptfeatures · Key Features
 
 ### 📚 Bibliothek / Library
@@ -181,6 +201,22 @@ Consistent spacing, shadows and components across the app.
 
 ---
 
+## 🚦 Projektumfang · Product Scope
+
+**Stabilisiert und review-ready:**
+- Library-, Book-Detail-, Session-, History-, Stats-, Goals- und Focus-Flows.
+- SwiftData-basierte Persistenz für Bücher, Sessions und aktive Ziele.
+- Google-Books-gestützte Suche mit Repository-/DTO-Schicht.
+- Lokalisierte UI-Texte, Accessibility-Labels und reduzierte Debug-Ausgaben.
+- Unit-Test-Baseline plus GitHub Actions für Pull Requests und `main`.
+
+**Bewusst nicht finalisiert:**
+- Vollständiger Offline-Discover-Modus.
+- Vollständiger App-Store-Release-Prozess mit Signierung, Datenschutztexten und Store-Metadaten.
+- Breite UI-Test-Suite in CI; UI-Flows bleiben gezielt/lokal, weil sie auf Simulatoren deutlich fragiler sind.
+
+---
+
 ## 🧪 Teststrategie
 
 **Getestete Kernmodule:**
@@ -262,10 +298,28 @@ xcodebuild test \
 
 ## 🔐 Setup
 
-1. Repository klonen
-2. Öffne `ReadRhythm.xcodeproj` in **Xcode 16+**
-3. Zielgerät: **iOS 17+**
-4. Build & Run
+**Voraussetzungen:**
+- macOS mit Xcode 16+.
+- iOS Simulator mit iOS 17+.
+- Keine externen API-Keys erforderlich; Discover nutzt öffentliche Google-Books-Endpunkte.
+
+**Lokal starten:**
+1. Repository klonen.
+2. `ReadRhythm/ReadRhythm.xcodeproj` in Xcode öffnen.
+3. Scheme `ReadRhythm` auswählen.
+4. iPhone-Simulator mit iOS 17+ wählen.
+5. Build & Run.
+
+**Unit-Tests lokal ausführen:**
+
+```bash
+xcodebuild test \
+  -project ReadRhythm/ReadRhythm.xcodeproj \
+  -scheme ReadRhythm \
+  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' \
+  -parallel-testing-enabled NO \
+  -only-testing:ReadRhythmTests
+```
 
 ---
 
