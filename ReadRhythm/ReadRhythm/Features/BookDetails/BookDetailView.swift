@@ -18,7 +18,6 @@ import SwiftData
 struct BookDetailView: View {
     let book: BookEntity
 
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Environment(\.openURL) private var openURL
 
@@ -42,16 +41,6 @@ struct BookDetailView: View {
         .screenBackground()
         .navigationTitle(Text("book.detail.title"))
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                }
-                .accessibilityIdentifier("bookdetail.back")
-            }
-        }
         .onAppear {
             viewModel.bind(context: modelContext)
             loadReadingStats()
