@@ -56,7 +56,7 @@ struct MainTabView: View {
                 MoreView()
             }
             .tabItem {
-                Label("More", systemImage: "ellipsis")
+                Label(LocalizedStringKey("rr.tab.more"), systemImage: "ellipsis")
             }
             .accessibilityIdentifier("tab.more")
         }

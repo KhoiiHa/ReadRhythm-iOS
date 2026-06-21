@@ -63,6 +63,9 @@
 "rr.tab.more" = "Mehr";
 
 // Settings
+"more.subtitle" = "Verwalte dein Leseprofil und passe ReadRhythm an deine Arbeitsweise an.";
+"more.profile.subtitle" = "Insights, Fortschritt und persönliche Lesegewohnheiten.";
+"more.settings.subtitle" = "Theme, Darstellung und App-Einstellungen.";
 "settings.appearance.section" = "Erscheinungsbild";
 "settings.theme.title" = "Theme";
 "settings.theme.system" = "System";
@@ -95,6 +98,7 @@
 "discover.empty.subtitle" = "Passe Suche oder Filter an, um mehr Ergebnisse zu sehen.";
 "discover.empty.resetFilters" = "Filter zurücksetzen";
 "discover.empty.noResultsForCategory" = "Für diese Kategorie wurden keine Bücher gefunden.";
+"error.network.generic" = "Die Suche ist gerade nicht erreichbar. Bitte prüfe deine Verbindung und versuche es erneut.";
 
 "discover.sort.title" = "Sortieren";
 "discover.sort.title.short" = "Sortieren";

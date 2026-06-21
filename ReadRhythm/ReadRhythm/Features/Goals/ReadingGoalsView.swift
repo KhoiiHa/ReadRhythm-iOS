@@ -165,8 +165,7 @@ struct ReadingGoalsView: View {
                         Image(systemName: "slider.horizontal.3")
                     }
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
+                .buttonStyle(PrimaryButtonStyle())
                 .frame(maxWidth: .infinity)
                 .padding(.top, AppSpace.lg)
                 .padding(.horizontal, AppSpace.lg)
@@ -231,6 +230,7 @@ struct ReadingGoalsView: View {
             .accessibilityIdentifier("Goals.Screen")
         }
         .screenBackground()
+        .safeAreaPadding(.bottom, 96)
         .navigationTitle(Text(NSLocalizedString("goals.title", comment: "Lesziele")))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

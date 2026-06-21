@@ -55,6 +55,11 @@
 "rr.tab.profile" = "Profile";
 "rr.tab.more" = "More";
 
+// More
+"more.subtitle" = "Manage your reading profile and tune ReadRhythm to your workflow.";
+"more.profile.subtitle" = "Insights, progress, and personal reading habits.";
+"more.settings.subtitle" = "Theme, appearance, and app settings.";
+
 // Discover
 "discover.sort.byTitle" = "Title";
 "discover.sort.byAuthor" = "Author";
@@ -63,6 +68,7 @@
 "discover.filter.activeCategory" = "Active category";
 "discover.filter.categories" = "Categories";
 "discover.filter.reset" = "Reset filter";
+"error.network.generic" = "Search is currently unavailable. Check your connection and try again.";
 
 // Stats
 "rr.stats.title" = "Reading & Listening Stats";
