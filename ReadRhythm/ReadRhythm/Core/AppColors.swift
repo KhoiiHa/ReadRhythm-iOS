@@ -9,18 +9,18 @@ import SwiftUI
 // Wie: Brand & Neutral leiten Semantic Tokens ab / How: Brand & neutral colors drive semantic tokens
 
 enum AppColors {
-    // MARK: - Brand (Behance-inspiriert) / Brand (Behance-inspired)
+    // MARK: - Brand / Marke
     enum Brand {
-        /// Primär: warmes Rot für Aktionen / Primary: warm red for actions and highlights
+        /// Primär: tiefes Teal für klare Aktionen / Primary: deep teal for clear actions
         static let teal: Color = .dynamic(
-            // Behance-Rot-Verlauf / Behance red gradient
-            light: Color(red: 0.73, green: 0.47, blue: 0.46),   // #BA7876
-            dark:  Color(red: 0.65, green: 0.32, blue: 0.31)    // #A55250
+            light: Color(red: 0.09, green: 0.42, blue: 0.39),   // #176B63
+            dark:  Color(red: 0.29, green: 0.78, blue: 0.72)    // #4AC7B8
         )
-        /// Sekundär: ruhiges Ocker für Akzente / Secondary: calm ochre for accents
+        /// Sekundär: warmes Korall für Listening, Highlights und sekundäre Betonung /
+        /// Secondary: warm coral for listening, highlights, and secondary emphasis
         static let ochre: Color = .dynamic(
-            light: Color(red: 0.83, green: 0.64, blue: 0.31),   // #D4A24F
-            dark:  Color(red: 0.86, green: 0.70, blue: 0.42)    // #DBB369
+            light: Color(red: 0.72, green: 0.28, blue: 0.23),   // #B8473A
+            dark:  Color(red: 0.95, green: 0.52, blue: 0.43)    // #F2856E
         )
 
         // Backwards-Compat für alte Namen / Backwards compatibility for legacy names
@@ -32,28 +32,34 @@ enum AppColors {
     enum Neutral {
         /// Screen-Hintergrund für große Flächen / Screen background for large surfaces
         static let screen: Color = .dynamic(
-            light: Color(red: 0.97, green: 0.95, blue: 0.91),   // #F7F2E8
-            dark:  Color(red: 0.11, green: 0.11, blue: 0.10)    // #1C1C1A
+            light: Color(red: 0.96, green: 0.97, blue: 0.95),   // #F4F7F2
+            dark:  Color(red: 0.06, green: 0.08, blue: 0.08)    // #0F1414
         )
         /// Kartenfläche / Elevated surface color
         static let surface: Color = .dynamic(
-            light: Color(red: 0.91, green: 0.88, blue: 0.84),   // #E7E0D6
-            dark:  Color(red: 0.16, green: 0.16, blue: 0.14)    // #282823
+            light: Color(red: 1.00, green: 0.99, blue: 0.97),   // #FFFDF8
+            dark:  Color(red: 0.11, green: 0.14, blue: 0.13)    // #1C2321
+        )
+        /// Sanft getönte Fläche für Suchfelder, Filter und ruhige Sektionen /
+        /// Soft tinted surface for search fields, filters, and quiet sections
+        static let surfaceMuted: Color = .dynamic(
+            light: Color(red: 0.91, green: 0.94, blue: 0.91),   // #E8EFE8
+            dark:  Color(red: 0.14, green: 0.18, blue: 0.17)    // #242E2B
         )
         /// Rahmen und Separator / Frame and separator color
         static let outline: Color = .dynamic(
-            light: Color(red: 0.72, green: 0.68, blue: 0.63),   // #B7ADA0
-            dark:  Color(red: 0.45, green: 0.43, blue: 0.39)    // #736E63
+            light: Color(red: 0.75, green: 0.80, blue: 0.76),   // #BFCCC1
+            dark:  Color(red: 0.30, green: 0.38, blue: 0.36)    // #4D615C
         )
         /// Primärtext / Primary text color
         static let textPrimary: Color = .dynamic(
-            light: Color(red: 0.14, green: 0.14, blue: 0.12),   // #23231F
-            dark:  Color(red: 0.93, green: 0.92, blue: 0.90)    // #EEECE6
+            light: Color(red: 0.10, green: 0.14, blue: 0.13),   // #1A2421
+            dark:  Color(red: 0.93, green: 0.96, blue: 0.94)    // #EDF5F0
         )
         /// Sekundärtext / Secondary text color
         static let textSecondary: Color = .dynamic(
-            light: Color(red: 0.36, green: 0.35, blue: 0.32),   // #5C5A51
-            dark:  Color(red: 0.79, green: 0.77, blue: 0.72)    // #C9C4B8
+            light: Color(red: 0.34, green: 0.40, blue: 0.37),   // #56665F
+            dark:  Color(red: 0.75, green: 0.82, blue: 0.78)    // #BFCFC7
         )
     }
 
@@ -62,7 +68,7 @@ enum AppColors {
         // Backgrounds / Hintergründe
         static let bgScreen   = Neutral.screen
         static let bgPrimary  = Neutral.screen       // Alias für Bestandscode / Alias for legacy calls
-        static let bgSecondary = Neutral.surface     // Alias für Bestandscode / Alias for legacy calls
+        static let bgSecondary = Neutral.surfaceMuted // Alias für Bestandscode / Alias for legacy calls
         static let bgCard     = Neutral.surface
         // Text / Texte
         static let text       = Neutral.textPrimary
@@ -75,18 +81,16 @@ enum AppColors {
         static let tintSecondary = Brand.ochre
         // Chips / Pills / Chips & Pills styling
         static let chipBg = Color.dynamic(
-            // Behance-Red-Soft (#EFD6D6 / #E4C3C3) / Soft Behance red accent
-            light: Color(red: 0.94, green: 0.84, blue: 0.84),
-            dark:  Color(red: 0.26, green: 0.15, blue: 0.15)
+            light: Color(red: 0.84, green: 0.93, blue: 0.90),   // #D6EEE6
+            dark:  Color(red: 0.10, green: 0.28, blue: 0.26)    // #1A4742
         )
         static let chipFg = Color.dynamic(
-            // Tieferes Rot für Kontrast / Deeper red for contrast
-            light: Color(red: 0.56, green: 0.28, blue: 0.27),   // etwa zwischen 600/700
-            dark:  Color(red: 0.93, green: 0.88, blue: 0.87)
+            light: Color(red: 0.06, green: 0.34, blue: 0.31),   // #0F574F
+            dark:  Color(red: 0.79, green: 0.96, blue: 0.91)    // #C9F5E8
         )
         // Badges (z. B. "Google Books") / Badge styling for meta tags
-        static let badgeBg: Color = Brand.teal.opacity(0.14)
-        static let badgeFg: Color = Brand.teal
+        static let badgeBg: Color = Brand.ochre.opacity(0.14)
+        static let badgeFg: Color = Brand.ochre
         // Separators / Separatoren
         static let borderMuted: Color  = Neutral.outline
         static let borderStrong: Color = Neutral.outline
@@ -98,7 +102,7 @@ enum AppColors {
         // Shadows / Schattenfarben
         static var shadowColor: Color {
             Color(UIColor { trait in
-                let alpha: CGFloat = (trait.userInterfaceStyle == .dark) ? 0.35 : 0.10
+                let alpha: CGFloat = (trait.userInterfaceStyle == .dark) ? 0.42 : 0.12
                 return UIColor.black.withAlphaComponent(alpha)
             })
         }
