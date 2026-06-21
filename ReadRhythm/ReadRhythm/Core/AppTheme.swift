@@ -45,11 +45,11 @@ enum AppSpace {
 enum AppShadow {
     struct Spec { let color: Color; let radius: CGFloat; let x: CGFloat; let y: CGFloat }
     /// Sanfter Schatten für Karten/Tiles / Soft shadow for cards and tiles
-    static let card = Spec(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
-    static let elevation1 = Color.black.opacity(0.08)
-    static let elevation2 = Color.black.opacity(0.12)
-    static let elevation3 = Color.black.opacity(0.16)
-    static let elevation4 = Color.black.opacity(0.20)
+    static let card = Spec(color: Color.black.opacity(0.10), radius: 8, x: 0, y: 4)
+    static let elevation1 = Color.black.opacity(0.06)
+    static let elevation2 = Color.black.opacity(0.10)
+    static let elevation3 = Color.black.opacity(0.14)
+    static let elevation4 = Color.black.opacity(0.18)
 }
 
 // MARK: - Reusable Modifiers / Wiederverwendbare Modifiers
@@ -69,9 +69,9 @@ struct CardBackground: ViewModifier {
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.l)
-                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.5)
+                    .stroke(AppColors.Semantic.borderMuted.opacity(0.75), lineWidth: 0.75)
             )
-            .shadow(color: AppColors.Semantic.shadowColor, radius: 3, x: 0, y: 1)
+            .shadow(color: AppColors.Semantic.shadowColor.opacity(0.9), radius: 8, x: 0, y: 3)
     }
 }
 
@@ -84,7 +84,7 @@ struct MetricTile: ViewModifier {
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.l)
-                    .stroke(AppColors.Semantic.borderMuted, lineWidth: 0.75)
+                    .stroke(AppColors.Semantic.borderMuted.opacity(0.75), lineWidth: 0.75)
             )
     }
 }
