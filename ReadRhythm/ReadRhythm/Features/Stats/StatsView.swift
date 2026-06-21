@@ -47,6 +47,7 @@ struct StatsView: View {
             }
             .padding(.horizontal, AppSpace.lg)
             .padding(.vertical, AppSpace.lg)
+            .padding(.bottom, AppLayout.tabBarContentClearance)
         }
         .background(AppColors.Semantic.bgScreen)
         .tint(AppColors.Semantic.tintPrimary)

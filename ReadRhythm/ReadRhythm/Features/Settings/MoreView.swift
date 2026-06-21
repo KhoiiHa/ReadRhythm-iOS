@@ -51,7 +51,7 @@ struct MoreView: View {
                 .padding(.horizontal, AppSpace._16)
             }
             .padding(.top, AppSpace._16)
-            .padding(.bottom, 120)
+            .padding(.bottom, AppLayout.tabBarContentClearance)
         }
         .screenBackground()
         .tint(AppColors.Semantic.tintPrimary)

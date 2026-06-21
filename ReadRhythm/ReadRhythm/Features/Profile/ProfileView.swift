@@ -28,6 +28,7 @@ struct ProfileView: View {
             }
             .padding(.horizontal, AppSpace.lg)
             .padding(.vertical, AppSpace.lg)
+            .padding(.bottom, AppLayout.tabBarContentClearance)
         }
         .screenBackground()
         .navigationTitle(Text(LocalizedStringKey("profile.title")))

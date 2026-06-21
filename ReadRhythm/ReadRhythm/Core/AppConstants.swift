@@ -42,6 +42,11 @@ enum AppChart {
     static let selectionDotSize: CGFloat = 6
 }
 
+enum AppLayout {
+    /// Zusätzlicher Abstand für Scroll-Inhalte hinter der schwebenden Tab-Bar.
+    static let tabBarContentClearance: CGFloat = 144
+}
+
 /// A11y/HIG-relevante Konstanten / Accessibility constants following Apple HIG.
 enum AppA11y {
     /// Mindest-Tap-Fläche laut Apple HIG / Minimum tap height following Apple HIG
