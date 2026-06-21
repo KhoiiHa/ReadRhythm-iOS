@@ -51,23 +51,18 @@ struct BookRowView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            AppColors.Semantic.bgCard.opacity(0.96),
-                            AppColors.Semantic.bgCard.opacity(1.0)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
+                .fill(AppColors.Semantic.bgCard)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                        .stroke(AppColors.Semantic.borderMuted.opacity(0.75), lineWidth: AppStroke.cardBorder)
                 )
                 .shadow(
-                    color: AppColors.Semantic.shadow.opacity(0.12),
-                    radius: 8,
+                    color: AppColors.Semantic.shadowColor.opacity(0.85),
+                    radius: 10,
                     x: 0,
-                    y: 4
+                    y: 5
                 )
-            HStack(spacing: 12) {
+            HStack(spacing: AppSpace._12) {
                 // <-- kleines Cover
                 LibraryRowCoverArtwork(
                     thumbnailURL: thumbnailURL,
@@ -100,9 +95,13 @@ struct BookRowView: View {
                             .padding(.vertical, 6)
                             .background(
                                 Capsule()
-                                    .fill(AppColors.Brand.primary.opacity(0.08))
+                                    .fill(AppColors.Semantic.badgeBg)
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(AppColors.Semantic.badgeBg.opacity(0.7), lineWidth: AppStroke.cardBorder)
+                                    )
                             )
-                            .foregroundStyle(AppColors.Brand.primary)
+                            .foregroundStyle(AppColors.Semantic.badgeFg)
                             .padding(.top, 4)
                             .accessibilityIdentifier("library.row.badge.google.\(book.persistentModelID.hashValue)")
                     }
@@ -110,10 +109,10 @@ struct BookRowView: View {
 
                 Spacer()
             }
-            .padding(.vertical, 10)
-            .padding(.horizontal, 16)
+            .padding(.vertical, AppSpace._12)
+            .padding(.horizontal, AppSpace._16)
         }
-        .contentShape(RoundedRectangle(cornerRadius: AppRadius.m, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous))
         .accessibilityLabel(Text("\(book.title), \(authorText)"))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("library.row.\(book.persistentModelID.hashValue)")
@@ -129,14 +128,24 @@ private struct LibraryRowCoverPlaceholder: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
-                .fill(AppColors.Semantic.bgCard)
-
-            RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
-                .strokeBorder(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            AppColors.Semantic.bgSecondary,
+                            AppColors.Semantic.chipBg.opacity(0.85)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
+                        .strokeBorder(AppColors.Semantic.borderMuted.opacity(0.75), lineWidth: AppStroke.cardBorder)
+                )
 
             Text(initials)
                 .font(AppFont.headingS())
-                .foregroundStyle(AppColors.Semantic.textSecondary)
+                .foregroundStyle(AppColors.Semantic.tintPrimary)
         }
     }
 }
@@ -162,10 +171,10 @@ private struct LibraryRowCoverArtwork: View {
                     switch phase {
                     case .empty:
                         RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
-                            .fill(AppColors.Semantic.bgCard)
+                            .fill(AppColors.Semantic.bgSecondary)
                             .overlay(
                                 RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
-                                    .strokeBorder(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
+                                    .strokeBorder(AppColors.Semantic.borderMuted.opacity(0.75), lineWidth: AppStroke.cardBorder)
                             )
                     case .success(let image):
                         image
@@ -176,7 +185,7 @@ private struct LibraryRowCoverArtwork: View {
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: AppRadius.s, style: .continuous)
-                                    .strokeBorder(AppColors.Semantic.chipBg.opacity(0.6), lineWidth: AppStroke.cardBorder)
+                                    .strokeBorder(AppColors.Semantic.borderMuted.opacity(0.75), lineWidth: AppStroke.cardBorder)
                             )
                     case .failure:
                         LibraryRowCoverPlaceholder(initials: initials)

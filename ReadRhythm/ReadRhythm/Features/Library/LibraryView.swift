@@ -123,30 +123,58 @@ private struct LibraryEmptyStateView: View {
     let onAddTapped: () -> Void
 
     var body: some View {
-        VStack(spacing: AppSpace._12) {
-            Image(systemName: "books.vertical")
-                .font(.system(size: 44))
-                .foregroundStyle(AppColors.Semantic.textSecondary)
+        VStack {
+            Spacer(minLength: 0)
 
-            Text(LocalizedStringKey("library.empty.title"))
-                .font(AppFont.headingS())
+            VStack(spacing: AppSpace._16) {
+                ZStack {
+                    Circle()
+                        .fill(AppColors.Semantic.tintPrimary.opacity(0.12))
+                        .frame(width: 72, height: 72)
 
-            Text(LocalizedStringKey("library.empty.subtitle"))
-                .font(AppFont.bodyStandard())
-                .foregroundStyle(AppColors.Semantic.textSecondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, AppSpace._16)
+                    Image(systemName: "books.vertical.fill")
+                        .font(.system(size: 34, weight: .semibold))
+                        .foregroundStyle(AppColors.Semantic.tintPrimary)
+                }
+                .accessibilityHidden(true)
 
-            Button {
-                #if os(iOS)
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                #endif
-                onAddTapped()
-            } label: {
-                Label(LocalizedStringKey("library.empty.add"), systemImage: "plus")
+                VStack(spacing: AppSpace._8) {
+                    Text(LocalizedStringKey("library.empty.title"))
+                        .font(AppFont.headingS())
+                        .foregroundStyle(AppColors.Semantic.textPrimary)
+
+                    Text(LocalizedStringKey("library.empty.subtitle"))
+                        .font(AppFont.bodyStandard())
+                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Button {
+                    #if os(iOS)
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    #endif
+                    onAddTapped()
+                } label: {
+                    Label(LocalizedStringKey("library.empty.add"), systemImage: "plus")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                .accessibilityIdentifier("library.empty.add")
             }
-            .buttonStyle(.borderedProminent)
-            .accessibilityIdentifier("library.empty.add")
+            .padding(AppSpace._24)
+            .frame(maxWidth: 360)
+            .background(
+                RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                    .fill(AppColors.Semantic.bgCard)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                            .stroke(AppColors.Semantic.borderMuted.opacity(0.75), lineWidth: AppStroke.cardBorder)
+                    )
+                    .shadow(color: AppColors.Semantic.shadowColor.opacity(0.9), radius: 12, x: 0, y: 6)
+            )
+
+            Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, AppSpace._16)

@@ -119,6 +119,7 @@ struct BookDetailView: View {
                 width: 140,
                 height: 200
             )
+            .shadow(color: AppColors.Semantic.shadowColor.opacity(0.35), radius: 14, x: 0, y: 8)
             .accessibilityHidden(true)
 
             // Titel / Untertitel / Autor zentriert unter dem Cover
@@ -169,11 +170,24 @@ struct BookDetailView: View {
             .frame(maxWidth: .infinity, alignment: .center)
         }
         .frame(maxWidth: .infinity, alignment: .center)
-        .padding(AppSpace._16)
+        .padding(AppSpace._20)
         .background(
-            RoundedRectangle(cornerRadius: AppRadius.l)
-                .fill(AppColors.Semantic.bgCard)
-                .shadow(color: AppColors.Semantic.shadowColor.opacity(0.12), radius: 10, x: 0, y: 6)
+            RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            AppColors.Semantic.bgCard,
+                            AppColors.Semantic.bgSecondary.opacity(0.95)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)
+                        .stroke(AppColors.Semantic.borderMuted.opacity(0.75), lineWidth: AppStroke.cardBorder)
+                )
+                .shadow(color: AppColors.Semantic.shadowColor.opacity(0.9), radius: 14, x: 0, y: 7)
         )
     }
 
@@ -231,8 +245,7 @@ struct BookDetailView: View {
                     .font(AppFont.bodyStandard(.semibold))
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
-            .buttonBorderShape(.roundedRectangle(radius: AppRadius.s))
+            .buttonStyle(PrimaryButtonStyle())
             .accessibilityIdentifier("bookdetail.addSession")
 
             if let addedText = addedOnText {
@@ -314,8 +327,7 @@ struct BookDetailView: View {
                         .font(AppFont.caption2(.semibold))
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.roundedRectangle(radius: AppRadius.s))
+                .buttonStyle(SecondaryButtonStyle())
                 .accessibilityIdentifier("detail.openInGoogleBooks")
             }
         }
@@ -392,7 +404,8 @@ struct BookDetailView: View {
     private func infoRow(icon: String, text: Text) -> some View {
         HStack(spacing: AppSpace._8) {
             Image(systemName: icon)
-                .foregroundStyle(AppColors.Semantic.textSecondary)
+                .frame(width: 22)
+                .foregroundStyle(AppColors.Semantic.tintPrimary)
             text
                 .font(AppFont.bodyStandard())
                 .foregroundStyle(AppColors.Semantic.textSecondary)
