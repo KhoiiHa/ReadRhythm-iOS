@@ -226,11 +226,10 @@ struct ReadingGoalsView: View {
                 Spacer(minLength: AppSpace.xl)
             }
             .frame(maxWidth: .infinity)
-            .padding(.bottom, AppSpace.xl)
+            .padding(.bottom, AppLayout.tabBarContentClearance)
             .accessibilityIdentifier("Goals.Screen")
         }
         .screenBackground()
-        .safeAreaPadding(.bottom, 96)
         .navigationTitle(Text(NSLocalizedString("goals.title", comment: "Lesziele")))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

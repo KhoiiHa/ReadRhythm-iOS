@@ -37,6 +37,7 @@ struct BookDetailView: View {
             }
             .padding(.horizontal, AppSpace._16)
             .padding(.vertical, AppSpace._16)
+            .padding(.bottom, AppLayout.tabBarContentClearance)
         }
         .screenBackground()
         .navigationTitle(Text("book.detail.title"))

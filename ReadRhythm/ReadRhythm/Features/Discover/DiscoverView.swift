@@ -125,6 +125,7 @@ struct DiscoverView: View {
             }
             .padding(.horizontal, AppSpace._16)
             .padding(.vertical, AppSpace._16)
+            .padding(.bottom, AppLayout.tabBarContentClearance)
         }
         .padding(.top, AppSpace._24)
         .background(AppColors.Semantic.bgScreen)
