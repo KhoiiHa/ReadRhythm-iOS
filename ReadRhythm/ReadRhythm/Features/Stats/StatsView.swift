@@ -69,7 +69,7 @@ struct StatsView: View {
         VStack(alignment: .leading, spacing: AppSpace.lg) {
             headerSection
 
-            if viewModel.daily.allSatisfy({ $0.minutes == 0 }) || viewModel.daily.isEmpty {
+            if !viewModel.hasData() {
                 StatsEmptyState()
                     .padding(.top, AppSpace.md)
             } else {

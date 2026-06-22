@@ -224,6 +224,26 @@ final class ReadRhythmTests: XCTestCase {
         XCTAssertEqual(viewModel.currentStreak, 1)
     }
 
+    func testStatsViewModel_WhenAllTimeSelected_ThenIncludesSessionsOutsideChartWindow() throws {
+        let repository = LocalSessionRepository(context: context)
+        let viewModel = StatsViewModel(
+            sessionRepository: repository,
+            statsService: .shared
+        )
+        let oldDate = Calendar.current.date(byAdding: .day, value: -180, to: Date())!
+
+        try repository.saveSession(book: nil, minutes: 45, date: oldDate, medium: "reading")
+        try repository.saveSession(book: nil, minutes: 20, date: Date(), medium: "listening")
+
+        viewModel.refreshFromRepositoryContext(days: Int.max)
+
+        XCTAssertTrue(viewModel.hasData())
+        XCTAssertEqual(viewModel.totalMinutes, 65)
+        XCTAssertEqual(viewModel.totalReadingMinutes, 45)
+        XCTAssertEqual(viewModel.totalListeningMinutes, 20)
+        XCTAssertEqual(viewModel.combinedTotalMinutes, 65)
+    }
+
     private func makeRemoteBook(id: String, title: String) -> RemoteBook {
         RemoteBook(
             id: id,

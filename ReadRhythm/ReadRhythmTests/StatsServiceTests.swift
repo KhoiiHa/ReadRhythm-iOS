@@ -71,4 +71,17 @@ final class StatsServiceTests: XCTestCase {
         let totalAllTime = StatsService.shared.totalMinutes(context: context, days: nil)
         XCTAssertEqual(totalAllTime, 100)
     }
+
+    func testTotalMinutesByMedium_WhenNoWindowProvided_ThenIncludesOlderSessions() throws {
+        let today = calendar.startOfDay(for: Date())
+        let olderThanChartWindow = calendar.date(byAdding: .day, value: -180, to: today)!
+
+        try repository.saveSession(book: nil, minutes: 40, date: olderThanChartWindow, medium: "reading")
+        try repository.saveSession(book: nil, minutes: 15, date: today, medium: "listening")
+
+        let totals = StatsService.shared.totalMinutesByMedium(context: context, days: nil)
+
+        XCTAssertEqual(totals.reading, 40)
+        XCTAssertEqual(totals.listening, 15)
+    }
 }

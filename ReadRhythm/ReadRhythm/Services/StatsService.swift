@@ -99,6 +99,35 @@ final class StatsService {
         }
     }
 
+    /// Summiert Minuten getrennt nach Medium – optional für ein Zeitfenster, sonst "All time".
+    func totalMinutesByMedium(context: ModelContext, days: Int? = nil) -> (reading: Int, listening: Int) {
+        if let d = days {
+            let stats = fetchDailyStats(context: context, days: d)
+            let reading = stats.reduce(0) { $0 + $1.readingMinutes }
+            let listening = stats.reduce(0) { $0 + $1.listeningMinutes }
+            return (reading, listening)
+        }
+
+        do {
+            let descriptor = FetchDescriptor<ReadingSessionEntity>()
+            let sessions = try context.fetch(descriptor)
+
+            return sessions.reduce(into: (reading: 0, listening: 0)) { result, session in
+                switch session.medium {
+                case "listening":
+                    result.listening += session.minutes
+                default:
+                    result.reading += session.minutes
+                }
+            }
+        } catch {
+            #if DEBUG
+            DebugLogger.log("⚠️ Fehler beim Summieren der Minuten nach Medium: \(error)")
+            #endif
+            return (0, 0)
+        }
+    }
+
     // MARK: - Goals Helpers (date-range based)
     /// Summe der Leseminuten im [start, end) Intervall (halb-offen).
     /// - Parameters:

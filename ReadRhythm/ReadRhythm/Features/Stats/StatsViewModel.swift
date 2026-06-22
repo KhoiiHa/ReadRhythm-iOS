@@ -56,7 +56,7 @@ final class StatsViewModel: ObservableObject {
     // MARK: - Convenience
     /// True, wenn es mindestens einen Tag mit >0 Minuten gibt
     func hasData() -> Bool {
-        daily.contains { $0.minutes > 0 }
+        totalMinutes > 0 || daily.contains { $0.minutes > 0 }
     }
 
     /// Liefert die Anzahl der Tage basierend auf UI-Auswahl (z. B. Woche, Monat, Jahr, Gesamt).
@@ -89,17 +89,21 @@ final class StatsViewModel: ObservableObject {
     func refreshFromRepositoryContext() {
         // Performance-Schutz: clamp der gewünschten Tage
         let window = safeDays(for: days)
+        let isAllTime = days == Int.max
 
         // Hole aggregierte Tageswerte über den StatsService.
         let items = statsService.minutesPerDay(context: context, days: window)
         daily = items
 
-        let combined = items.reduce(0) { $0 + $1.minutes }
-        totalMinutes = combined
+        let mediumTotals = statsService.totalMinutesByMedium(
+            context: context,
+            days: isAllTime ? nil : window
+        )
+        let combined = mediumTotals.reading + mediumTotals.listening
 
-        // Platzhalter bis der StatsService Lesen/Hören trennt
-        totalReadingMinutes = combined
-        totalListeningMinutes = 0
+        totalMinutes = combined
+        totalReadingMinutes = mediumTotals.reading
+        totalListeningMinutes = mediumTotals.listening
         combinedTotalMinutes = combined
 
         currentStreak = statsService.currentStreak(context: context)
