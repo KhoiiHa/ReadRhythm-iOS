@@ -134,6 +134,34 @@ final class ReadRhythmTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, "error.network.generic")
     }
 
+    func testDiscoverSearch_WhenRetryAfterFailure_ThenUsesSameQueryAndShowsResults() async throws {
+        let recoveredRemote = makeRemoteBook(id: "retry-result", title: "Recovered Result")
+        let searchRepository = SequencedBookSearchRepository(results: [
+            .failure(StubSearchError.failed),
+            .success([recoveredRemote])
+        ])
+        let viewModel = DiscoverViewModel(
+            repository: LocalBookRepository(context: context),
+            bookSearchRepository: searchRepository
+        )
+
+        viewModel.searchQuery = "recovery"
+        viewModel.applySearch()
+
+        try await waitUntil { viewModel.isLoading == false }
+
+        XCTAssertEqual(viewModel.errorMessage, "error.network.generic")
+        XCTAssertTrue(viewModel.results.isEmpty)
+
+        viewModel.applySearch()
+
+        try await waitUntil { viewModel.results == [recoveredRemote] }
+
+        XCTAssertEqual(searchRepository.receivedQueries, ["recovery", "recovery"])
+        XCTAssertNil(viewModel.errorMessage)
+        XCTAssertEqual(viewModel.results, [recoveredRemote])
+    }
+
     func testAddToLibrary_WhenSameRemoteBookAddedTwice_ThenSecondCallIsDuplicate() {
         let viewModel = DiscoverViewModel(repository: LocalBookRepository(context: context))
         let remote = makeRemoteBook(id: "remote-duplicate", title: "Duplicate Book")
@@ -295,6 +323,23 @@ private final class StubBookSearchRepository: BookSearchRepositoryProtocol {
     func search(query: String?, category: DiscoverCategory?, maxResults: Int) async throws -> [RemoteBook] {
         receivedQueries.append(query ?? "")
         return try result.get()
+    }
+}
+
+@MainActor
+private final class SequencedBookSearchRepository: BookSearchRepositoryProtocol {
+    private var results: [Result<[RemoteBook], Error>]
+    private(set) var receivedQueries: [String] = []
+
+    init(results: [Result<[RemoteBook], Error>]) {
+        self.results = results
+    }
+
+    func search(query: String?, category: DiscoverCategory?, maxResults: Int) async throws -> [RemoteBook] {
+        receivedQueries.append(query ?? "")
+
+        guard results.isEmpty == false else { return [] }
+        return try results.removeFirst().get()
     }
 }
 

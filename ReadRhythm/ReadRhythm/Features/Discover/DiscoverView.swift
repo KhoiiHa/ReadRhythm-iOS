@@ -47,9 +47,7 @@ struct DiscoverView: View {
                     ProgressView(LocalizedStringKey("discover.loading"))
                         .frame(maxWidth: .infinity, minHeight: 120)
                 } else if let msg = viewModel.errorMessage {
-                    Text(LocalizedStringKey(msg))
-                        .font(AppFont.caption2())
-                        .foregroundStyle(AppColors.Semantic.textSecondary)
+                    errorState(messageKey: msg)
                 } else if !viewModel.results.isEmpty {
                     sectionCard {
                         DiscoverSectionHeader(
@@ -337,6 +335,47 @@ struct DiscoverView: View {
         .frame(maxWidth: .infinity, minHeight: 320)
         .accessibilityIdentifier("discover.empty")
     }
+
+    private func errorState(messageKey: String) -> some View {
+        VStack(spacing: AppSpace._16) {
+            Image(systemName: "wifi.exclamationmark")
+                .font(.system(size: 36, weight: .semibold))
+                .foregroundStyle(AppColors.Semantic.tintSecondary)
+                .accessibilityHidden(true)
+
+            VStack(spacing: AppSpace._8) {
+                Text(LocalizedStringKey("discover.error.generic"))
+                    .font(AppFont.headingS())
+                    .foregroundStyle(AppColors.Semantic.textPrimary)
+
+                Text(LocalizedStringKey(messageKey))
+                    .font(AppFont.bodyStandard())
+                    .foregroundStyle(AppColors.Semantic.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Button {
+                viewModel.applySearch()
+            } label: {
+                Label(LocalizedStringKey("common.retry"), systemImage: "arrow.clockwise")
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.regular)
+            .accessibilityIdentifier("discover.error.retry")
+        }
+        .padding(AppSpace._20)
+        .frame(maxWidth: .infinity, minHeight: 220)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                .fill(AppColors.Semantic.bgCard)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                        .stroke(AppColors.Semantic.borderMuted.opacity(0.75), lineWidth: 0.75)
+                )
+        )
+        .accessibilityIdentifier("discover.error")
+    }
     
     /// Spezifischer leerer Zustand: aktive Suche / Kategorie liefert nichts
     private var noResultsForCategory: some View {
@@ -350,7 +389,19 @@ struct DiscoverView: View {
                 .foregroundStyle(AppColors.Semantic.textSecondary)
                 .multilineTextAlignment(.center)
 
-            // Optional später: Button "Filter zurücksetzen"
+            Button {
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    viewModel.searchQuery = ""
+                    viewModel.applyFilter(category: nil)
+                }
+            } label: {
+                Label(
+                    LocalizedStringKey("discover.empty.resetFilters"),
+                    systemImage: "arrow.counterclockwise"
+                )
+            }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("discover.empty.resetFilters")
         }
         .frame(maxWidth: .infinity, minHeight: 200)
         .accessibilityIdentifier("discover.empty.category")
