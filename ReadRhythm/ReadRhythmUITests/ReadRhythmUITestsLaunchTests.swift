@@ -18,21 +18,28 @@ final class ReadRhythmUITestsLaunchTests: XCTestCase {
         let tabBar = app.tabBars.firstMatch
         XCTAssertTrue(tabBar.waitForExistence(timeout: 6), "Expected tab bar to be present on launch")
 
-        let tabs: [(identifier: String, fallbackLabel: String)] = [
-            ("tab.library", "Bibliothek"),
-            ("tab.discover", "Entdecken"),
-            ("tab.stats", "Statistiken"),
-            ("tab.more", "More")
+        let tabs: [(identifier: String, fallbackLabels: [String])] = [
+            ("tab.library", ["Bibliothek", "Library"]),
+            ("tab.discover", ["Entdecken", "Discover"]),
+            ("tab.stats", ["Statistiken", "Stats"]),
+            ("tab.more", ["Mehr", "More"])
         ]
 
         for tab in tabs {
+            let fallbackDescription = tab.fallbackLabels.joined(separator: ", ")
             var tabButton = tabBar.buttons.matching(identifier: tab.identifier).firstMatch
             if !tabButton.exists {
-                tabButton = tabBar.buttons[tab.fallbackLabel]
+                for label in tab.fallbackLabels {
+                    let localizedButton = tabBar.buttons[label]
+                    if localizedButton.exists {
+                        tabButton = localizedButton
+                        break
+                    }
+                }
             }
             XCTAssertTrue(
                 tabButton.waitForExistence(timeout: 6),
-                "Expected tab \(tab.identifier) / \(tab.fallbackLabel) to be present on launch"
+                "Expected tab \(tab.identifier) / \(fallbackDescription) to be present on launch"
             )
         }
 

@@ -14,10 +14,10 @@ final class ReadRhythmUITests: XCTestCase {
         let tabBar = app.tabBars.firstMatch
         waitForExistence(of: tabBar)
 
-        assertTabExists(in: tabBar, identifier: "tab.library", fallbackLabel: "Bibliothek")
-        assertTabExists(in: tabBar, identifier: "tab.discover", fallbackLabel: "Entdecken")
-        assertTabExists(in: tabBar, identifier: "tab.stats", fallbackLabel: "Statistiken")
-        assertTabExists(in: tabBar, identifier: "tab.more", fallbackLabel: "More")
+        assertTabExists(in: tabBar, identifier: "tab.library", fallbackLabels: ["Bibliothek", "Library"])
+        assertTabExists(in: tabBar, identifier: "tab.discover", fallbackLabels: ["Entdecken", "Discover"])
+        assertTabExists(in: tabBar, identifier: "tab.stats", fallbackLabels: ["Statistiken", "Stats"])
+        assertTabExists(in: tabBar, identifier: "tab.more", fallbackLabels: ["Mehr", "More"])
     }
 
     // MARK: - Focus Mode
@@ -26,7 +26,7 @@ final class ReadRhythmUITests: XCTestCase {
     func testFocusMode_StartsAndStopsTimer() throws {
         let app = launchApp()
 
-        tapTab(app, identifier: "tab.goals", fallbackLabel: "Ziele")
+        tapTab(app, identifier: "tab.goals", fallbackLabels: ["Ziele", "Goals"])
 
         let goalsScreen = element(in: app, identifier: "Goals.Screen")
         waitForExistence(of: goalsScreen)
@@ -98,7 +98,7 @@ final class ReadRhythmUITests: XCTestCase {
     func testStatsView_ChartVisibleAndRangeSwitches() throws {
         let app = launchApp()
 
-        tapTab(app, identifier: "tab.stats", fallbackLabel: "Statistiken")
+        tapTab(app, identifier: "tab.stats", fallbackLabels: ["Statistiken", "Stats"])
 
         let statsView = element(in: app, identifier: "stats.view")
         waitForExistence(of: statsView)
@@ -186,22 +186,28 @@ final class ReadRhythmUITests: XCTestCase {
     }
 
     @MainActor
-    private func tapTab(_ app: XCUIApplication, identifier: String, fallbackLabel: String) {
+    private func tapTab(_ app: XCUIApplication, identifier: String, fallbackLabels: [String]) {
         let tabBar = app.tabBars.firstMatch
         waitForExistence(of: tabBar)
 
-        var tabButton = tabBar.buttons[fallbackLabel]
-        if !tabButton.exists {
-            tabButton = tabBar.buttons.matching(identifier: identifier).firstMatch
-        }
+        var tabButton = tabBar.buttons.matching(identifier: identifier).firstMatch
         if !tabButton.isHittable {
-            let identifierButton = tabBar.buttons.matching(identifier: identifier).firstMatch
-            if identifierButton.exists && identifierButton.isHittable {
-                tabButton = identifierButton
+            for label in fallbackLabels {
+                let localizedButton = tabBar.buttons[label]
+                if localizedButton.exists && localizedButton.isHittable {
+                    tabButton = localizedButton
+                    break
+                }
             }
         }
         if !tabButton.exists {
-            tabButton = tabBar.buttons[fallbackLabel]
+            for label in fallbackLabels {
+                let localizedButton = tabBar.buttons[label]
+                if localizedButton.exists {
+                    tabButton = localizedButton
+                    break
+                }
+            }
         }
         waitForExistence(of: tabButton)
         tabButton.tap()
@@ -209,22 +215,31 @@ final class ReadRhythmUITests: XCTestCase {
 
     @MainActor
     private func openProfileFromMore(in app: XCUIApplication) {
-        tapTab(app, identifier: "tab.more", fallbackLabel: "More")
+        tapTab(app, identifier: "tab.more", fallbackLabels: ["Mehr", "More"])
+
+        let moreView = element(in: app, identifier: "more.view")
+        waitForExistence(of: moreView)
 
         if element(in: app, identifier: "Profile.Metrics").exists {
             return
         }
 
-        let profileLink = app.buttons["Profil"]
+        let profileLink = button(in: app, identifiers: ["more.row.rr.tab.profile", "Profil", "Profile"])
         waitForExistence(of: profileLink)
         profileLink.tap()
     }
 
     @MainActor
-    private func assertTabExists(in tabBar: XCUIElement, identifier: String, fallbackLabel: String) {
+    private func assertTabExists(in tabBar: XCUIElement, identifier: String, fallbackLabels: [String]) {
         var tabButton = tabBar.buttons.matching(identifier: identifier).firstMatch
         if !tabButton.exists {
-            tabButton = tabBar.buttons[fallbackLabel]
+            for label in fallbackLabels {
+                let localizedButton = tabBar.buttons[label]
+                if localizedButton.exists {
+                    tabButton = localizedButton
+                    break
+                }
+            }
         }
         waitForExistence(of: tabButton)
         XCTAssertTrue(tabButton.exists)

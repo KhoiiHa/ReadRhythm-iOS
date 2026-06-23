@@ -103,5 +103,6 @@ private struct MoreRow<Destination: View>: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("more.row.\(titleKey)")
     }
 }
