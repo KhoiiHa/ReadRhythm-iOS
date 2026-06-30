@@ -17,7 +17,7 @@ final class ReadRhythmUITests: XCTestCase {
         assertTabExists(in: tabBar, identifier: "tab.library", fallbackLabel: "Bibliothek")
         assertTabExists(in: tabBar, identifier: "tab.discover", fallbackLabel: "Entdecken")
         assertTabExists(in: tabBar, identifier: "tab.stats", fallbackLabel: "Statistiken")
-        assertTabExists(in: tabBar, identifier: "tab.more", fallbackLabel: "More")
+        assertTabExists(in: tabBar, identifier: "tab.more", fallbackLabel: "Mehr")
     }
 
     // MARK: - Focus Mode
@@ -209,13 +209,16 @@ final class ReadRhythmUITests: XCTestCase {
 
     @MainActor
     private func openProfileFromMore(in app: XCUIApplication) {
-        tapTab(app, identifier: "tab.more", fallbackLabel: "More")
+        tapTab(app, identifier: "tab.more", fallbackLabel: "Mehr")
 
         if element(in: app, identifier: "Profile.Metrics").exists {
             return
         }
 
-        let profileLink = app.buttons["Profil"]
+        var profileLink = app.buttons["More.ProfileLink"]
+        if !profileLink.exists {
+            profileLink = app.buttons["Profil"]
+        }
         waitForExistence(of: profileLink)
         profileLink.tap()
     }
