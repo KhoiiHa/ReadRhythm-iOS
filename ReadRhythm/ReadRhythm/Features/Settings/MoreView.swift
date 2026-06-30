@@ -27,6 +27,7 @@ struct MoreView: View {
                     ) {
                         ProfileView(context: context)
                     }
+                    .accessibilityIdentifier("More.ProfileLink")
 
                     Divider()
                         .padding(.leading, 72)
@@ -38,6 +39,7 @@ struct MoreView: View {
                     ) {
                         SettingsView()
                     }
+                    .accessibilityIdentifier("More.SettingsLink")
                 }
                 .background(
                     RoundedRectangle(cornerRadius: AppRadius.l, style: .continuous)

@@ -290,6 +290,16 @@ final class ReadRhythmTests: XCTestCase {
         XCTAssertEqual(goals.count, 1)
     }
 
+    func testDebugDemoDataSeeder_WhenStoreIsEmpty_ThenUsesReaderCompatibleBookIDs() throws {
+        DebugDemoDataSeeder.seedIfNeeded(in: context)
+
+        let books = try context.fetch(FetchDescriptor<BookEntity>())
+        let sourceIDs = Set(books.map(\.sourceID))
+
+        XCTAssertTrue(sourceIDs.contains("demo-atomic-habits"))
+        XCTAssertTrue(sourceIDs.contains("demo-deep-work"))
+    }
+
     func testDebugDemoDataSeeder_WhenLibraryHasUserBook_ThenSkipsSeeding() throws {
         _ = try makeLocalBook()
 

@@ -32,7 +32,7 @@ enum DebugDemoDataSeeder {
     private static func demoBooks() -> [BookEntity] {
         [
             BookEntity(
-                sourceID: "debug-demo-atomic-habits",
+                sourceID: "demo-atomic-habits",
                 title: "Atomic Habits",
                 author: "James Clear",
                 thumbnailURL: "https://books.google.com/books/content?id=fFCjDQAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
@@ -49,7 +49,7 @@ enum DebugDemoDataSeeder {
                 previewLink: URL(string: "https://books.google.com/books?id=fFCjDQAAQBAJ")
             ),
             BookEntity(
-                sourceID: "debug-demo-deep-work",
+                sourceID: "demo-deep-work",
                 title: "Deep Work",
                 author: "Cal Newport",
                 thumbnailURL: "https://books.google.com/books/content?id=xJY4EAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
