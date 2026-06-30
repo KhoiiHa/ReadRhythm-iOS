@@ -107,13 +107,38 @@ final class BookSearchRepository: BookSearchRepositoryProtocol {
         DebugLogger.log("🌐 [BookSearchRepository] Fetching remote data for \(key)")
         #endif
 
-        let data = try await apiClient.search(query: trimmed, maxResults: maxResults)
+        let data: Data
+        do {
+            data = try await apiClient.search(query: trimmed, maxResults: maxResults)
+        } catch {
+            #if DEBUG
+            let fallback = DiscoverSampleBooks.results(for: trimmed, category: category, limit: maxResults)
+            if fallback.isEmpty == false {
+                DebugLogger.log("🧪 [BookSearchRepository] API failed, using \(fallback.count) debug sample books for \(key)")
+                memoryCache[key] = CacheEntry(timestamp: .now, items: fallback)
+                return fallback
+            }
+            #endif
+
+            throw error
+        }
 
         #if DEBUG
         DebugLogger.log("🔎 [BookSearchRepository] API call succeeded, received \(data.count) bytes. Decoding…")
         #endif
 
         let remote = try mapRemoteBooks(from: data)
+
+        #if DEBUG
+        if remote.isEmpty {
+            let fallback = DiscoverSampleBooks.results(for: trimmed, category: category, limit: maxResults)
+            if fallback.isEmpty == false {
+                DebugLogger.log("🧪 [BookSearchRepository] API returned no usable books, using \(fallback.count) debug sample books for \(key)")
+                memoryCache[key] = CacheEntry(timestamp: .now, items: fallback)
+                return fallback
+            }
+        }
+        #endif
 
         #if DEBUG
         if remote.isEmpty {

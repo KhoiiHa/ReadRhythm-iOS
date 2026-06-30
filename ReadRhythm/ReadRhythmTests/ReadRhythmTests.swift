@@ -134,6 +134,43 @@ final class ReadRhythmTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, "error.network.generic")
     }
 
+    func testBookSearchRepository_WhenAPIThrowsInDebug_ThenReturnsSampleBooks() async throws {
+        let apiClient = StubBooksAPIClient(result: .failure(StubSearchError.failed))
+        let searchRepository = BookSearchRepository(
+            apiClient: apiClient,
+            feedCache: DiscoverFeedCacheRepository(container: container)
+        )
+
+        let results = try await searchRepository.search(
+            query: "meditation",
+            category: .mindfulness,
+            maxResults: 3
+        )
+
+        XCTAssertFalse(results.isEmpty)
+        XCTAssertLessThanOrEqual(results.count, 3)
+        XCTAssertTrue(results.contains { $0.title == "The Power of Now" })
+    }
+
+    func testBookSearchRepository_WhenAPIReturnsNoUsableBooksInDebug_ThenReturnsSampleBooks() async throws {
+        let emptyResponse = Data(#"{"items":[]}"#.utf8)
+        let apiClient = StubBooksAPIClient(result: .success(emptyResponse))
+        let searchRepository = BookSearchRepository(
+            apiClient: apiClient,
+            feedCache: DiscoverFeedCacheRepository(container: container)
+        )
+
+        let results = try await searchRepository.search(
+            query: "creative",
+            category: .creativity,
+            maxResults: 2
+        )
+
+        XCTAssertFalse(results.isEmpty)
+        XCTAssertLessThanOrEqual(results.count, 2)
+        XCTAssertTrue(results.contains { $0.title == "Deep Work" || $0.title == "Big Magic" })
+    }
+
     func testAddToLibrary_WhenSameRemoteBookAddedTwice_ThenSecondCallIsDuplicate() {
         let viewModel = DiscoverViewModel(repository: LocalBookRepository(context: context))
         let remote = makeRemoteBook(id: "remote-duplicate", title: "Duplicate Book")
@@ -281,6 +318,22 @@ final class ReadRhythmTests: XCTestCase {
 
 private enum StubSearchError: Error {
     case failed
+}
+
+private final class StubBooksAPIClient: BooksAPIClientProtocol {
+    private let result: Result<Data, Error>
+
+    init(result: Result<Data, Error>) {
+        self.result = result
+    }
+
+    func search(query: String, maxResults: Int) async throws -> Data {
+        try result.get()
+    }
+
+    func detail(id: String) async throws -> Data {
+        try result.get()
+    }
 }
 
 @MainActor
