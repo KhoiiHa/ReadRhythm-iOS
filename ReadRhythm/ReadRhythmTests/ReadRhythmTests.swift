@@ -261,6 +261,49 @@ final class ReadRhythmTests: XCTestCase {
         XCTAssertEqual(viewModel.currentStreak, 1)
     }
 
+    func testDebugDemoDataSeeder_WhenStoreIsEmpty_ThenSeedsDashboardData() throws {
+        DebugDemoDataSeeder.seedIfNeeded(in: context)
+
+        let books = try context.fetch(FetchDescriptor<BookEntity>())
+        let sessions = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+        let goals = try context.fetch(ReadingGoalEntity.activeGoalFetchDescriptor)
+
+        XCTAssertEqual(books.count, 3)
+        XCTAssertEqual(sessions.count, 6)
+        XCTAssertEqual(goals.count, 1)
+        XCTAssertTrue(books.contains { $0.title == "Atomic Habits" })
+        XCTAssertTrue(sessions.contains { $0.medium == "listening" })
+        XCTAssertEqual(goals.first?.period, .monthly)
+        XCTAssertEqual(goals.first?.targetMinutes, 600)
+    }
+
+    func testDebugDemoDataSeeder_WhenCalledTwice_ThenDoesNotDuplicateData() throws {
+        DebugDemoDataSeeder.seedIfNeeded(in: context)
+        DebugDemoDataSeeder.seedIfNeeded(in: context)
+
+        let books = try context.fetch(FetchDescriptor<BookEntity>())
+        let sessions = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+        let goals = try context.fetch(ReadingGoalEntity.activeGoalFetchDescriptor)
+
+        XCTAssertEqual(books.count, 3)
+        XCTAssertEqual(sessions.count, 6)
+        XCTAssertEqual(goals.count, 1)
+    }
+
+    func testDebugDemoDataSeeder_WhenLibraryHasUserBook_ThenSkipsSeeding() throws {
+        _ = try makeLocalBook()
+
+        DebugDemoDataSeeder.seedIfNeeded(in: context)
+
+        let books = try context.fetch(FetchDescriptor<BookEntity>())
+        let sessions = try context.fetch(FetchDescriptor<ReadingSessionEntity>())
+        let goals = try context.fetch(ReadingGoalEntity.activeGoalFetchDescriptor)
+
+        XCTAssertEqual(books.count, 1)
+        XCTAssertTrue(sessions.isEmpty)
+        XCTAssertTrue(goals.isEmpty)
+    }
+
     private func makeRemoteBook(id: String, title: String) -> RemoteBook {
         RemoteBook(
             id: id,
