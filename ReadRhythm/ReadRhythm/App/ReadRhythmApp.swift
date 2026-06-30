@@ -29,6 +29,11 @@ struct ReadRhythmApp: App {
             MainTabView()
                 .environmentObject(settings)
                 .applyPreferredColorScheme(resolvedAppearance)
+                .task {
+                    #if DEBUG
+                    DebugDemoDataSeeder.seedIfNeeded(in: PersistenceController.shared)
+                    #endif
+                }
         }
         // Zentralisiert den ModelContainer für jede Szene /
         // Centralizes the model container for every scene instance.
