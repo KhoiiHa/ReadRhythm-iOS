@@ -209,6 +209,10 @@ final class ReadRhythmUITests: XCTestCase {
 
     @MainActor
     private func openProfileFromMore(in app: XCUIApplication) {
+        if element(in: app, identifier: "Profile.Metrics").exists {
+            return
+        }
+
         tapTab(app, identifier: "tab.more", fallbackLabel: "Mehr")
 
         if element(in: app, identifier: "Profile.Metrics").exists {
