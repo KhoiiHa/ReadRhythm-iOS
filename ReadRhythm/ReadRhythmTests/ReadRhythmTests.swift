@@ -69,6 +69,19 @@ final class ReadRhythmTests: XCTestCase {
         XCTAssertEqual(viewModel.streakCount, 1)
     }
 
+    func testGoalsProgress_WhenSessionExceedsGoal_ThenCapsProgressAtFull() throws {
+        let repository = LocalSessionRepository(context: context)
+        let viewModel = ReadingGoalsViewModel(context: context, statsService: .shared)
+
+        XCTAssertTrue(viewModel.saveGoal(targetMinutes: 30, period: .daily))
+        try repository.saveSession(book: nil, minutes: 45, date: Date(), medium: "reading")
+
+        viewModel.calculateProgress()
+
+        XCTAssertEqual(viewModel.totalMinutes, 45)
+        XCTAssertEqual(viewModel.progress, 1.0, accuracy: 0.001)
+    }
+
     func testDiscoverSearch_WhenRepositoryInjected_ThenUsesInjectedResults() async throws {
         let remote = makeRemoteBook(id: "remote-1", title: "Injected Result")
         let searchRepository = StubBookSearchRepository(result: .success([remote]))

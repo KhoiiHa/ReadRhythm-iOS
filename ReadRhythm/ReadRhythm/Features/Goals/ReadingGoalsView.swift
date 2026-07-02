@@ -262,7 +262,7 @@ struct ReadingGoalsView: View {
     // MARK: - Helpers
     private func progressPercent(_ p: Double) -> String {
         let clamped = max(0, min(1, p))
-        return NumberFormatter.localizedString(from: NSNumber(value: clamped * 100), number: .percent)
+        return NumberFormatter.localizedString(from: NSNumber(value: clamped), number: .percent)
     }
 
     private var progressAccessibilityValue: String {

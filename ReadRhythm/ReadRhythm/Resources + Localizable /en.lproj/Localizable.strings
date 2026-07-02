@@ -214,6 +214,7 @@
 "goals.metric.minutes" = "Minutes";
 "goals.celebration.reached" = "Goal reached";
 "goals.focus.subtitle" = "Focused reading sessions with a timer.";
+"goals.progress.title.hasGoal" = "Current goal";
 "goals.progress.title.noGoal" = "Start with your first goal.";
 "goals.streak.subtitle" = "Keep your streak going.";
 "goals.edit.title" = "Edit goal";
