@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/SwiftUI-Framework-blue?logo=swift&logoColor=white" />
   <img src="https://img.shields.io/badge/SwiftData-Ready-orange" />
   <img src="https://img.shields.io/badge/Architecture-MVVM-green" />
-  <img src="https://img.shields.io/badge/Target-iOS_17+-lightgrey" />
+  <img src="https://img.shields.io/badge/Target-iOS_18.5+-lightgrey" />
   <img src="https://github.com/KhoiiHa/ReadRhythm-iOS/actions/workflows/ios-unit-tests.yml/badge.svg" />
   <img src="https://img.shields.io/badge/Tests-Core_Stable-success" />
   <img src="https://img.shields.io/badge/Phase-MVP_Hardening-blueviolet" />
@@ -86,12 +86,29 @@ Der Fokus liegt auf sauberer Architektur, Kernflows, Persistenz, Testing und nac
 
 - **README:** Aktueller technischer Einstieg mit Features, Architektur, Teststrategie und Setup.
 - **Case Study PDF:** Visueller Snapshot für UX, Produktidee und Designrichtung.
+- **Screenshots:** Finale Simulator-Auswahl mit Library, Book Detail, Discover, Stats und Profil.
 - **GitHub Actions:** Aktueller Qualitätsnachweis für Pull Requests und `main`.
 - **PR-Historie:** Zeigt die inkrementelle Arbeitsweise mit kleinen, testbaren Änderungen.
 
-Neue Screenshots oder eine aktualisierte PDF sollten erst erstellt werden, wenn gezielt neues
-Portfolio-Material benötigt wird. Für normale Code-/Doku-Hardening-Schritte bleibt der README
-die maßgebliche Quelle für den aktuellen Stand.
+Die Screenshots liegen unter [`docs/screenshots`](./docs/screenshots) und zeigen den aktuellen
+Portfolio-Stand nach UI-Polish, Demo-Daten und MVP-Hardening.
+
+## 📱 Screenshots · Final App Preview
+
+<p align="center">
+  <img src="./docs/screenshots/01-library.png" alt="ReadRhythm Library screen" width="170" />
+  <img src="./docs/screenshots/02-book-detail.png" alt="ReadRhythm Book Detail screen" width="170" />
+  <img src="./docs/screenshots/03-discover.png" alt="ReadRhythm Discover screen" width="170" />
+</p>
+
+<p align="center">
+  <img src="./docs/screenshots/04-stats.png" alt="ReadRhythm Stats screen" width="170" />
+  <img src="./docs/screenshots/05-profile.png" alt="ReadRhythm Profile screen" width="170" />
+</p>
+
+**Auswahlkriterium:** Die Screenshots zeigen bewusst die stärksten Portfolio-Flows:
+gespeicherte Bücher, Detail- und Session-Kontext, Discover-Fallback, Statistikaggregation
+und Profil-Dashboard.
 
 ---
 
@@ -320,14 +337,14 @@ xcodebuild test \
 
 **Voraussetzungen:**
 - macOS mit Xcode 16+.
-- iOS Simulator mit iOS 17+.
+- iOS Simulator mit iOS 18.5+.
 - Keine externen API-Keys erforderlich; Discover nutzt öffentliche Google-Books-Endpunkte.
 
 **Lokal starten:**
 1. Repository klonen.
 2. `ReadRhythm/ReadRhythm.xcodeproj` in Xcode öffnen.
 3. Scheme `ReadRhythm` auswählen.
-4. iPhone-Simulator mit iOS 17+ wählen.
+4. iPhone-Simulator mit iOS 18.5+ wählen.
 5. Build & Run.
 
 **Unit-Tests lokal ausführen:**
