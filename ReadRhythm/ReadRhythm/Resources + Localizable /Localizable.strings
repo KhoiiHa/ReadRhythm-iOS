@@ -236,6 +236,7 @@
 "goals.empty.subtitle" = "Lege ein realistisches Minutenziel fest. Danach zeigt dir der Ring, wie nah du deinem Lese- und Hörziel bist.";
 
 "goals.focus.subtitle" = "Fokussierte Lesesessions mit Timer.";
+"goals.progress.title.hasGoal" = "Aktuelles Ziel";
 "goals.progress.title.noGoal" = "Starte mit deinem ersten Ziel.";
 "goals.streak.subtitle" = "Halte deine Serie am Laufen.";
 
